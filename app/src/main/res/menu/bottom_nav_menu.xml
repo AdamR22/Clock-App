@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/alarm"
+        android:enabled="true"
+        android:icon="@drawable/ic_alarm"
+        android:title="@string/alarm" />
+    <item
+        android:id="@+id/clock"
+        android:enabled="true"
+        android:icon="@drawable/ic_clock"
+        android:title="@string/clock" />
+    <item
+        android:id="@+id/timer"
+        android:enabled="true"
+        android:icon="@drawable/ic_timer"
+        android:title="@string/timer" />
+    <item
+        android:id="@+id/stop_watch"
+        android:enabled="true"
+        android:icon="@drawable/ic_stopwatch"
+        android:title="@string/stopwatch" />
+    <item
+        android:id="@+id/bed_time"
+        android:enabled="true"
+        android:icon="@drawable/ic_bedtime"
+        android:title="@string/bedtime" />
+</menu>
