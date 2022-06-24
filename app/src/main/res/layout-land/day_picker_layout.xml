@@ -6,8 +6,8 @@
 
     <ToggleButton
         android:id="@+id/mon"
-        android:layout_marginStart="4dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
         android:layout_width="48dp"
         android:layout_height="48dp"
         style="@style/ToggleButton"
@@ -17,8 +17,8 @@
 
     <ToggleButton
         android:id="@+id/tue"
-        android:layout_marginStart="4dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
         android:layout_width="48dp"
         android:layout_height="48dp"
         style="@style/ToggleButton"
@@ -28,8 +28,8 @@
 
     <ToggleButton
         android:id="@+id/wed"
-        android:layout_marginStart="4dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
         android:layout_width="48dp"
         android:layout_height="48dp"
         style="@style/ToggleButton"
@@ -39,8 +39,8 @@
 
     <ToggleButton
         android:id="@+id/thur"
-        android:layout_marginStart="4dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
         android:layout_width="48dp"
         android:layout_height="48dp"
         style="@style/ToggleButton"
@@ -50,8 +50,8 @@
 
     <ToggleButton
         android:id="@+id/fri"
-        android:layout_marginStart="4dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
         android:layout_width="48dp"
         android:layout_height="48dp"
         style="@style/ToggleButton"
@@ -61,8 +61,8 @@
 
     <ToggleButton
         android:id="@+id/sat"
-        android:layout_marginStart="4dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
         android:layout_width="48dp"
         android:layout_height="48dp"
         style="@style/ToggleButton"
@@ -72,8 +72,8 @@
 
     <ToggleButton
         android:id="@+id/sun"
-        android:layout_marginStart="4dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
         android:layout_width="48dp"
         android:layout_height="48dp"
         style="@style/ToggleButton"

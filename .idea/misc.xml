@@ -3,15 +3,24 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/collapse_expand_card_button_bg.xml" value="0.2005" />
+        <entry key="app/src/main/res/drawable/ic_alarm.xml" value="0.2015" />
+        <entry key="app/src/main/res/drawable/ic_arrow_down.xml" value="0.2015" />
+        <entry key="app/src/main/res/drawable/ic_arrow_up.xml" value="0.2015" />
         <entry key="app/src/main/res/drawable/ic_baseline_add_light.xml" value="0.2015" />
+        <entry key="app/src/main/res/drawable/ic_baseline_timer_off_24.xml" value="0.2015" />
+        <entry key="app/src/main/res/drawable/ic_clock.xml" value="0.2015" />
+        <entry key="app/src/main/res/drawable/ic_label.xml" value="0.2015" />
         <entry key="app/src/main/res/drawable/oval_shape.xml" value="0.2015" />
         <entry key="app/src/main/res/drawable/oval_transparent.xml" value="0.2005" />
         <entry key="app/src/main/res/drawable/toggle_bg.xml" value="0.2015" />
         <entry key="app/src/main/res/drawable/toggle_text_color.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/toogle_text_color.xml" value="0.2015" />
+        <entry key="app/src/main/res/layout-land/alarm_card_item.xml" value="0.25" />
+        <entry key="app/src/main/res/layout-land/day_picker_layout.xml" value="0.164021164021164" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.2" />
-        <entry key="app/src/main/res/layout/alarm_card_item.xml" value="0.30337078651685395" />
-        <entry key="app/src/main/res/layout/day_picker_layout.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/alarm_card_item.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/day_picker_layout.xml" value="0.1" />
         <entry key="app/src/main/res/layout/dismiss_text.xml" value="0.10280797101449275" />
         <entry key="app/src/main/res/layout/fragment_alarm.xml" value="0.18" />
         <entry key="app/src/main/res/menu/bottom_nav_menu.xml" value="0.19375" />

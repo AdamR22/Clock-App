@@ -22,4 +22,10 @@
     <string name="f">F</string>
     <string name="sa">S</string>
     <string name="su">S</string>
+    <string name="alarm_label_badge">Alarm Label Badge</string>
+    <string name="expand_card_icon">Expand Card Icon</string>
+    <string name="collapse_card_item">Collapse Card Item</string>
+    <string name="delete">Delete</string>
+    <string name="default">Default</string>
+    <string name="vibrate">Vibrate</string>
 </resources>
