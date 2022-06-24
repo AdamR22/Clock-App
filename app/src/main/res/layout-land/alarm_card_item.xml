@@ -55,6 +55,48 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_weight="1"/>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
 
             <View
                 android:layout_width="0dp"
@@ -133,17 +175,17 @@
             app:layout_constraintTop_toBottomOf="@+id/set_time"
             tools:text="Not Scheduled"/>
 
+
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switch_alarm_on_off"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="232dp"
+            android:layout_marginStart="560dp"
             android:layout_marginTop="4dp"
             app:layout_constraintStart_toEndOf="@+id/tv_days_scheduled"
             app:layout_constraintTop_toBottomOf="@+id/set_time"
             app:thumbTint="@color/grey_50"
             app:trackTint="@color/white" />
-
 
         <LinearLayout
             android:id="@+id/expanded_content"
@@ -192,10 +234,11 @@
                     android:drawablePadding="8sp"
                     android:fontFamily="@font/poppins"
                     android:gravity="center"
+                    android:text="@string/vibrate"
                     android:textColor="@color/white"
                     android:textSize="13sp"
                     app:drawableLeftCompat="@drawable/ic_vibration"
-                    tools:text="Default" />
+                    tools:text="Vibrate" />
 
                 <View
                     android:layout_width="0dp"
@@ -222,12 +265,33 @@
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_weight="1"/>
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+
                 <View
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_weight="1"/>
 
                 <CheckBox
+                    android:id="@+id/vibrate_checkbox"
                     android:layout_width="0dp"
                     android:layout_height="24dp"
                     android:layout_weight="1"

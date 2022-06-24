@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <ToggleButton
+        android:id="@+id/mon"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        style="@style/ToggleButton"
+        android:textOff="@string/m"
+        android:textOn="@string/m"
+        android:background="@drawable/toggle_bg"/>
+
+    <ToggleButton
+        android:id="@+id/tue"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        style="@style/ToggleButton"
+        android:textOff="@string/T"
+        android:textOn="@string/T"
+        android:background="@drawable/toggle_bg"/>
+
+    <ToggleButton
+        android:id="@+id/wed"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        style="@style/ToggleButton"
+        android:textOff="@string/w"
+        android:textOn="@string/w"
+        android:background="@drawable/toggle_bg"/>
+
+    <ToggleButton
+        android:id="@+id/thur"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        style="@style/ToggleButton"
+        android:textOff="@string/th"
+        android:textOn="@string/th"
+        android:background="@drawable/toggle_bg"/>
+
+    <ToggleButton
+        android:id="@+id/fri"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        style="@style/ToggleButton"
+        android:textOff="@string/f"
+        android:textOn="@string/f"
+        android:background="@drawable/toggle_bg"/>
+
+    <ToggleButton
+        android:id="@+id/sat"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        style="@style/ToggleButton"
+        android:textOff="@string/sa"
+        android:textOn="@string/sa"
+        android:background="@drawable/toggle_bg"/>
+
+    <ToggleButton
+        android:id="@+id/sun"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        style="@style/ToggleButton"
+        android:textOff="@string/su"
+        android:textOn="@string/su"
+        android:background="@drawable/toggle_bg"/>
+
+</LinearLayout>
