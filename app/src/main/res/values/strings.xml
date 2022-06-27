@@ -26,6 +26,6 @@
     <string name="expand_card_icon">Expand Card Icon</string>
     <string name="collapse_card_item">Collapse Card Item</string>
     <string name="delete">Delete</string>
-    <string name="default">Default</string>
+    <string name="defaultt">Default</string>
     <string name="vibrate">Vibrate</string>
 </resources>
