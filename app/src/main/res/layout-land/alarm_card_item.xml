@@ -207,7 +207,8 @@
                 android:layout_gravity="center" />
 
             <TextView
-                android:id="@+id/tv_chosen_song"
+                android:clickable="true"
+                android:focusable="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12sp"
@@ -302,6 +303,8 @@
             </LinearLayout>
 
             <TextView
+                android:clickable="true"
+                android:focusable="true"
                 android:id="@+id/delete_alarm_item"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

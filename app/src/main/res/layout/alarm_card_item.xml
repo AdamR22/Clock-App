@@ -165,6 +165,8 @@
                 android:layout_gravity="center" />
 
             <TextView
+                android:clickable="true"
+                android:focusable="true"
                 android:id="@+id/tv_chosen_song"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -194,8 +196,8 @@
                     android:gravity="center"
                     android:textColor="@color/white"
                     android:textSize="13sp"
-                    app:drawableLeftCompat="@drawable/ic_vibration"
-                    tools:text="Default" />
+                    android:text="@string/vibrate"
+                    app:drawableLeftCompat="@drawable/ic_vibration"/>
 
                 <View
                     android:layout_width="0dp"
@@ -228,6 +230,7 @@
                     android:layout_weight="1"/>
 
                 <CheckBox
+                    android:id="@+id/vibrate_checkbox"
                     android:layout_width="0dp"
                     android:layout_height="24dp"
                     android:layout_weight="1"
@@ -238,6 +241,8 @@
             </LinearLayout>
 
             <TextView
+                android:clickable="true"
+                android:focusable="true"
                 android:id="@+id/delete_alarm_item"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
