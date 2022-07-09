@@ -6,13 +6,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.R
+import com.github.adamr22.common.AddLabelDialog
 import com.github.adamr22.common.TimePicker
+import com.github.adamr22.common.VibrateSingleton
 import com.google.android.material.switchmaterial.SwitchMaterial
 
-class AlarmRecyclerViewAdapter(private val data: ArrayList<AlarmItemModel>, private val context: Context) :
+class AlarmRecyclerViewAdapter(
+    private val data: ArrayList<AlarmItemModel>,
+    private val context: Context
+) :
     RecyclerView.Adapter<AlarmRecyclerViewAdapter.AlarmItemViewHolder>() {
 
     private var mExpandedPosition: Int = -1
@@ -62,13 +68,14 @@ class AlarmRecyclerViewAdapter(private val data: ArrayList<AlarmItemModel>, priv
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlarmItemViewHolder {
-       val view = LayoutInflater.from(parent.context).inflate(R.layout.alarm_card_item, parent,false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.alarm_card_item, parent, false)
 
         return AlarmItemViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: AlarmItemViewHolder, position: Int) {
-        val isExpanded: Boolean = position==mExpandedPosition
+        val isExpanded: Boolean = position == mExpandedPosition
 
         if (data[position].label == null) {
             holder.addLabel.text = context.getText(R.string.add_label)
@@ -91,7 +98,8 @@ class AlarmRecyclerViewAdapter(private val data: ArrayList<AlarmItemModel>, priv
         holder.currentTime.text = data[position].time
 
         holder.addLabel.setOnClickListener {
-            // TODO: Add label functionality
+            AddLabelDialog.newInstance(position)
+                .show((context as AppCompatActivity).supportFragmentManager, "Add Label")
         }
 
         holder.activateAlarm.setOnCheckedChangeListener { _, isChecked ->
@@ -124,7 +132,7 @@ class AlarmRecyclerViewAdapter(private val data: ArrayList<AlarmItemModel>, priv
 
         holder.vibrate.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                // TODO: vibration functionality
+                VibrateSingleton.vibrateDevice(context, true)
             }
         }
 
@@ -185,7 +193,7 @@ class AlarmRecyclerViewAdapter(private val data: ArrayList<AlarmItemModel>, priv
         }
 
         holder.selectSong.setOnClickListener {
-            // TODO: Select Song Functionality
+            // TODO: SELECT SONG FUNCTIONALITY
         }
 
     }

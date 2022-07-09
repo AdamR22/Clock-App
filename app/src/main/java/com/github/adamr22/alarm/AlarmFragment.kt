@@ -74,7 +74,7 @@ class AlarmFragment : Fragment() {
 
     private fun addAlarmItem() {
         val chosenTime = "${picker.hour}:${picker.minute}"
-        val alarm = AlarmItemModel(null, chosenTime, null)
+        val alarm = AlarmItemModel(null, chosenTime)
         alarmViewModel.addAlarmItem(alarm)
     }
 

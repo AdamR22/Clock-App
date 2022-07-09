@@ -18,4 +18,9 @@ class AlarmViewModel : ViewModel() {
     fun addAlarmItem(alarm: AlarmItemModel) {
         alarmItems.value?.add(alarm)
     }
+
+    fun addLabel(label: String, index: Int) {
+        val alarmItem = alarmItems.value?.get(index)
+        alarmItem?.label = label
+    }
 }
