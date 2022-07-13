@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.R
 import com.github.adamr22.common.TimePicker
@@ -21,6 +22,7 @@ class AlarmFragment : Fragment() {
     private lateinit var alarmViewModel: AlarmViewModel
     private lateinit var alarmRecyclerView: RecyclerView
     private lateinit var emptyAlarmContent: ConstraintLayout
+    private lateinit var alarmAdapter: AlarmRecyclerViewAdapter
 
     private val TAG = "AlarmFragment"
 
@@ -59,6 +61,14 @@ class AlarmFragment : Fragment() {
 
         alarmViewModel.getAlarmItems().observe(viewLifecycleOwner) {
             toggleLayoutType(it)
+        }
+    }
+
+    private fun inflateAlarmRecyclerView(data: ArrayList<AlarmItemModel>) {
+        if (data.isNotEmpty()) {
+            alarmAdapter = AlarmRecyclerViewAdapter(data, requireContext())
+            alarmRecyclerView.adapter = alarmAdapter
+            alarmRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         }
     }
 

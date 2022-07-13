@@ -29,4 +29,6 @@
     <string name="defaultt">Default</string>
     <string name="vibrate">Vibrate</string>
     <string name="not_scheduled">Not Scheduled</string>
+    <string name="notification_icon">notification_icon</string>
+    <string name="chosen_value_icon">Choosen value icon</string>
 </resources>

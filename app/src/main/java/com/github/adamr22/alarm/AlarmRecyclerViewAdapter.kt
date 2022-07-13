@@ -1,18 +1,19 @@
 package com.github.adamr22.alarm
 
 import android.content.Context
+import android.content.Intent
 import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.R
 import com.github.adamr22.common.AddLabelDialog
 import com.github.adamr22.common.TimePicker
 import com.github.adamr22.common.VibrateSingleton
+import com.github.adamr22.sound.SoundActivity
 import com.google.android.material.switchmaterial.SwitchMaterial
 
 class AlarmRecyclerViewAdapter(
@@ -23,6 +24,7 @@ class AlarmRecyclerViewAdapter(
 
     private var mExpandedPosition: Int = -1
     private lateinit var mRecyclerView: RecyclerView
+    private val SOUND_SCREEN_TITLE: String = "SOUND SCREEN TITLE"
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
@@ -104,7 +106,9 @@ class AlarmRecyclerViewAdapter(
 
         holder.activateAlarm.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                // TODO: Activate Alarm Functionality
+                val intent = Intent(context, SoundActivity::class.java)
+                intent.putExtra(SOUND_SCREEN_TITLE, "Alarm Sound")
+                context.startActivity(intent)
             }
         }
 
