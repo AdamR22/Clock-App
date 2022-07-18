@@ -7,7 +7,7 @@ import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.github.adamr22.R
-import com.github.adamr22.alarm.AlarmViewModel
+import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
 import com.google.android.material.textfield.TextInputEditText
 
 class AddLabelDialog(private val position: Int) : DialogFragment() {

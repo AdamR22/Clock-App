@@ -1,5 +1,6 @@
-package com.github.adamr22.alarm
+package com.github.adamr22.alarm.presentation.adapters
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.transition.TransitionManager
@@ -10,6 +11,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.R
+import com.github.adamr22.alarm.data.models.AlarmItemModel
 import com.github.adamr22.common.AddLabelDialog
 import com.github.adamr22.common.TimePicker
 import com.github.adamr22.common.VibrateSingleton
@@ -17,10 +19,11 @@ import com.github.adamr22.sound.SoundActivity
 import com.google.android.material.switchmaterial.SwitchMaterial
 
 class AlarmRecyclerViewAdapter(
-    private val data: ArrayList<AlarmItemModel>,
     private val context: Context
 ) :
     RecyclerView.Adapter<AlarmRecyclerViewAdapter.AlarmItemViewHolder>() {
+
+    private var data = ArrayList<AlarmItemModel>()
 
     private var mExpandedPosition: Int = -1
     private lateinit var mRecyclerView: RecyclerView
@@ -31,7 +34,7 @@ class AlarmRecyclerViewAdapter(
         mRecyclerView = recyclerView
     }
 
-    class AlarmItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class AlarmItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val addLabel: TextView
         val expandOrCollapseItem: ImageButton
         val currentTime: TextView
@@ -106,9 +109,7 @@ class AlarmRecyclerViewAdapter(
 
         holder.activateAlarm.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                val intent = Intent(context, SoundActivity::class.java)
-                intent.putExtra(SOUND_SCREEN_TITLE, "Alarm Sound")
-                context.startActivity(intent)
+                // TODO: Activate alarm functionality
             }
         }
 
@@ -197,12 +198,21 @@ class AlarmRecyclerViewAdapter(
         }
 
         holder.selectSong.setOnClickListener {
-            // TODO: SELECT SONG FUNCTIONALITY
+            val intent = Intent(context, SoundActivity::class.java)
+            intent.putExtra(SOUND_SCREEN_TITLE, "Alarm Sound")
+            context.startActivity(intent)
         }
 
     }
 
     override fun getItemCount(): Int {
         return data.size
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateAlarmList(newList: ArrayList<AlarmItemModel>) {
+        data.clear()
+        data = newList
+        notifyDataSetChanged()
     }
 }

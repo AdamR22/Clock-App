@@ -2,7 +2,7 @@ package com.github.adamr22
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.github.adamr22.alarm.AlarmFragment
+import com.github.adamr22.alarm.presentation.views.AlarmFragment
 import com.github.adamr22.bedtime.BedTimeFragment
 import com.github.adamr22.clock.ClockFragment
 import com.github.adamr22.stopwatch.StopWatchFragment

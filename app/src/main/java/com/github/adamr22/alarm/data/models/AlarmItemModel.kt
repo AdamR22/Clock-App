@@ -1,4 +1,4 @@
-package com.github.adamr22.alarm
+package com.github.adamr22.alarm.data.models
 
 data class AlarmItemModel(
     var label: String?,
