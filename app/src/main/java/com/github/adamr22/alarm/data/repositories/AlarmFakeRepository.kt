@@ -3,7 +3,7 @@ package com.github.adamr22.alarm.data.repositories
 import com.github.adamr22.alarm.data.models.AlarmItemModel
 
 class AlarmFakeRepository {
-    private var _alarmItemList: MutableList<AlarmItemModel> = ArrayList()
+    private var _alarmItemList: MutableList<AlarmItemModel> = mutableListOf()
 
     fun getAlarmList(): List<AlarmItemModel> {
         val newList = mutableListOf<AlarmItemModel>()

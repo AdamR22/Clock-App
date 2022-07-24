@@ -28,7 +28,6 @@ class AlarmViewModel : ViewModel() {
 
     fun addLabel(label: String, index: Int) {
         alarmRepository.addAlarmLabel(label, index)
-        val updatedAlarmItems: List<AlarmItemModel> = alarmRepository.getAlarmList()
-        val alarmItems1 = alarmItems
+        _alarmItems.value = AlarmUIState.AlarmItems(alarmRepository.getAlarmList())
     }
 }
