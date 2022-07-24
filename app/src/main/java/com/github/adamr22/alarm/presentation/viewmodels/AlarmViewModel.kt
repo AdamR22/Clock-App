@@ -1,35 +1,34 @@
 package com.github.adamr22.alarm.presentation.viewmodels
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.adamr22.alarm.data.models.AlarmItemModel
 import com.github.adamr22.alarm.data.repositories.AlarmFakeRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class AlarmViewModel : ViewModel() {
-    private var alarmItems: MutableLiveData<ArrayList<AlarmItemModel>>? = null
     private val alarmRepository: AlarmFakeRepository = AlarmFakeRepository()
+    private var _alarmItems: MutableStateFlow<AlarmUIState> =
+        MutableStateFlow(AlarmUIState.Empty)
+    val alarmItems: StateFlow<AlarmUIState> = _alarmItems
 
     private val TAG = "AlarmViewModel"
 
-    fun getAlarmItems(): MutableLiveData<ArrayList<AlarmItemModel>> {
-
-        if (alarmItems == null) {
-            alarmItems = MutableLiveData()
-            alarmItems?.value = alarmRepository.getAlarmList()
-        }
-
-        return alarmItems!!
+    sealed class AlarmUIState {
+        object Empty : AlarmUIState()
+        data class AlarmItems(val alarmItems: List<AlarmItemModel>) : AlarmUIState()
     }
 
     fun addAlarmItem(alarm: AlarmItemModel) {
         alarmRepository.addAlarmItem(alarm)
-        Log.d(TAG, "addAlarmItem: Function Triggered")
-        Log.d(TAG, "addAlarmItem: ${alarm.time}")
+        _alarmItems.value = AlarmUIState.AlarmItems(alarmRepository.getAlarmList())
     }
 
     fun addLabel(label: String, index: Int) {
         alarmRepository.addAlarmLabel(label, index)
+        val updatedAlarmItems: List<AlarmItemModel> = alarmRepository.getAlarmList()
+        val alarmItems1 = alarmItems
     }
 }

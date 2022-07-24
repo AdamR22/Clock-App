@@ -23,7 +23,7 @@ class AlarmRecyclerViewAdapter(
 ) :
     RecyclerView.Adapter<AlarmRecyclerViewAdapter.AlarmItemViewHolder>() {
 
-    private var data = ArrayList<AlarmItemModel>()
+    private var data: List<AlarmItemModel> = mutableListOf()
 
     private var mExpandedPosition: Int = -1
     private lateinit var mRecyclerView: RecyclerView
@@ -131,7 +131,7 @@ class AlarmRecyclerViewAdapter(
         }
 
         holder.delete.setOnClickListener {
-            data.removeAt(position)
+            data = data - data[position]
             notifyItemRemoved(position)
         }
 
@@ -210,8 +210,8 @@ class AlarmRecyclerViewAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun updateAlarmList(newList: ArrayList<AlarmItemModel>) {
-        data.clear()
+    fun updateAlarmList(newList: List<AlarmItemModel>) {
+        data = mutableListOf()
         data = newList
         notifyDataSetChanged()
     }

@@ -7,8 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.R
@@ -18,6 +18,7 @@ import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
 import com.github.adamr22.common.TimePicker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.timepicker.MaterialTimePicker
+import kotlinx.coroutines.flow.collectLatest
 
 class AlarmFragment : Fragment() {
 
@@ -40,9 +41,7 @@ class AlarmFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        alarmViewModel = ViewModelProvider(requireActivity()).get(AlarmViewModel::class.java)
-        alarmViewModel.getAlarmItems().observe(viewLifecycleOwner, updateListObserver())
-
+        alarmViewModel = ViewModelProvider(requireActivity())[AlarmViewModel::class.java]
         addAlarmButton = view.findViewById(R.id.fab_add)
         alarmRecyclerView = view.findViewById(R.id.rv_alarm_items)
         emptyAlarmContent = view.findViewById(R.id.empty_alarm_content)
@@ -53,6 +52,24 @@ class AlarmFragment : Fragment() {
         alarmRecyclerView.adapter = alarmAdapter
         alarmRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         alarmRecyclerView.hasFixedSize()
+
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            alarmViewModel.alarmItems.collectLatest {
+                when (it) {
+                    is AlarmViewModel.AlarmUIState.AlarmItems -> {
+                        alarmRecyclerView.visibility = View.VISIBLE
+                        emptyAlarmContent.visibility = View.GONE
+                        alarmAdapter.updateAlarmList(it.alarmItems)
+                        Log.d(TAG, "onViewCreated: List size ${it.alarmItems.size}")
+                    }
+
+                    is AlarmViewModel.AlarmUIState.Empty -> {
+                        alarmRecyclerView.visibility = View.GONE
+                        emptyAlarmContent.visibility = View.VISIBLE
+                    }
+                }
+            }
+        }
     }
 
     override fun onResume() {
@@ -71,26 +88,6 @@ class AlarmFragment : Fragment() {
         val chosenTime = "${picker.hour}:${picker.minute}"
         val alarm = AlarmItemModel(null, chosenTime)
         alarmViewModel.addAlarmItem(alarm)
-        Log.d(TAG, "addAlarmItem: Add Alarm Function Triggered")
-        Log.d(TAG, "addAlarmItem: ${alarmViewModel.getAlarmItems().value?.size}")
-        Log.d(TAG, "addAlarmItem: Chosen Time : $chosenTime")
-    }
-
-    private fun updateListObserver(): Observer<ArrayList<AlarmItemModel>> =
-        Observer<ArrayList<AlarmItemModel>> { t ->
-            Log.d(TAG, "updateListObserver: list size: ${t.size}")
-            alarmAdapter.updateAlarmList(t)
-            updateUILayout(t.size)
-        }
-
-    private fun updateUILayout(listSize: Int) {
-        if (listSize > 0) {
-            alarmRecyclerView.visibility = View.VISIBLE
-            emptyAlarmContent.visibility = View.GONE
-        } else {
-            alarmRecyclerView.visibility = View.GONE
-            emptyAlarmContent.visibility = View.VISIBLE
-        }
     }
 
     companion object {
