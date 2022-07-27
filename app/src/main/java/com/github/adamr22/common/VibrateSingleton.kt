@@ -31,6 +31,8 @@ object VibrateSingleton {
                 @Suppress("DEPRECATION")
                 vibrator.vibrate(mVibrationPattern, START)
             }
+        } else {
+            vibrator.cancel()
         }
 
     }

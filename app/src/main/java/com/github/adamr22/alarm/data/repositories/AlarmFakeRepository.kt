@@ -6,12 +6,7 @@ class AlarmFakeRepository {
     private var _alarmItemList: MutableList<AlarmItemModel> = mutableListOf()
 
     fun getAlarmList(): List<AlarmItemModel> {
-        val newList = mutableListOf<AlarmItemModel>()
-        _alarmItemList.forEach {
-            newList.add(it)
-        }
-
-        return newList
+        return _alarmItemList.toList()
     }
 
     fun addAlarmItem(alarm: AlarmItemModel) {
@@ -19,10 +14,22 @@ class AlarmFakeRepository {
     }
 
     fun addAlarmLabel(label: String, index: Int) {
-        _alarmItemList[index].label = label
+        _alarmItemList[index].label
     }
 
     fun deleteAlarm(index: Int) {
         _alarmItemList.removeAt(index)
+    }
+
+    fun addDayOfWeekToSchedule(index: Int, day: String) {
+        _alarmItemList[index].schedule.add(day)
+    }
+
+    fun removeDayOfWeekOnSchedule(index: Int, day: String) {
+        _alarmItemList[index].schedule.remove(day)
+    }
+
+    fun changeTime(index: Int, newTime: String) {
+        _alarmItemList[index].time = newTime
     }
 }

@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.R
 import com.github.adamr22.alarm.data.models.AlarmItemModel
+import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
 import com.github.adamr22.common.AddLabelDialog
 import com.github.adamr22.common.TimePicker
 import com.github.adamr22.common.VibrateSingleton
@@ -19,7 +20,8 @@ import com.github.adamr22.sound.SoundActivity
 import com.google.android.material.switchmaterial.SwitchMaterial
 
 class AlarmRecyclerViewAdapter(
-    private val context: Context
+    private val context: Context,
+    private val viewModel: AlarmViewModel
 ) :
     RecyclerView.Adapter<AlarmRecyclerViewAdapter.AlarmItemViewHolder>() {
 
@@ -82,7 +84,7 @@ class AlarmRecyclerViewAdapter(
     override fun onBindViewHolder(holder: AlarmItemViewHolder, position: Int) {
         val isExpanded: Boolean = position == mExpandedPosition
 
-        if (data[position].label == null) {
+        if (data[position].label == "") {
             holder.addLabel.text = context.getText(R.string.add_label)
         } else {
             holder.addLabel.text = data[position].label
@@ -94,9 +96,9 @@ class AlarmRecyclerViewAdapter(
             if (data[position].schedule.size == 1) {
                 holder.alarmSchedule.text = data[position].schedule[0]
             } else {
-                for (day in data[position].schedule) {
-                    holder.alarmSchedule.text = "${day.slice(0..2)}, "
-                }
+                holder.alarmSchedule.text = data[position].schedule.map {
+                    s: String -> s.slice(0..2)
+                }.toString().replace("[", "").replace("]", "")
             }
         }
 
@@ -125,75 +127,91 @@ class AlarmRecyclerViewAdapter(
             val picker = TimePicker.buildPicker("Set Alarm")
             picker.show((context as AppCompatActivity).supportFragmentManager, "Reschedule Alarm")
             picker.addOnPositiveButtonClickListener {
-                data[position].time = "${picker.hour}:${picker.minute}"
+                viewModel.changeTime(position, "%02d:%02d".format(picker.hour, picker.minute))
                 notifyItemChanged(position)
             }
         }
 
         holder.delete.setOnClickListener {
-            data = data - data[position]
+            viewModel.deleteItem(position)
             notifyItemRemoved(position)
         }
 
         holder.vibrate.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 VibrateSingleton.vibrateDevice(context, true)
+            } else {
+                VibrateSingleton.vibrateDevice(context, false)
             }
         }
 
         holder.btnMonday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                data[position].schedule.add("Monday")
+                viewModel.addDayToSchedule(position, "Monday")
+                notifyItemChanged(position)
             } else {
-                data[position].schedule.remove("Monday")
+                viewModel.removeDayOnSchedule(position, "Monday")
+                notifyItemChanged(position)
             }
         }
 
         holder.btnTuesday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                data[position].schedule.add("Tuesday")
+                viewModel.addDayToSchedule(position, "Tuesday")
+                notifyItemChanged(position)
             } else {
-                data[position].schedule.remove("Tuesday")
+                viewModel.removeDayOnSchedule(position, "Tuesday")
+                notifyItemChanged(position)
             }
         }
 
         holder.btnWednesday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                data[position].schedule.add("Wednesday")
+                viewModel.addDayToSchedule(position, "Wednesday")
+                notifyItemChanged(position)
             } else {
-                data[position].schedule.remove("Wednesday")
+                viewModel.removeDayOnSchedule(position, "Wednesday")
+                notifyItemChanged(position)
             }
         }
 
         holder.btnThursday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                data[position].schedule.add("Thursday")
+                viewModel.addDayToSchedule(position, "Thursday")
+                notifyItemChanged(position)
             } else {
-                data[position].schedule.remove("Thursday")
+                viewModel.removeDayOnSchedule(position, "Thursday")
+                notifyItemChanged(position)
             }
         }
 
         holder.btnFriday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                data[position].schedule.add("Friday")
+                viewModel.addDayToSchedule(position, "Friday")
+                notifyItemChanged(position)
             } else {
-                data[position].schedule.remove("Friday")
+                viewModel.removeDayOnSchedule(position, "Friday")
+                notifyItemChanged(position)
             }
         }
 
         holder.btnSaturday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                data[position].schedule.add("Saturday")
+                viewModel.addDayToSchedule(position, "Saturday")
+                notifyItemChanged(position)
             } else {
-                data[position].schedule.remove("Saturday")
+                viewModel.removeDayOnSchedule(position, "Saturday")
+                notifyItemChanged(position)
             }
         }
 
         holder.btnSunday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                data[position].schedule.add("Sunday")
+                viewModel.addDayToSchedule(position, "Saturday")
+                notifyItemChanged(position)
             } else {
-                data[position].schedule.remove("Sunday")
+                viewModel.removeDayOnSchedule(position, "Sunday")
+                notifyItemChanged(position)
             }
         }
 
@@ -212,7 +230,9 @@ class AlarmRecyclerViewAdapter(
     @SuppressLint("NotifyDataSetChanged")
     fun updateAlarmList(newList: List<AlarmItemModel>) {
         data = mutableListOf()
-        data = newList
+        newList.forEach {
+            (data as MutableList<AlarmItemModel>).add(it)
+        }
         notifyDataSetChanged()
     }
 }

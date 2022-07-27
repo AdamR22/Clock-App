@@ -48,7 +48,7 @@ class AlarmFragment : Fragment() {
 
         picker = TimePicker.buildPicker("Set Alarm")
 
-        alarmAdapter = AlarmRecyclerViewAdapter(requireContext())
+        alarmAdapter = AlarmRecyclerViewAdapter(requireContext(), alarmViewModel)
         alarmRecyclerView.adapter = alarmAdapter
         alarmRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         alarmRecyclerView.hasFixedSize()
@@ -85,8 +85,8 @@ class AlarmFragment : Fragment() {
     }
 
     private fun addAlarmItem() {
-        val chosenTime = "${picker.hour}:${picker.minute}"
-        val alarm = AlarmItemModel(null, chosenTime)
+        val chosenTime = "%02d:%02d".format(picker.hour, picker.minute)
+        val alarm = AlarmItemModel(chosenTime)
         alarmViewModel.addAlarmItem(alarm)
     }
 
