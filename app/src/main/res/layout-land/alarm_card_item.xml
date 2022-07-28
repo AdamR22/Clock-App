@@ -128,21 +128,17 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"/>
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
             <ImageButton
                 android:id="@+id/expand_or_collapse_alarm_item"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="24dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:layout_marginEnd="20dp"
+                android:layout_marginEnd="10dp"
                 android:background="@drawable/collapse_expand_card_button_bg"
                 android:contentDescription="@string/expand_card_icon"
                 tools:ignore="TouchTargetSizeCheck"
+                app:srcCompat="@drawable/ic_arrow_down"
                 tools:srcCompat="@drawable/ic_arrow_down" />
 
         </LinearLayout>

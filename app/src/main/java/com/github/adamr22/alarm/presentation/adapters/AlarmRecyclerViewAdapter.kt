@@ -121,6 +121,12 @@ class AlarmRecyclerViewAdapter(
             notifyItemChanged(position)
         }
 
+        if (isExpanded) {
+            holder.expandOrCollapseItem.setImageResource(R.drawable.ic_arrow_up)
+        } else {
+            holder.expandOrCollapseItem.setImageResource(R.drawable.ic_arrow_down)
+        }
+
         holder.extraContent.visibility = if (isExpanded) View.VISIBLE else View.GONE
 
         holder.currentTime.setOnClickListener {
