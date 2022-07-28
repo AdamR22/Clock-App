@@ -14,7 +14,7 @@ class AlarmFakeRepository {
     }
 
     fun addAlarmLabel(label: String, index: Int) {
-        _alarmItemList[index].label
+        _alarmItemList[index].label = label
     }
 
     fun deleteAlarm(index: Int) {

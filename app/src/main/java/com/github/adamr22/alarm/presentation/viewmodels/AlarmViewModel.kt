@@ -11,10 +11,17 @@ class AlarmViewModel : ViewModel() {
     private var _alarmItems: MutableStateFlow<AlarmUIState> =
         MutableStateFlow(AlarmUIState.Empty)
     val alarmItems: StateFlow<AlarmUIState> = _alarmItems
+    private var _labelChanged: MutableStateFlow<LabelChangedState> = MutableStateFlow(LabelChangedState.Unchanged)
+    val labelChanged = _labelChanged
 
     sealed class AlarmUIState {
         object Empty : AlarmUIState()
         data class AlarmItems(val alarmItems: List<AlarmItemModel>) : AlarmUIState()
+    }
+
+    sealed class LabelChangedState {
+        object Unchanged : LabelChangedState()
+        object Changed : LabelChangedState()
     }
 
     fun addAlarmItem(alarm: AlarmItemModel) {
@@ -23,8 +30,10 @@ class AlarmViewModel : ViewModel() {
     }
 
     fun addLabel(label: String, index: Int) {
+        _labelChanged.value = LabelChangedState.Unchanged
         alarmRepository.addAlarmLabel(label, index)
         _alarmItems.value = AlarmUIState.AlarmItems(alarmRepository.getAlarmList())
+        _labelChanged.value = LabelChangedState.Changed
     }
 
     fun deleteItem(index: Int) {

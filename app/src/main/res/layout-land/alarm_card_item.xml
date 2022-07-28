@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:visibility="visible">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/card_label_and_collapse_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -37,96 +37,13 @@
                 android:textColor="@color/grey"
                 android:textSize="13sp"
                 app:drawableStartCompat="@drawable/ic_label"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 android:drawablePadding="4dp"
                 tools:ignore="TouchTargetSizeCheck"
                 tools:text="Add Label" />
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
 
             <ImageButton
                 android:id="@+id/expand_or_collapse_alarm_item"
@@ -135,13 +52,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:layout_marginEnd="10dp"
+                android:gravity="end"
                 android:background="@drawable/collapse_expand_card_button_bg"
                 android:contentDescription="@string/expand_card_icon"
                 tools:ignore="TouchTargetSizeCheck"
                 app:srcCompat="@drawable/ic_arrow_down"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 tools:srcCompat="@drawable/ic_arrow_down" />
-
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
             android:id="@+id/set_time"
@@ -176,12 +95,10 @@
             android:id="@+id/switch_alarm_on_off"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="560dp"
             android:layout_marginTop="4dp"
-            app:layout_constraintStart_toEndOf="@+id/tv_days_scheduled"
-            app:layout_constraintTop_toBottomOf="@+id/set_time"
-            app:thumbTint="@color/grey_50"
-            app:trackTint="@color/white" />
+            android:layout_marginEnd="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/set_time" />
 
         <LinearLayout
             android:id="@+id/expanded_content"

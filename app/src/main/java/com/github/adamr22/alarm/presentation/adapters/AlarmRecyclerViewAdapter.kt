@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.R
 import com.github.adamr22.alarm.data.models.AlarmItemModel
@@ -18,6 +20,7 @@ import com.github.adamr22.common.TimePicker
 import com.github.adamr22.common.VibrateSingleton
 import com.github.adamr22.sound.SoundActivity
 import com.google.android.material.switchmaterial.SwitchMaterial
+import kotlinx.coroutines.flow.collectLatest
 
 class AlarmRecyclerViewAdapter(
     private val context: Context,
@@ -105,8 +108,19 @@ class AlarmRecyclerViewAdapter(
         holder.currentTime.text = data[position].time
 
         holder.addLabel.setOnClickListener {
-            AddLabelDialog.newInstance(position)
+            AddLabelDialog.newInstance(position, viewModel)
                 .show((context as AppCompatActivity).supportFragmentManager, "Add Label")
+
+
+            context.lifecycleScope.launchWhenCreated {
+                viewModel.labelChanged.collectLatest {
+                    when(it) {
+                        is AlarmViewModel.LabelChangedState.Changed -> notifyItemChanged(position)
+                        else -> {}
+                    }
+                }
+            }
+
         }
 
         holder.activateAlarm.setOnCheckedChangeListener { _, isChecked ->
