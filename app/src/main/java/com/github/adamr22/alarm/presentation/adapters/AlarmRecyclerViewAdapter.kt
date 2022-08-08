@@ -158,9 +158,9 @@ class AlarmRecyclerViewAdapter(
 
         holder.vibrate.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                VibrateSingleton.vibrateDevice(context, true)
+                VibrateSingleton.vibrateDeviceOnce(context, true)
             } else {
-                VibrateSingleton.vibrateDevice(context, false)
+                VibrateSingleton.vibrateDeviceOnce(context, false)
             }
         }
 
