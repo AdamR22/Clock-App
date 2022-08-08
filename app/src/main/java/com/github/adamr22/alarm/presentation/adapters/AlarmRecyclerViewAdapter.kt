@@ -124,7 +124,7 @@ class AlarmRecyclerViewAdapter(
 
         holder.activateAlarm.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                // TODO: Activate alarm functionality
+
             }
         }
 
@@ -235,9 +235,10 @@ class AlarmRecyclerViewAdapter(
         }
 
         holder.selectSong.setOnClickListener {
-            val intent = Intent(context, SoundActivity::class.java)
-            intent.putExtra(SOUND_SCREEN_TITLE, "Alarm Sound")
-            context.startActivity(intent)
+            Intent(context, SoundActivity::class.java).apply {
+                putExtra(SOUND_SCREEN_TITLE, "Alarm Sound")
+                context.startActivity(this)
+            }
         }
 
     }

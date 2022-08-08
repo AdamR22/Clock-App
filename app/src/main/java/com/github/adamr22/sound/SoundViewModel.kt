@@ -13,6 +13,7 @@ class SoundViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun getRingtones() {
+        ringtoneList = mapOf()
         viewModelScope.launch {
             ringtoneList = RingtoneSingleton.getRingtones(getApplication<Application>().applicationContext)
         }

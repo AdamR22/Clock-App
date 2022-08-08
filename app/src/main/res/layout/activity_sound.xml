@@ -9,36 +9,35 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="true"
+        android:background="@color/grey_50">
         
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:contentScrim="@color/grey_50"
+            app:expandedTitleTextAppearance="@style/CollapsingToolbarExpanded"
+            app:collapsedTitleTextAppearance="@style/CollapsingToolbarCollapsed"
             >
 
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
-                android:gravity="bottom|center_vertical"
                 android:padding="8dp">
                 <TextView
                     android:id="@+id/toolbar_expanded_title"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppins"
-                    android:textColor="@color/black"
-                    android:textSize="24sp"
-                    tools:text="Sounds Screen" />
+                    android:layout_height="wrap_content"/>
             </LinearLayout>
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@color/grey_50"
                 app:layout_collapseMode="pin"
-                app:titleTextColor="@color/white"/>
+                app:navigationIconTint="@color/white"/>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
         
