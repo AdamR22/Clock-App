@@ -59,11 +59,11 @@ class SoundViewHolder(
     var ringtoneTitle: TextView
     var selectedIcon: ImageView
     var selectedItemPosition: Int = 0
-    val mMediaPlayer = mediaPlayer
-    val mRingtones = ringtones
-    val mAlarmViewModel = alarmViewModel
-    val mAlarmItemIndex = alarmItemIndex
-    val mContext = context
+    private val mMediaPlayer = mediaPlayer
+    private val mRingtones = ringtones
+    private val mAlarmViewModel = alarmViewModel
+    private val mAlarmItemIndex = alarmItemIndex
+    private val mContext = context
 
     private val TAG = "SoundViewHolder"
 
@@ -75,7 +75,7 @@ class SoundViewHolder(
 
     override fun onClick(view: View?) {
         selectedItemPosition = adapterPosition
-        setAlarmTune(selectedItemPosition)
+        setAlarmTune(mAlarmItemIndex)
         playTune(mRingtones[selectedItemPosition].second)
     }
 
