@@ -14,7 +14,14 @@
         android:theme="@style/Theme.ClockApp">
         <activity
             android:name=".sound.SoundActivity"
-            android:exported="false" />
+            android:exported="false">
+
+        <intent-filter>
+            <action android:name="android.intent.action.RINGTONE_PICKER" />
+            <category android:name="android.intent.category.DEFAULT" />
+        </intent-filter>
+
+        </activity>
         <activity
             android:name=".MainActivity"
             android:exported="true">

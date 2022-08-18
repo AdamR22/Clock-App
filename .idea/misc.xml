@@ -18,6 +18,7 @@
         <entry key="app/src/main/res/drawable/toggle_bg.xml" value="0.2015" />
         <entry key="app/src/main/res/drawable/toggle_text_color.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/toogle_text_color.xml" value="0.2015" />
+        <entry key="app/src/main/res/layout-land/activity_sound.xml" value="0.164021164021164" />
         <entry key="app/src/main/res/layout-land/alarm_card_item.xml" value="0.25" />
         <entry key="app/src/main/res/layout-land/day_picker_layout.xml" value="0.164021164021164" />
         <entry key="app/src/main/res/layout-land/fragment_alarm.xml" value="0.164021164021164" />

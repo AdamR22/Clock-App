@@ -3,6 +3,7 @@ package com.github.adamr22.alarm.presentation.adapters
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.media.RingtoneManager
 import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
@@ -17,7 +18,6 @@ import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
 import com.github.adamr22.common.AddLabelDialog
 import com.github.adamr22.common.TimePicker
 import com.github.adamr22.common.VibrateSingleton
-import com.github.adamr22.sound.SoundActivity
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.flow.collectLatest
 
@@ -31,7 +31,9 @@ class AlarmRecyclerViewAdapter(
 
     private var mExpandedPosition: Int = -1
     private lateinit var mRecyclerView: RecyclerView
-    private val SOUND_SCREEN_TITLE: String = "SOUND SCREEN TITLE"
+    private val VIEW_MODEL = "Alarm View Model"
+    private val ALARM_ITEM_INDEX = "Alarm Item Index"
+    private val ALARM_TONE_TITLE = "Alarm Tone Title"
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
@@ -98,8 +100,8 @@ class AlarmRecyclerViewAdapter(
             if (data[position].schedule.size == 1) {
                 holder.alarmSchedule.text = data[position].schedule[0]
             } else {
-                holder.alarmSchedule.text = data[position].schedule.map {
-                    s: String -> s.slice(0..2)
+                holder.alarmSchedule.text = data[position].schedule.map { s: String ->
+                    s.slice(0..2)
                 }.toString().replace("[", "").replace("]", "")
             }
         }
@@ -113,7 +115,7 @@ class AlarmRecyclerViewAdapter(
 
             context.lifecycleScope.launchWhenCreated {
                 viewModel.labelChanged.collectLatest {
-                    when(it) {
+                    when (it) {
                         is AlarmViewModel.LabelChangedState.Changed -> notifyItemChanged(position)
                         else -> {}
                     }
@@ -234,9 +236,21 @@ class AlarmRecyclerViewAdapter(
             }
         }
 
+        holder.selectSong.text.apply {
+            data[position].ringtoneTitle
+            notifyItemChanged(position)
+        }
+
         holder.selectSong.setOnClickListener {
-            Intent(context, SoundActivity::class.java).apply {
-                putExtra(SOUND_SCREEN_TITLE, "Alarm Sound")
+            val ringtoneTitle = data[position].ringtoneTitle
+            Intent(RingtoneManager.ACTION_RINGTONE_PICKER).run {
+                putExtra(VIEW_MODEL, viewModel)
+                putExtra(ALARM_ITEM_INDEX, position)
+                putExtra(ALARM_TONE_TITLE, ringtoneTitle)
+                putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Alarm Sound")
+                putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM)
+                putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true)
+                putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
                 context.startActivity(this)
             }
         }

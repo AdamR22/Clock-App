@@ -1,6 +1,8 @@
 package com.github.adamr22.alarm.presentation.views
 
+import android.media.RingtoneManager
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -86,7 +88,17 @@ class AlarmFragment : Fragment() {
 
     private fun addAlarmItem() {
         val chosenTime = "%02d:%02d".format(picker.hour, picker.minute)
-        val alarm = AlarmItemModel(chosenTime)
+        val alarm = AlarmItemModel(
+            chosenTime,
+            RingtoneManager.getRingtone(
+                requireActivity(),
+                Settings.System.DEFAULT_ALARM_ALERT_URI
+            ).getTitle(requireContext()),
+            RingtoneManager.getActualDefaultRingtoneUri(
+                requireContext(),
+                RingtoneManager.TYPE_ALARM
+            ),
+        )
         alarmViewModel.addAlarmItem(alarm)
     }
 

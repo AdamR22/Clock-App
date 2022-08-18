@@ -1,6 +1,9 @@
 package com.github.adamr22.sound
 
-import android.os.Build
+import android.content.Context
+import android.media.MediaPlayer
+import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,40 +11,36 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.R
+import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
+import java.lang.Exception
 
 class SoundRecyclerViewAdapter(
-    private val ringtones: Map<String, String>,
+    private val ringtones: List<Pair<String, Uri>>,
+    private val mediaPlayer: MediaPlayer,
+    private val alarmViewModel: AlarmViewModel,
+    private val alarmItemIndex: Int,
+    private val alarmToneTitle: String,
+    private val context: Context,
 ) : RecyclerView.Adapter<SoundViewHolder>() {
 
-    private val ringtoneTitles = ArrayList<String>()
-    private val ringtoneUris = ArrayList<String>()
-
-    init {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            ringtones.forEach { (title, uri) ->
-                ringtoneTitles.add(title)
-                ringtoneUris.add(uri)
-            }
-        } else {
-            ringtones.keys.forEach { title ->
-                ringtoneTitles.add(title)
-            }
-
-            ringtones.values.forEach { uri ->
-                ringtoneUris.add(uri)
-            }
-        }
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SoundViewHolder {
         val view =
             LayoutInflater.from(parent.context).inflate(R.layout.sound_item_layout, parent, false)
-        return SoundViewHolder(view)
+        return SoundViewHolder(
+            view,
+            ringtones,
+            mediaPlayer,
+            alarmViewModel,
+            alarmItemIndex,
+            context
+        )
     }
 
     override fun onBindViewHolder(holder: SoundViewHolder, position: Int) {
-        holder.selectedIcon.visibility = if (holder.selectedItemPosition == position) View.VISIBLE else View.GONE
-        holder.ringtoneTitle.text = ringtoneTitles[position]
+        holder.ringtoneTitle.text = ringtones[position].first
+        holder.selectedIcon.visibility =
+            if (holder.selectedItemPosition == position || (holder.ringtoneTitle.text == alarmToneTitle && holder.selectedItemPosition == position)) View.VISIBLE else View.GONE
     }
 
     override fun getItemCount(): Int {
@@ -49,10 +48,24 @@ class SoundRecyclerViewAdapter(
     }
 }
 
-class SoundViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+class SoundViewHolder(
+    itemView: View,
+    ringtones: List<Pair<String, Uri>>,
+    mediaPlayer: MediaPlayer,
+    alarmViewModel: AlarmViewModel,
+    alarmItemIndex: Int,
+    context: Context
+) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
     var ringtoneTitle: TextView
     var selectedIcon: ImageView
     var selectedItemPosition: Int = 0
+    val mMediaPlayer = mediaPlayer
+    val mRingtones = ringtones
+    val mAlarmViewModel = alarmViewModel
+    val mAlarmItemIndex = alarmItemIndex
+    val mContext = context
+
+    private val TAG = "SoundViewHolder"
 
     init {
         ringtoneTitle = itemView.findViewById(R.id.tv_ringtone_title)
@@ -62,6 +75,27 @@ class SoundViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.
 
     override fun onClick(view: View?) {
         selectedItemPosition = adapterPosition
-        // TODO: function to play and set selected ringtone as alarm tone
+        setAlarmTune(selectedItemPosition)
+        playTune(mRingtones[selectedItemPosition].second)
+    }
+
+    private fun setAlarmTune(index: Int) {
+        mAlarmViewModel.changeRingtone(
+            index,
+            mRingtones[index].first,
+            mRingtones[index].second,
+        )
+    }
+
+    private fun playTune(uri: Uri) {
+        try {
+            mMediaPlayer.reset()
+            mMediaPlayer.setDataSource(mContext, uri)
+            mMediaPlayer.isLooping = false
+            mMediaPlayer.prepare()
+            mMediaPlayer.start()
+        } catch (e: Exception) {
+            Log.d(TAG, "playTune: ${e.stackTrace}")
+        }
     }
 }

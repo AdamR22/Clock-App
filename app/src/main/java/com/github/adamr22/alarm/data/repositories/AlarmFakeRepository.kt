@@ -1,5 +1,6 @@
 package com.github.adamr22.alarm.data.repositories
 
+import android.net.Uri
 import com.github.adamr22.alarm.data.models.AlarmItemModel
 
 class AlarmFakeRepository {
@@ -31,5 +32,10 @@ class AlarmFakeRepository {
 
     fun changeTime(index: Int, newTime: String) {
         _alarmItemList[index].time = newTime
+    }
+
+    fun changeRingtone(index: Int, title: String, uri: Uri) {
+        _alarmItemList[index].ringtoneTitle = title
+        _alarmItemList[index].ringtoneUri = uri
     }
 }
