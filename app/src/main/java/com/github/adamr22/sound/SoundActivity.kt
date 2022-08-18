@@ -63,7 +63,8 @@ class SoundActivity : AppCompatActivity() {
             mediaPlayer,
             alarmViewModel,
             alarmItemIndex,
-            alarmToneTitle
+            alarmToneTitle,
+            this
         )
         soundRecyclerView = findViewById(R.id.sounds_recycler_view)
         soundRecyclerView.adapter = soundRecyclerViewAdapter
