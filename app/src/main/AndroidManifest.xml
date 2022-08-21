@@ -12,16 +12,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ClockApp">
-        <activity
-            android:name=".sound.SoundActivity"
-            android:exported="false">
+<!--        <activity-->
+<!--            android:name=".sound.SoundActivity"-->
+<!--            android:exported="false">-->
 
-        <intent-filter>
-            <action android:name="android.intent.action.RINGTONE_PICKER" />
-            <category android:name="android.intent.category.DEFAULT" />
-        </intent-filter>
+<!--        <intent-filter>-->
+<!--            <action android:name="android.intent.action.RINGTONE_PICKER" />-->
+<!--            <category android:name="android.intent.category.DEFAULT" />-->
+<!--        </intent-filter>-->
 
-        </activity>
+<!--        </activity>-->
         <activity
             android:name=".MainActivity"
             android:exported="true">

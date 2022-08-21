@@ -2,8 +2,6 @@ package com.github.adamr22.alarm.presentation.adapters
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
-import android.media.RingtoneManager
 import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
@@ -31,13 +29,20 @@ class AlarmRecyclerViewAdapter(
 
     private var mExpandedPosition: Int = -1
     private lateinit var mRecyclerView: RecyclerView
-    private val VIEW_MODEL = "Alarm View Model"
-    private val ALARM_ITEM_INDEX = "Alarm Item Index"
-    private val ALARM_TONE_TITLE = "Alarm Tone Title"
+    private val mCallbackInterface: CallbackInterface
+    private lateinit var currentTitle: String
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         mRecyclerView = recyclerView
+    }
+
+    interface CallbackInterface {
+        fun selectChosenTone(index: Int, viewModel: AlarmViewModel, recyclerView: RecyclerView)
+    }
+
+    init {
+        mCallbackInterface = context as CallbackInterface
     }
 
     inner class AlarmItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -87,6 +92,8 @@ class AlarmRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: AlarmItemViewHolder, position: Int) {
         val isExpanded: Boolean = position == mExpandedPosition
+
+        currentTitle = data[position].ringtoneTitle
 
         if (data[position].label == "") {
             holder.addLabel.text = context.getText(R.string.add_label)
@@ -236,23 +243,10 @@ class AlarmRecyclerViewAdapter(
             }
         }
 
-        holder.selectSong.text.apply {
-            data[position].ringtoneTitle
-            notifyItemChanged(position)
-        }
+        holder.selectSong.text = data[position].ringtoneTitle
 
         holder.selectSong.setOnClickListener {
-            val ringtoneTitle = data[position].ringtoneTitle
-            Intent(RingtoneManager.ACTION_RINGTONE_PICKER).run {
-                putExtra(VIEW_MODEL, viewModel)
-                putExtra(ALARM_ITEM_INDEX, position)
-                putExtra(ALARM_TONE_TITLE, ringtoneTitle)
-                putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Alarm Sound")
-                putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM)
-                putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, true)
-                putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
-                context.startActivity(this)
-            }
+            mCallbackInterface.selectChosenTone(position, viewModel, mRecyclerView)
         }
 
     }

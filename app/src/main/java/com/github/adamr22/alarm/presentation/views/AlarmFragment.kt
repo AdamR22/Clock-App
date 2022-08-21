@@ -3,7 +3,6 @@ package com.github.adamr22.alarm.presentation.views
 import android.media.RingtoneManager
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -30,8 +29,6 @@ class AlarmFragment : Fragment() {
     private lateinit var alarmRecyclerView: RecyclerView
     private lateinit var emptyAlarmContent: ConstraintLayout
     private lateinit var alarmAdapter: AlarmRecyclerViewAdapter
-
-    private val TAG = "AlarmFragment"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -62,7 +59,6 @@ class AlarmFragment : Fragment() {
                         alarmRecyclerView.visibility = View.VISIBLE
                         emptyAlarmContent.visibility = View.GONE
                         alarmAdapter.updateAlarmList(it.alarmItems)
-                        Log.d(TAG, "onViewCreated: List size ${it.alarmItems.size}")
                     }
 
                     is AlarmViewModel.AlarmUIState.Empty -> {
@@ -107,4 +103,5 @@ class AlarmFragment : Fragment() {
         fun newInstance() =
             AlarmFragment()
     }
+
 }
