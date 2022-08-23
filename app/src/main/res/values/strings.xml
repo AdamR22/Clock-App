@@ -31,4 +31,6 @@
     <string name="not_scheduled">Not Scheduled</string>
     <string name="notification_icon">notification_icon</string>
     <string name="chosen_value_icon">Choosen value icon</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="scheduled">Scheduled</string>
 </resources>

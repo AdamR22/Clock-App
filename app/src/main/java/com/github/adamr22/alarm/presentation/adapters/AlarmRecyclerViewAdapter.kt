@@ -14,10 +14,15 @@ import com.github.adamr22.R
 import com.github.adamr22.alarm.data.models.AlarmItemModel
 import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
 import com.github.adamr22.common.AddLabelDialog
+import com.github.adamr22.common.AlarmHelper
 import com.github.adamr22.common.TimePicker
 import com.github.adamr22.common.VibrateSingleton
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.flow.collectLatest
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.*
 
 class AlarmRecyclerViewAdapter(
     private val context: Context,
@@ -31,6 +36,7 @@ class AlarmRecyclerViewAdapter(
     private lateinit var mRecyclerView: RecyclerView
     private val mCallbackInterface: CallbackInterface
     private lateinit var currentTitle: String
+    private var c = Calendar.getInstance()
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
@@ -101,7 +107,7 @@ class AlarmRecyclerViewAdapter(
             holder.addLabel.text = data[position].label
         }
 
-        if (data[position].schedule.isEmpty()) {
+        if (data[position].schedule.isEmpty() && !holder.activateAlarm.isChecked) {
             holder.alarmSchedule.text = context.getText(R.string.not_scheduled)
         } else {
             if (data[position].schedule.size == 1) {
@@ -133,7 +139,10 @@ class AlarmRecyclerViewAdapter(
 
         holder.activateAlarm.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-
+                setAlarm(data[position].time, holder.alarmSchedule, position)
+                Toast.makeText(context, "Alarm activated.", Toast.LENGTH_SHORT).show()
+            } else {
+                AlarmHelper.cancelAlarm(context)
             }
         }
 
@@ -262,5 +271,45 @@ class AlarmRecyclerViewAdapter(
             (data as MutableList<AlarmItemModel>).add(it)
         }
         notifyDataSetChanged()
+    }
+
+    private fun setAlarm(time: String, scheduleTextView: TextView, position: Int) {
+        val setTime = time.split(":")
+        val hour = Integer.parseInt(setTime[0])
+        val minute = Integer.parseInt(setTime[1])
+
+        c.apply {
+            add(Calendar.HOUR, hour)
+            add(Calendar.MINUTE, minute)
+
+            if (this.before(Calendar.getInstance())) {
+                add(Calendar.DATE, 1)
+            }
+
+            if (this.after(Calendar.getInstance()) && c.get(Calendar.DATE) == SimpleDateFormat(
+                    "dd/MM/yy",
+                    Locale.getDefault()
+                ).format(
+                    Date()
+                ).toString().split("/")[0].toInt()
+            ) {
+                scheduleTextView.text = context.getString(R.string.scheduled)
+            }
+
+            if (this.after(Calendar.getInstance()) && c.get(Calendar.DATE) != SimpleDateFormat(
+                    "dd/MM/yy",
+                    Locale.getDefault()
+                ).format(
+                    Date()
+                ).toString().split("/")[0].toInt()
+            ) {
+                scheduleTextView.text = context.getString(R.string.tomorrow)
+            }
+
+            AlarmHelper.createAlarm(this, context)
+        }
+
+        c = Calendar.getInstance()
+        notifyItemChanged(position)
     }
 }
