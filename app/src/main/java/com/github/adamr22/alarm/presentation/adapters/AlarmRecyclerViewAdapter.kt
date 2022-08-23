@@ -20,8 +20,6 @@ import com.github.adamr22.common.VibrateSingleton
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.flow.collectLatest
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.*
 
 class AlarmRecyclerViewAdapter(
