@@ -1,19 +1,24 @@
 package com.github.adamr22.common
 
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
 import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import kotlin.math.roundToInt
 
 class AlertReceiver : BroadcastReceiver() {
+    // TODO: Replace notification code with code that starts an activity that wakes up phone
     override fun onReceive(context: Context?, intent: Intent?) {
-        intent?.let {
-            if (it.action == "android.intent.action.BOOT_COMPLETED") {
-                createAlarmNotification()
-            }
+        context?.let {
+            val componentName = ComponentName(it, AlertService::class.java)
+            val job = JobInfo.Builder(Math.random().roundToInt(), componentName)
+                .setPersisted(true)
+                .build()
+
+            val jobScheduler = it.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+            jobScheduler.schedule(job)
         }
-    }
-
-    private fun createAlarmNotification() {
-
     }
 }

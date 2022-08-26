@@ -27,17 +27,13 @@
         <receiver android:name=".common.AlertReceiver"
             android:exported="false"
             android:enabled="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
         </receiver>
         <receiver android:name=".common.AlertPrecursorReceiver"
             android:exported="false"
             android:enabled="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
         </receiver>
+        <service android:name=".common.AlertService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
