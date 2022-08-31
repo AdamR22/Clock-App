@@ -19,7 +19,6 @@
             android:textSize="40sp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="30dp"
-            android:format24Hour="hh:mm"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="23:45" />
