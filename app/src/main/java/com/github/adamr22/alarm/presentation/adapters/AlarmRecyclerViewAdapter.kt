@@ -19,7 +19,6 @@ import com.github.adamr22.common.TimePicker
 import com.github.adamr22.common.VibrateSingleton
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.flow.collectLatest
-import java.text.SimpleDateFormat
 import java.util.*
 
 class AlarmRecyclerViewAdapter(
@@ -135,11 +134,12 @@ class AlarmRecyclerViewAdapter(
 
         }
 
-        holder.activateAlarm.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                setAlarm(data[position].time, holder.alarmSchedule, position)
-                Toast.makeText(context, "Alarm activated.", Toast.LENGTH_SHORT).show()
+        holder.activateAlarm.setOnCheckedChangeListener { buttonView, _ ->
+            if (buttonView.isChecked) {
+                setAlarm(data[position].time, holder.alarmSchedule)
+                Toast.makeText(context, context.resources.getString(R.string.alarm_activated), Toast.LENGTH_SHORT).show()
             } else {
+                holder.alarmSchedule.text = context.resources.getString(R.string.not_scheduled)
                 AlarmHelper.cancelAlarm(context)
             }
         }
@@ -271,7 +271,7 @@ class AlarmRecyclerViewAdapter(
         notifyDataSetChanged()
     }
 
-    private fun setAlarm(time: String, scheduleTextView: TextView, position: Int) {
+    private fun setAlarm(time: String, scheduleTextView: TextView) {
         val setTime = time.split(":")
         val hour = Integer.parseInt(setTime[0])
         val minute = Integer.parseInt(setTime[1])
@@ -282,32 +282,12 @@ class AlarmRecyclerViewAdapter(
 
             if (this.before(Calendar.getInstance())) {
                 add(Calendar.DATE, 1)
-            }
-
-            if (this.after(Calendar.getInstance()) && c.get(Calendar.DATE) == SimpleDateFormat(
-                    "dd/MM/yy",
-                    Locale.getDefault()
-                ).format(
-                    Date()
-                ).toString().split("/")[0].toInt()
-            ) {
-                scheduleTextView.text = context.getString(R.string.scheduled)
-            }
-
-            if (this.after(Calendar.getInstance()) && c.get(Calendar.DATE) != SimpleDateFormat(
-                    "dd/MM/yy",
-                    Locale.getDefault()
-                ).format(
-                    Date()
-                ).toString().split("/")[0].toInt()
-            ) {
-                scheduleTextView.text = context.getString(R.string.tomorrow)
+                scheduleTextView.text = context.resources.getString(R.string.tomorrow)
+            } else {
+                scheduleTextView.text = context.resources.getString(R.string.scheduled)
             }
 
             AlarmHelper.createAlarm(this, context)
         }
-
-        c = Calendar.getInstance()
-        notifyItemChanged(position)
     }
 }

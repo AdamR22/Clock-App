@@ -22,6 +22,7 @@
     <string name="f">F</string>
     <string name="sa">S</string>
     <string name="su">S</string>
+    <string name="alarm_activated">Alarm Activated</string>
     <string name="alarm_label_badge">Alarm Label Badge</string>
     <string name="expand_card_icon">Expand Card Icon</string>
     <string name="collapse_card_item">Collapse Card Item</string>
@@ -30,7 +31,7 @@
     <string name="vibrate">Vibrate</string>
     <string name="not_scheduled">Not Scheduled</string>
     <string name="notification_icon">notification_icon</string>
-    <string name="chosen_value_icon">Choosen value icon</string>
+    <string name="chosen_value_icon">Chosen value icon</string>
     <string name="tomorrow">Tomorrow</string>
     <string name="scheduled">Scheduled</string>
 </resources>
