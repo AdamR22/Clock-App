@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".alarm.presentation.views.AlarmFragment">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_alarm_items"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add"
+        style="@style/LightModeFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:layout_margin="20dp"
+        android:clickable="true"
+        android:contentDescription="@string/add"
+        android:focusable="true"
+        app:fabCustomSize="100dp"
+        app:srcCompat="@drawable/ic_baseline_add_light" />
+</FrameLayout>
