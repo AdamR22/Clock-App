@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -72,6 +73,8 @@ class AlarmFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+
+        (activity as AppCompatActivity).supportActionBar?.title = "Alarm"
 
         addAlarmButton.setOnClickListener {
             picker.show(parentFragmentManager, "Alarm Picker")
