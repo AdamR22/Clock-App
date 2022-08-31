@@ -7,6 +7,7 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.alarm.presentation.adapters.AlarmRecyclerViewAdapter
 import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
@@ -22,6 +23,7 @@ class MainActivity : AppCompatActivity(), AlarmRecyclerViewAdapter.CallbackInter
     lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var alarmViewModel: AlarmViewModel
     private lateinit var mRecyclerView: RecyclerView
+    private lateinit var mToolbar: Toolbar
     private var alarmItem = 0
 
     private val activityForResultLauncher =
@@ -42,6 +44,8 @@ class MainActivity : AppCompatActivity(), AlarmRecyclerViewAdapter.CallbackInter
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         bottomNavigationView = findViewById(R.id.bottomNav)
+        mToolbar = findViewById(R.id.app_toolbar)
+        setSupportActionBar(mToolbar)
     }
 
     override fun onResume() {

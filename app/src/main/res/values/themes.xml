@@ -56,5 +56,10 @@
         <item name="fontFamily">@font/poppins</item>
     </style>
 
+    <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:fontFamily">@font/poppins_medium</item>
+        <item name="android:textSize">20sp</item>
+        <item name="titleTextColor">@color/black</item>
+    </style>
 
 </resources>
