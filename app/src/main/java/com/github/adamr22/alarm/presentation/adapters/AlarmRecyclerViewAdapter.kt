@@ -277,8 +277,8 @@ class AlarmRecyclerViewAdapter(
         val minute = Integer.parseInt(setTime[1])
 
         c.apply {
-            add(Calendar.HOUR, hour)
-            add(Calendar.MINUTE, minute)
+            this.set(Calendar.HOUR_OF_DAY, hour)
+            this.set(Calendar.MINUTE, minute)
 
             if (this.before(Calendar.getInstance())) {
                 add(Calendar.DATE, 1)

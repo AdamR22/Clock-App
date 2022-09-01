@@ -31,6 +31,7 @@
         <entry key="app/src/main/res/layout/dismiss_text.xml" value="0.10280797101449275" />
         <entry key="app/src/main/res/layout/fragment_alarm.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_clock.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_timer.xml" value="0.5" />
         <entry key="app/src/main/res/layout/sound_item_layout.xml" value="0.33" />
         <entry key="app/src/main/res/menu/bottom_nav_menu.xml" value="0.19375" />
       </map>
