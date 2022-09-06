@@ -37,7 +37,7 @@
         <entry key="app/src/main/res/layout/dismiss_text.xml" value="0.10280797101449275" />
         <entry key="app/src/main/res/layout/fragment_alarm.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_clock.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/fragment_run_timer.xml" value="0.10924750679963735" />
+        <entry key="app/src/main/res/layout/fragment_run_timer.xml" value="0.16" />
         <entry key="app/src/main/res/layout/fragment_set_timer.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_timer.xml" value="0.31794871794871793" />
         <entry key="app/src/main/res/layout/numpad_button.xml" value="0.33" />

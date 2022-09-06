@@ -29,9 +29,6 @@ class SetTimerAdapter(private val numpadText: Array<String>, private val context
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View? {
         val numpadText = numpadText[position]
         var mConvertView = convertView
-//        convertView?.let {
-//            LayoutInflater.from(context).inflate(R.layout.numpad_button, null)
-//        }
 
         if (convertView == null) {
             mConvertView = LayoutInflater.from(context).inflate(R.layout.numpad_button, null)

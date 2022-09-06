@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.alarm.presentation.adapters.AlarmRecyclerViewAdapter
 import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
@@ -25,6 +26,9 @@ class MainActivity : AppCompatActivity(), AlarmRecyclerViewAdapter.CallbackInter
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mToolbar: Toolbar
     private var alarmItem = 0
+    private var currentFragment = 0
+
+    private val FRAGMENT_ID = "frag_id"
 
     private val activityForResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -50,29 +54,48 @@ class MainActivity : AppCompatActivity(), AlarmRecyclerViewAdapter.CallbackInter
 
     override fun onResume() {
         super.onResume()
+
+        when (currentFragment) {
+            0 -> supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, AlarmFragment.newInstance()).commit()
+            1 -> supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, ClockFragment.newInstance()).commit()
+            2 -> supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, TimerFragment.newInstance()).commit()
+            3 -> supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, StopWatchFragment.newInstance()).commit()
+            4 -> supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, BedTimeFragment.newInstance()).commit()
+        }
+
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.alarm -> {
+                    currentFragment = 0
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, AlarmFragment.newInstance()).commit()
                     true
                 }
                 R.id.clock -> {
+                    currentFragment = 1
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, ClockFragment.newInstance()).commit()
                     true
                 }
                 R.id.timer -> {
+                    currentFragment = 2
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, TimerFragment.newInstance()).commit()
                     true
                 }
                 R.id.stop_watch -> {
+                    currentFragment = 3
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, StopWatchFragment.newInstance()).commit()
                     true
                 }
                 R.id.bed_time -> {
+                    currentFragment = 4
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, BedTimeFragment.newInstance()).commit()
                     true
@@ -82,7 +105,11 @@ class MainActivity : AppCompatActivity(), AlarmRecyclerViewAdapter.CallbackInter
         }
     }
 
-    override fun selectChosenTone(index: Int, viewModel: AlarmViewModel, recyclerView: RecyclerView) {
+    override fun selectChosenTone(
+        index: Int,
+        viewModel: AlarmViewModel,
+        recyclerView: RecyclerView
+    ) {
         alarmItem = index
         alarmViewModel = viewModel
         mRecyclerView = recyclerView
@@ -93,5 +120,28 @@ class MainActivity : AppCompatActivity(), AlarmRecyclerViewAdapter.CallbackInter
             putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
             activityForResultLauncher.launch(this)
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(FRAGMENT_ID, currentFragment)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+
+        when (savedInstanceState.getInt(FRAGMENT_ID)) {
+            0 -> supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, AlarmFragment.newInstance()).commit()
+            1 -> supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, ClockFragment.newInstance()).commit()
+            2 -> supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, TimerFragment.newInstance()).commit()
+            3 -> supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, StopWatchFragment.newInstance()).commit()
+            4 -> supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, BedTimeFragment.newInstance()).commit()
+        }
+
+        super.onRestoreInstanceState(savedInstanceState)
     }
 }
