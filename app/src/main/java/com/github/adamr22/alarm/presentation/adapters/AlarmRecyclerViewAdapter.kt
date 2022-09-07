@@ -119,7 +119,7 @@ class AlarmRecyclerViewAdapter(
         holder.currentTime.text = data[position].time
 
         holder.addLabel.setOnClickListener {
-            AddLabelDialog.newInstance(position, viewModel)
+            AddLabelDialog.newInstance(position, viewModel, null)
                 .show((context as AppCompatActivity).supportFragmentManager, "Add Label")
 
 

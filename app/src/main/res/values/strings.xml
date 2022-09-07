@@ -35,4 +35,5 @@
     <string name="tomorrow">Tomorrow</string>
     <string name="scheduled">Scheduled</string>
     <string name="start_timer">Start timer</string>
+    <string name="timer_text">%s%s</string>
 </resources>

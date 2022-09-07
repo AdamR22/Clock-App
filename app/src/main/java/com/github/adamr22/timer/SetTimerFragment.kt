@@ -10,6 +10,7 @@ import android.widget.GridView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -29,6 +30,8 @@ class SetTimerFragment : Fragment() {
 
     private val timerNumpadText =
         arrayOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "00", "0", "X")
+
+    private var setTime: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         timerAdapter = SetTimerAdapter(timerNumpadText, requireContext())
@@ -57,6 +60,8 @@ class SetTimerFragment : Fragment() {
     }
 
     override fun onResume() {
+        while (setTime.isNotEmpty()) btnStartTimer.visibility = View.VISIBLE
+
         btnStartTimer.setOnClickListener {
             parentFragmentManager.beginTransaction().setCustomAnimations(
                 androidx.appcompat.R.anim.abc_slide_in_top,
@@ -67,7 +72,16 @@ class SetTimerFragment : Fragment() {
         }
 
         timerNumpad.setOnItemClickListener { _, _, position, _ ->
-            Log.d(TAG, "onResume: ${timerNumpadText[position]}")
+            if (timerNumpadText[position] == "X" && setTime.isNotEmpty()) {
+                setTime = setTime.dropLast(1)
+            }
+
+            if (setTime.length < 6 && timerNumpadText[position] != "X") {
+                setTime += timerNumpadText[position]
+            }
+
+            Log.d(TAG, "onResume: Timer: $setTime")
+
         }
         super.onResume()
     }
@@ -80,44 +94,79 @@ class SetTimerFragment : Fragment() {
 
     private fun changeTextViewColor(inputTime: String) {
         when (inputTime.length) {
+            0 -> tvSeconds.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey_50))
             1 -> {
                 tvSeconds.apply {
                     this.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-                    this.text = "0${inputTime}s"
+                    this.text =
+                        String.format(getString(R.string.timer_text, "0${inputTime[0]}", "s"))
                 }
             }
             2 -> {
+                tvMinutes.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey_50))
                 tvSeconds.apply {
                     this.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-                    this.text = "${inputTime}s"
+                    this.text = String.format(getString(R.string.timer_text, inputTime, "s"))
                 }
             }
             3 -> {
                 tvMinutes.apply {
                     this.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-                    this.text = "0${inputTime[0]}m"
+                    this.text =
+                        String.format(getString(R.string.timer_text, "0${inputTime[0]}", "m"))
                 }
 
             }
             4 -> {
+                tvHours.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey_50))
                 tvMinutes.apply {
                     this.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-                    this.text = "${inputTime}m"
+                    this.text =
+                        String.format(getString(R.string.timer_text, inputTime.slice(0..1), "m"))
+                }
+                tvSeconds.apply {
+                    this.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                    this.text =
+                        String.format(getString(R.string.timer_text, inputTime.slice(2..3), "s"))
                 }
             }
             5 -> {
                 tvHours.apply {
                     this.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-                    this.text = "0${inputTime}h"
+                    this.text =
+                        String.format(getString(R.string.timer_text, "0${inputTime[0]}", "h"))
                 }
-            }
-            6 -> {
                 tvMinutes.apply {
                     this.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-                    this.text = "${inputTime}h"
+                    this.text =
+                        String.format(getString(R.string.timer_text, inputTime.slice(1..2), "m"))
+                }
+                tvSeconds.apply {
+                    this.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                    this.text =
+                        String.format(getString(R.string.timer_text, inputTime.slice(3..4), "s"))
+                }
+
+            }
+            6 -> {
+                tvHours.apply {
+                    this.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                    this.text =
+                        String.format(getString(R.string.timer_text, inputTime.slice(0..1), "h"))
+                }
+                tvMinutes.apply {
+                    this.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                    this.text =
+                        String.format(getString(R.string.timer_text, inputTime.slice(2..3), "m"))
+                }
+                tvSeconds.apply {
+                    this.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+                    this.text =
+                        String.format(getString(R.string.timer_text, inputTime.slice(4..5), "s"))
                 }
             }
-            else -> return
         }
     }
+
+    private fun setTime() {}
 }

@@ -1,7 +1,9 @@
 package com.github.adamr22.timer
 
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class TimerViewModel : ViewModel() {
-    // TODO: Implement the ViewModel
+    private var _timers = MutableStateFlow<MutableList<TimerModel>>(mutableListOf())
+
 }

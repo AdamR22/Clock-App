@@ -26,6 +26,7 @@
                 android:layout_marginStart="10dp"
                 android:gravity="center"
                 android:text="00h"
+                android:textColor="@color/grey_50"
                 android:textSize="40sp"
                 tools:text="00h" />
 
@@ -37,6 +38,7 @@
                 android:fontFamily="@font/poppins_medium"
                 android:gravity="center"
                 android:text="00m"
+                android:textColor="@color/grey_50"
                 android:textSize="40sp"
                 tools:text="00m" />
 
@@ -49,6 +51,7 @@
                 android:layout_marginStart="10dp"
                 android:gravity="center"
                 android:text="00s"
+                android:textColor="@color/grey_50"
                 android:textSize="40sp"
                 tools:text="00s" />
 
@@ -89,6 +92,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/numpad_layout"
             android:focusable="true"
-            android:contentDescription="@string/start_timer" />
+            android:contentDescription="@string/start_timer"
+            android:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
