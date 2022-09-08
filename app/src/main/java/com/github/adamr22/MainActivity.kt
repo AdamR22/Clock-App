@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
-import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.alarm.presentation.adapters.AlarmRecyclerViewAdapter
 import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
@@ -29,6 +28,7 @@ class MainActivity : AppCompatActivity(), AlarmRecyclerViewAdapter.CallbackInter
     private var currentFragment = 0
 
     private val FRAGMENT_ID = "frag_id"
+    private val FRAG_KEY = "shared_pref_frag_id_key"
 
     private val activityForResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -47,6 +47,17 @@ class MainActivity : AppCompatActivity(), AlarmRecyclerViewAdapter.CallbackInter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        if (savedInstanceState == null) {
+            getSharedPreferences(FRAG_KEY, MODE_PRIVATE).apply {
+                currentFragment = this.getInt(FRAGMENT_ID, 0)
+            }
+        }
+
+        savedInstanceState?.let {
+            currentFragment = it.getInt(FRAGMENT_ID)
+        }
+
         bottomNavigationView = findViewById(R.id.bottomNav)
         mToolbar = findViewById(R.id.app_toolbar)
         setSupportActionBar(mToolbar)
@@ -56,16 +67,36 @@ class MainActivity : AppCompatActivity(), AlarmRecyclerViewAdapter.CallbackInter
         super.onResume()
 
         when (currentFragment) {
-            0 -> supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, AlarmFragment.newInstance()).commit()
-            1 -> supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, ClockFragment.newInstance()).commit()
-            2 -> supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, TimerFragment.newInstance()).commit()
-            3 -> supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, StopWatchFragment.newInstance()).commit()
-            4 -> supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, BedTimeFragment.newInstance()).commit()
+            0 -> {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, AlarmFragment.newInstance()).commit()
+
+                bottomNavigationView.selectedItemId = R.id.alarm
+            }
+            1 -> {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, ClockFragment.newInstance()).commit()
+
+                bottomNavigationView.selectedItemId = R.id.clock
+            }
+            2 -> {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, TimerFragment.newInstance()).commit()
+
+                bottomNavigationView.selectedItemId = R.id.timer
+            }
+            3 -> {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, StopWatchFragment.newInstance()).commit()
+
+                bottomNavigationView.selectedItemId = R.id.stop_watch
+            }
+            4 -> {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, BedTimeFragment.newInstance()).commit()
+
+                bottomNavigationView.selectedItemId = R.id.bed_time
+            }
         }
 
         bottomNavigationView.setOnItemSelectedListener { item ->
@@ -122,26 +153,19 @@ class MainActivity : AppCompatActivity(), AlarmRecyclerViewAdapter.CallbackInter
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putInt(FRAGMENT_ID, currentFragment)
-        super.onSaveInstanceState(outState)
+    override fun onDestroy() {
+        val sharedPref = getSharedPreferences(FRAG_KEY, MODE_PRIVATE)
+
+        sharedPref.edit().also {
+            it.putInt(FRAGMENT_ID, currentFragment)
+            it.apply()
+        } // Save most recent fragment after session ends
+
+        super.onDestroy()
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-
-        when (savedInstanceState.getInt(FRAGMENT_ID)) {
-            0 -> supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, AlarmFragment.newInstance()).commit()
-            1 -> supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, ClockFragment.newInstance()).commit()
-            2 -> supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, TimerFragment.newInstance()).commit()
-            3 -> supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, StopWatchFragment.newInstance()).commit()
-            4 -> supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, BedTimeFragment.newInstance()).commit()
-        }
-
-        super.onRestoreInstanceState(savedInstanceState)
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(FRAGMENT_ID, currentFragment) // Save most recent fragment in current session
+        super.onSaveInstanceState(outState)
     }
 }
