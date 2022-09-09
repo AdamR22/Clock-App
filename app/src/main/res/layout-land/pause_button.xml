@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImageButton xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/btn_pause"
+    android:layout_width="82sp"
+    android:layout_height="70sp"
+    android:background="@drawable/pause_fab_background"
+    android:contentDescription="@string/pause"
+    app:srcCompat="@drawable/ic_baseline_pause_light"/>

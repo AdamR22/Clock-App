@@ -26,7 +26,7 @@ class SetTimerAdapter(private val numpadText: Array<String>, private val context
     }
 
     @SuppressLint("ViewHolder", "InflateParams")
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View? {
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val numpadText = numpadText[position]
         var mConvertView = convertView
 

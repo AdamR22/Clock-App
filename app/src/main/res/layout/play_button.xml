@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.floatingactionbutton.FloatingActionButton xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/play"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="32dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:contentDescription="@string/start_timer"
+    android:visibility="gone"
+    style="@style/LightModeFab"
+    app:fabCustomSize="100dp"
+    app:srcCompat="@drawable/ic_baseline_play_arrow_24">
+
+</com.google.android.material.floatingactionbutton.FloatingActionButton>

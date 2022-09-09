@@ -17,6 +17,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/poppins_bold"
             android:textSize="40sp"
+            android:textStyle="bold"
             android:layout_marginStart="24dp"
             android:layout_marginTop="30dp"
             app:layout_constraintStart_toStartOf="parent"

@@ -75,20 +75,15 @@
 
     </LinearLayout>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/start_timer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40sp"
-            android:clickable="true"
-            style="@style/LightModeFab"
-            app:fabCustomSize="83dp"
-            app:srcCompat="@drawable/ic_baseline_play_arrow_24"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/numpad_layout"
-            app:layout_constraintTop_toTopOf="parent"
-            android:focusable="true"
-            android:contentDescription="@string/start_timer"
-            android:visibility="gone"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/numpad_layout"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <include layout="@layout/play_button" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
