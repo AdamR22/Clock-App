@@ -10,12 +10,17 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.lang.Exception
 
-class RunTimerAdapter(private val listOfTimers: List<String>, private val context: Context) :
+class RunTimerAdapter(
+    private val listOfTimers: List<String>,
+    private val context: Context,
+    private val fragmentManager: FragmentManager
+) :
     RecyclerView.Adapter<RunTimerAdapter.RunTimerViewHolder>() {
 
     private val TAG = "RunTimerAdapter"
@@ -53,6 +58,9 @@ class RunTimerAdapter(private val listOfTimers: List<String>, private val contex
 
     override fun onBindViewHolder(holder: RunTimerViewHolder, position: Int) {
         holder.tvSetTime.text = listOfTimers[position]
+        holder.btnAddTimer.setOnClickListener {
+            fragmentManager.popBackStack()
+        }
         holder.btnPauseTimer.setOnClickListener {
             Log.d(TAG, "onBindViewHolder: btn pause pressed")
             Thread {

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.R
+import ru.tinkoff.scrollingpagerindicator.ScrollingPagerIndicator
 
 class RunTimerFragment : Fragment() {
 
@@ -22,6 +23,7 @@ class RunTimerFragment : Fragment() {
     )
 
     private lateinit var mRecyclerView: RecyclerView
+    private lateinit var mRecyclerViewIndicator: ScrollingPagerIndicator
     private lateinit var runTimerAdapter: RunTimerAdapter
 
     override fun onCreateView(
@@ -34,10 +36,13 @@ class RunTimerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         mRecyclerView = view.findViewById(R.id.rv_run_timer)
-        runTimerAdapter = RunTimerAdapter(tempList, requireContext())
+        runTimerAdapter = RunTimerAdapter(tempList, requireContext(), parentFragmentManager)
+        mRecyclerViewIndicator = view.findViewById<ScrollingPagerIndicator?>(R.id.set_timer_indicator).also {
+            it.visibleDotCount = tempList.size
+        }
 
         mRecyclerView.adapter = runTimerAdapter
-        mRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        mRecyclerViewIndicator.attachToRecyclerView(mRecyclerView)
         super.onViewCreated(view, savedInstanceState)
     }
 

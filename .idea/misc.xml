@@ -10,6 +10,7 @@
         <entry key="app/src/main/res/drawable/ic_arrow_down.xml" value="0.2015" />
         <entry key="app/src/main/res/drawable/ic_arrow_up.xml" value="0.2015" />
         <entry key="app/src/main/res/drawable/ic_baseline_add_light.xml" value="0.2015" />
+        <entry key="app/src/main/res/drawable/ic_baseline_backspace_24.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_play_arrow_24.xml" value="0.2015" />
         <entry key="app/src/main/res/drawable/ic_baseline_play_arrow_black_24.xml" value="0.2015" />
         <entry key="app/src/main/res/drawable/ic_baseline_timer_off_24.xml" value="0.2015" />
@@ -34,7 +35,7 @@
         <entry key="app/src/main/res/layout-land/fragment_set_timer.xml" value="0.164021164021164" />
         <entry key="app/src/main/res/layout-land/pause_button.xml" value="0.164021164021164" />
         <entry key="app/src/main/res/layout-land/play_button.xml" value="0.164021164021164" />
-        <entry key="app/src/main/res/layout-land/run_timer_layout.xml" value="0.5" />
+        <entry key="app/src/main/res/layout-land/run_timer_layout.xml" value="0.33" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_sound.xml" value="0.33" />
         <entry key="app/src/main/res/layout/add_label_layout.xml" value="0.19375" />

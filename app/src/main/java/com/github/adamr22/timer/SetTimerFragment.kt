@@ -1,7 +1,6 @@
 package com.github.adamr22.timer
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -10,8 +9,10 @@ import android.widget.GridView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.flow.collectLatest
 
 class SetTimerFragment : Fragment() {
 
@@ -25,18 +26,13 @@ class SetTimerFragment : Fragment() {
     private lateinit var tvMinutes: TextView
     private lateinit var tvSeconds: TextView
 
-    private val TAG = "SetTimerFragment"
-    private val SET_TIMER_TAG = "Set Timer"
-
     private val timerNumpadText =
         arrayOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "00", "0", "X")
-
-    private var setTime: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         timerAdapter = SetTimerAdapter(timerNumpadText, requireContext())
         timerViewModel = ViewModelProvider(requireActivity())[TimerViewModel::class.java]
-        
+
         super.onCreate(savedInstanceState)
     }
 
@@ -49,12 +45,6 @@ class SetTimerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        savedInstanceState?.let {
-            setTime = it.getString(SET_TIMER_TAG)!!
-        }
-
-        Log.d(TAG, "onViewCreated: $setTime")
-
         btnStartTimer = view.findViewById(R.id.play)
         timerNumpad = view.findViewById(R.id.timer_numpad)
 
@@ -64,12 +54,18 @@ class SetTimerFragment : Fragment() {
 
         timerNumpad.adapter = timerAdapter
 
-        changeTextViewColor(setTime)
-
         super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onResume() {
+
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            timerViewModel.timer.collectLatest {
+                changeTextViewColor(it)
+                showBtn(it)
+            }
+        }
+
         btnStartTimer.setOnClickListener {
             setTime()
             parentFragmentManager.beginTransaction().setCustomAnimations(
@@ -77,22 +73,12 @@ class SetTimerFragment : Fragment() {
                 androidx.appcompat.R.anim.abc_slide_out_bottom
             )
                 .replace(R.id.timer_fragment_layout, RunTimerFragment.newInstance())
+                .addToBackStack(null)
                 .commit()
         }
 
         timerNumpad.setOnItemClickListener { _, _, position, _ ->
-            if (timerNumpadText[position] == "X" && setTime.isNotEmpty()) {
-                setTime = setTime.dropLast(1)
-            }
-
-            if (setTime.length < 6 && timerNumpadText[position] != "X") {
-                setTime += timerNumpadText[position]
-            }
-
-            Log.d(TAG, "onResume: Timer: $setTime")
-
-            changeTextViewColor(setTime)
-            showBtn(setTime)
+            timerViewModel.setTimer(timerNumpadText[position])
 
         }
         super.onResume()
@@ -345,11 +331,6 @@ class SetTimerFragment : Fragment() {
     }
 
     private fun setTime() {
-        // TODO: Set Time Functionality
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putString(SET_TIMER_TAG, setTime)
-        super.onSaveInstanceState(outState)
+        timerViewModel.setTimer(timerViewModel.timer.value)
     }
 }

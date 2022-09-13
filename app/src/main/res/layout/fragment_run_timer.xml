@@ -1,16 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="?actionBarSize"
     tools:context=".timer.RunTimerFragment">
 
-   <androidx.recyclerview.widget.RecyclerView
-       android:id="@+id/rv_run_timer"
-       android:layout_height="match_parent"
-       android:layout_width="match_parent">
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_run_timer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-   </androidx.recyclerview.widget.RecyclerView>
+    <ru.tinkoff.scrollingpagerindicator.ScrollingPagerIndicator
+        android:id="@+id/set_timer_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|end"
+        android:layout_margin="10dp"
+        app:spi_dotColor="@color/grey_50"
+        app:spi_dotSelectedColor="@color/black"
+        app:spi_dotSelectedSize="20dp"
+        app:spi_dotSize="8dp"
+        app:spi_orientation="vertical" />
 
 </FrameLayout>

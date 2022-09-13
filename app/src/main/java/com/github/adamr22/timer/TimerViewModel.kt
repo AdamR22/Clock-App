@@ -10,9 +10,18 @@ class TimerViewModel : ViewModel() {
 
     var timer: StateFlow<String> = _timer
 
-    fun setTime(input: String) {
-        if (_timer.value.isNotEmpty() && input == "X") _timer.value.dropLast(1)
-        if (_timer.value.length < 6 && input != "X") _timer.value += input
+    fun setTimer(input: String) {
+        if (input == "X" && _timer.value.isNotEmpty()) {
+            _timer.value = _timer.value.dropLast(1)
+        }
+
+        if (_timer.value.length < 6 && input != "X") {
+            _timer.value += input
+        }
+    }
+
+    fun addTimer(input: String) {
+        // TODO: set timer function
     }
 
 }
