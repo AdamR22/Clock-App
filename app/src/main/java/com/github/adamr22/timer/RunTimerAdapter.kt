@@ -1,30 +1,31 @@
 package com.github.adamr22.timer
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.R
+import com.github.adamr22.common.AddLabelDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import java.lang.Exception
+import kotlinx.coroutines.flow.collectLatest
+import java.util.*
 
 class RunTimerAdapter(
-    private val listOfTimers: List<String>,
     private val context: Context,
-    private val fragmentManager: FragmentManager
+    private val fragmentManager: FragmentManager,
+    private val viewModel: TimerViewModel
 ) :
     RecyclerView.Adapter<RunTimerAdapter.RunTimerViewHolder>() {
 
-    private val TAG = "RunTimerAdapter"
-    private var progress = 0
+    private var listOfTimers = mutableListOf<TimerModel>()
 
     inner class RunTimerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -56,31 +57,72 @@ class RunTimerAdapter(
         return RunTimerViewHolder(view)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: RunTimerViewHolder, position: Int) {
-        holder.tvSetTime.text = listOfTimers[position]
-        holder.btnAddTimer.setOnClickListener {
-            fragmentManager.popBackStack()
-        }
-        holder.btnPauseTimer.setOnClickListener {
-            Log.d(TAG, "onBindViewHolder: btn pause pressed")
-            Thread {
-                while (progress < 100) {
-                    progress += 1
-                    Handler(Looper.getMainLooper()).post {
-                        holder.pbTimer.progress = progress
-                    }
+        val timeInstance = listOfTimers[position].setTime
 
-                    try {
-                        Thread.sleep(200)
-                    } catch (e: Exception) {
-                        Log.d(TAG, "onBindViewHolder: ${e.printStackTrace()}")
+        val hours = timeInstance.get(Calendar.HOUR_OF_DAY)
+        val minutes = timeInstance.get(Calendar.MINUTE)
+        val seconds = timeInstance.get(Calendar.SECOND)
+
+        val timeSetTextView = holder.tvSetTime
+
+        if (hours == 0 && minutes == 0 && seconds != 0)
+            timeSetTextView.text = "$seconds"
+
+        if (hours == 0 && minutes != 0)
+            timeSetTextView.text = "$minutes:$seconds"
+
+        if (hours != 0)
+            timeSetTextView.text = "$hours:$minutes:$seconds"
+
+        holder.addLabel.text = listOfTimers[position].label ?: ""
+
+        holder.addLabel.setOnClickListener {
+            AddLabelDialog.newInstance(position, null, viewModel)
+        }
+
+        holder.btnDeleteTimer.setOnClickListener {
+            viewModel.deleteTimer(position)
+
+            (context as AppCompatActivity).lifecycleScope.launchWhenCreated {
+                viewModel.timers.collectLatest {
+                    when (it) {
+                        is TimerViewModel.TimerFragmentUIState.Timers -> {
+                            if (it.timerInstances.isEmpty()) {
+                                viewModel.currentFragment = 0
+                                fragmentManager.popBackStack()
+                            }
+                        }
+
+                        else -> {}
                     }
                 }
-            }.start()
+            }
+
+            notifyItemChanged(position)
+        }
+
+        holder.btnAddTimer.setOnClickListener {
+            viewModel.currentFragment = 0
+            fragmentManager.popBackStack()
+        }
+
+        holder.btnPauseTimer.setOnClickListener {
+            // TODO: Function to stop timer
         }
     }
 
     override fun getItemCount(): Int {
         return listOfTimers.size
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateList(newList: List<TimerModel>) {
+        listOfTimers.clear()
+        newList.forEach {
+            listOfTimers.add(it)
+        }
+        notifyDataSetChanged()
     }
 }

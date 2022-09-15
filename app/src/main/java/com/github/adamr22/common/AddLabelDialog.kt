@@ -28,7 +28,7 @@ class AddLabelDialog(
                     val label: String =
                         dialog?.findViewById<TextInputEditText>(R.id.add_label_edit_text)?.text.toString()
                     if (label.isNotEmpty()) {
-//                        addTimerLabel?.addLabel(label)
+                        addTimerLabel?.addLabel(position, label)
                         addAlarmLabel?.addLabel(label, position)
                     }
                 }

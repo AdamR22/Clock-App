@@ -32,10 +32,13 @@
         <entry key="app/src/main/res/layout-land/day_picker_layout.xml" value="0.164021164021164" />
         <entry key="app/src/main/res/layout-land/fragment_alarm.xml" value="0.164021164021164" />
         <entry key="app/src/main/res/layout-land/fragment_clock.xml" value="0.164021164021164" />
+        <entry key="app/src/main/res/layout-land/fragment_run_timer.xml" value="0.164021164021164" />
         <entry key="app/src/main/res/layout-land/fragment_set_timer.xml" value="0.164021164021164" />
+        <entry key="app/src/main/res/layout-land/fragment_timer.xml" value="0.164021164021164" />
         <entry key="app/src/main/res/layout-land/pause_button.xml" value="0.164021164021164" />
         <entry key="app/src/main/res/layout-land/play_button.xml" value="0.164021164021164" />
         <entry key="app/src/main/res/layout-land/run_timer_layout.xml" value="0.33" />
+        <entry key="app/src/main/res/layout-land/set_fragment_timer.xml" value="0.1641659311562224" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/activity_sound.xml" value="0.33" />
         <entry key="app/src/main/res/layout/add_label_layout.xml" value="0.19375" />
@@ -51,6 +54,7 @@
         <entry key="app/src/main/res/layout/pause_button.xml" value="0.33" />
         <entry key="app/src/main/res/layout/play_button.xml" value="0.10924750679963735" />
         <entry key="app/src/main/res/layout/run_timer_layout.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/set_fragment_timer.xml" value="0.15904232578024796" />
         <entry key="app/src/main/res/layout/sound_item_layout.xml" value="0.33" />
         <entry key="app/src/main/res/menu/bottom_nav_menu.xml" value="0.19375" />
       </map>

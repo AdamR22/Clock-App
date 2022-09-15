@@ -3,25 +3,204 @@ package com.github.adamr22.timer
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.util.*
 
-class TimerViewModel : ViewModel() {
-    private var _timers = MutableStateFlow<MutableList<TimerModel>>(mutableListOf())
-    private var _timer = MutableStateFlow("")
+class TimerViewModel: ViewModel() {
+    private val UNIT = 60 // to determine seconds, minutes or hours depending on input string value
+    var setTime = "" // prevents data loss as a result of screen rotation
+    var newTimerAdded = false // allows for navigation between run timer layout and add timer layout
+    var currentFragment = 0 // 0 for setTimerFragment, 1 for runTimerFragment
 
-    var timer: StateFlow<String> = _timer
+    private val timerRepository = TimerRepository()
+    private var _timers = MutableStateFlow<TimerFragmentUIState>(TimerFragmentUIState.Empty)
 
-    fun setTimer(input: String) {
-        if (input == "X" && _timer.value.isNotEmpty()) {
-            _timer.value = _timer.value.dropLast(1)
-        }
+    val timers: StateFlow<TimerFragmentUIState> = _timers
 
-        if (_timer.value.length < 6 && input != "X") {
-            _timer.value += input
-        }
+    sealed class TimerFragmentUIState {
+        data class Timers(val timerInstances: List<TimerModel>) : TimerFragmentUIState()
+        object Empty : TimerFragmentUIState()
     }
 
+
     fun addTimer(input: String) {
-        // TODO: set timer function
+        val c = Calendar.getInstance().apply {
+            this.set(Calendar.HOUR_OF_DAY, 0)
+            this.set(Calendar.MINUTE, 0)
+            this.set(Calendar.SECOND, 0)
+
+            when (input.length) {
+                1 -> this.set(Calendar.SECOND, input.toInt())
+                2 -> {
+                    if (input.toInt() >= 60) {
+                        val minutes = input.toInt() / UNIT
+                        val seconds = input.toInt() % UNIT
+
+                        this.set(Calendar.MINUTE, minutes)
+                        this.set(Calendar.SECOND, seconds)
+                    }
+
+                    this.set(Calendar.SECOND, input.toInt())
+                }
+
+                3 -> {
+                    val minuteVal = input.slice(0..0)
+                    val secondsVal = input.slice(1..2)
+
+                    this.set(Calendar.MINUTE, minuteVal.toInt())
+
+                    if (secondsVal.toInt() >= UNIT) {
+                        val minutes = secondsVal.toInt() / UNIT
+                        val seconds = secondsVal.toInt() % UNIT
+
+                        this.add(Calendar.MINUTE, minutes)
+                        this.set(Calendar.SECOND, seconds)
+                    } else {
+                        this.set(Calendar.SECOND, secondsVal.toInt())
+                    }
+                }
+
+                4 -> {
+                    val minuteVal = input.slice(0..1)
+                    val secondsVal = input.slice(2..3)
+
+
+                    if (minuteVal.toInt() >= UNIT) {
+                        val hours = minuteVal.toInt() / UNIT
+                        val minutes = minuteVal.toInt() % UNIT
+
+                        this.set(Calendar.HOUR_OF_DAY, hours)
+                        this.set(Calendar.MINUTE, minutes)
+
+                        if (secondsVal.toInt() >= UNIT) {
+                            val min = secondsVal.toInt() / UNIT
+                            val seconds = secondsVal.toInt() % UNIT
+
+                            this.add(Calendar.MINUTE, min)
+                            this.set(Calendar.SECOND, seconds)
+                        }
+
+                        if (secondsVal.toInt() < UNIT)
+                            this.set(Calendar.SECOND, secondsVal.toInt())
+                    }
+
+                    if (minuteVal.toInt() < UNIT) {
+                        this.set(Calendar.MINUTE, minuteVal.toInt())
+
+                        if (secondsVal.toInt() >= UNIT) {
+                            val min = secondsVal.toInt() / UNIT
+                            val seconds = secondsVal.toInt() % UNIT
+
+                            this.add(Calendar.MINUTE, min)
+                            this.set(Calendar.SECOND, seconds)
+                        }
+
+                        if (secondsVal.toInt() < UNIT)
+                            this.set(Calendar.SECOND, secondsVal.toInt())
+                    }
+                }
+
+                5 -> {
+                    val hourVal = input.slice(0..0)
+                    val minuteVal = input.slice(1..2)
+                    val secondsVal = input.slice(3..4)
+
+                    this.set(Calendar.HOUR_OF_DAY, hourVal.toInt())
+
+                    if (minuteVal.toInt() >= UNIT) {
+                        val hours = minuteVal.toInt() / UNIT
+                        val minutes = minuteVal.toInt() % UNIT
+
+                        this.add(Calendar.HOUR_OF_DAY, hours)
+                        this.set(Calendar.MINUTE, minutes)
+
+                        if (secondsVal.toInt() >= UNIT) {
+                            val min = secondsVal.toInt() / UNIT
+                            val seconds = secondsVal.toInt() % UNIT
+
+                            this.add(Calendar.MINUTE, min)
+                            this.set(Calendar.SECOND, seconds)
+                        }
+
+                        if (secondsVal.toInt() < UNIT)
+                            this.set(Calendar.SECOND, secondsVal.toInt())
+                    }
+
+                    if (minuteVal.toInt() < UNIT) {
+                        this.set(Calendar.MINUTE, minuteVal.toInt())
+
+                        if (secondsVal.toInt() >= UNIT) {
+                            val min = secondsVal.toInt() / UNIT
+                            val seconds = secondsVal.toInt() % UNIT
+
+                            this.add(Calendar.MINUTE, min)
+                            this.set(Calendar.SECOND, seconds)
+                        }
+
+                        if (secondsVal.toInt() < UNIT)
+                            this.set(Calendar.SECOND, secondsVal.toInt())
+                    }
+
+                }
+
+                6 -> {
+                    val hourVal = input.slice(0..1)
+                    val minuteVal = input.slice(2..3)
+                    val secondsVal = input.slice(4..5)
+
+                    this.set(Calendar.HOUR_OF_DAY, hourVal.toInt())
+
+                    if (minuteVal.toInt() >= UNIT) {
+                        val hours = minuteVal.toInt() / UNIT
+                        val minutes = minuteVal.toInt() % UNIT
+
+                        this.add(Calendar.HOUR_OF_DAY, hours)
+                        this.set(Calendar.MINUTE, minutes)
+
+                        if (secondsVal.toInt() >= UNIT) {
+                            val min = secondsVal.toInt() / UNIT
+                            val seconds = secondsVal.toInt() % UNIT
+
+                            this.add(Calendar.MINUTE, min)
+                            this.set(Calendar.SECOND, seconds)
+                        }
+
+                        if (secondsVal.toInt() < UNIT)
+                            this.set(Calendar.SECOND, secondsVal.toInt())
+                    }
+
+                    if (minuteVal.toInt() < UNIT) {
+                        this.set(Calendar.MINUTE, minuteVal.toInt())
+
+                        if (secondsVal.toInt() >= UNIT) {
+                            val min = secondsVal.toInt() / UNIT
+                            val seconds = secondsVal.toInt() % UNIT
+
+                            this.add(Calendar.MINUTE, min)
+                            this.set(Calendar.SECOND, seconds)
+                        }
+
+                        if (secondsVal.toInt() < UNIT)
+                            this.set(Calendar.SECOND, secondsVal.toInt())
+                    }
+                }
+            }
+        }
+
+        val timerModel = TimerModel(c)
+        timerRepository.addTimer(timerModel)
+        _timers.value = TimerFragmentUIState.Timers(timerRepository.getTimersList())
+    }
+
+    fun addNewTimer() { newTimerAdded = !newTimerAdded }
+
+    fun addLabel(index: Int, label: String) {
+        timerRepository.addLabel(index, label)
+        _timers.value = TimerFragmentUIState.Timers(timerRepository.getTimersList())
+    }
+
+    fun deleteTimer(index: Int) {
+        timerRepository.deleteTimer(index)
+        _timers.value = TimerFragmentUIState.Timers(timerRepository.getTimersList())
     }
 
 }

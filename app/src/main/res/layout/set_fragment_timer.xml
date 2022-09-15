@@ -2,18 +2,18 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_marginTop="?attr/actionBarSize"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginTop="?attr/actionBarSize"
     tools:context=".timer.SetTimerFragment">
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="250sp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="24dp"
-        android:orientation="horizontal"
         android:weightSum="3"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -26,7 +26,8 @@
             android:fontFamily="@font/poppins_medium"
             android:gravity="center"
             android:text="00h"
-            android:textSize="32sp"
+            android:textColor="@color/grey_50"
+            android:textSize="40sp"
             tools:text="00h" />
 
         <TextView
@@ -37,7 +38,8 @@
             android:fontFamily="@font/poppins_medium"
             android:gravity="center"
             android:text="00m"
-            android:textSize="32sp"
+            android:textColor="@color/grey_50"
+            android:textSize="40sp"
             tools:text="00m" />
 
         <TextView
@@ -49,26 +51,28 @@
             android:fontFamily="@font/poppins_medium"
             android:gravity="center"
             android:text="00s"
-            android:textSize="32sp"
+            android:textColor="@color/grey_50"
+            android:textSize="40sp"
             tools:text="00s" />
 
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/numpad_layout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintStart_toEndOf="@id/linearLayout"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
         <GridView
             android:id="@+id/timer_numpad"
-            android:layout_width="250sp"
-            android:layout_height="190sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
-            android:layout_marginStart="20dp"
             android:gravity="center"
             android:numColumns="3"
             android:verticalSpacing="5dp" />
@@ -78,12 +82,29 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/numpad_layout"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/numpad_layout">
 
         <include layout="@layout/play_button" />
     </LinearLayout>
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btn_delete_timer_instance"
+        style="@style/LightModeFab"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="64dp"
+        android:clickable="true"
+        android:contentDescription="@string/delete"
+        android:focusable="true"
+        android:visibility="gone"
+        app:fabCustomSize="50dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/numpad_layout"
+        app:srcCompat="@drawable/ic_delete" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

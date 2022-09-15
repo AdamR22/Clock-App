@@ -16,9 +16,12 @@ import kotlinx.coroutines.flow.collectLatest
 
 class SetTimerFragment : Fragment() {
 
+    private var setTime = ""
+
     private lateinit var timerViewModel: TimerViewModel
 
     private lateinit var btnStartTimer: FloatingActionButton
+    private lateinit var btnDeleteTimer: FloatingActionButton
     private lateinit var timerAdapter: SetTimerAdapter
     private lateinit var timerNumpad: GridView
 
@@ -29,9 +32,15 @@ class SetTimerFragment : Fragment() {
     private val timerNumpadText =
         arrayOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "00", "0", "X")
 
+    companion object {
+        fun newInstance() = SetTimerFragment()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         timerAdapter = SetTimerAdapter(timerNumpadText, requireContext())
         timerViewModel = ViewModelProvider(requireActivity())[TimerViewModel::class.java]
+
+        setTime = timerViewModel.setTime
 
         super.onCreate(savedInstanceState)
     }
@@ -40,11 +49,12 @@ class SetTimerFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_set_timer, container, false)
+        return inflater.inflate(R.layout.set_fragment_timer, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
+        btnDeleteTimer = view.findViewById(R.id.btn_delete_timer_instance)
         btnStartTimer = view.findViewById(R.id.play)
         timerNumpad = view.findViewById(R.id.timer_numpad)
 
@@ -54,40 +64,52 @@ class SetTimerFragment : Fragment() {
 
         timerNumpad.adapter = timerAdapter
 
+        changeTextViewColor(setTime)
+        showBtn(setTime)
+
         super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onResume() {
 
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-            timerViewModel.timer.collectLatest {
-                changeTextViewColor(it)
-                showBtn(it)
+            timerViewModel.timers.collectLatest {
+                when (it) {
+                    is TimerViewModel.TimerFragmentUIState.Timers -> {
+                        btnDeleteTimer.visibility =
+                            if (it.timerInstances.isEmpty()) View.GONE else View.VISIBLE
+                    }
+
+                    else -> {}
+                }
             }
         }
 
+        btnDeleteTimer.setOnClickListener { navigateToRunTimerScreen() }
+
         btnStartTimer.setOnClickListener {
-            setTime()
-            parentFragmentManager.beginTransaction().setCustomAnimations(
-                androidx.appcompat.R.anim.abc_slide_in_top,
-                androidx.appcompat.R.anim.abc_slide_out_bottom
-            )
-                .replace(R.id.timer_fragment_layout, RunTimerFragment.newInstance())
-                .addToBackStack(null)
-                .commit()
+            setTime(setTime)
         }
 
         timerNumpad.setOnItemClickListener { _, _, position, _ ->
-            timerViewModel.setTimer(timerNumpadText[position])
+            if (timerNumpadText[position] == "X" && setTime.isNotEmpty()) {
+                setTime = setTime.dropLast(1)
+            }
 
+            if (setTime.length < 6 && timerNumpadText[position] != "X") {
+                setTime += timerNumpadText[position]
+            }
+
+            changeTextViewColor(setTime)
+            showBtn(setTime)
         }
+
         super.onResume()
     }
 
-    companion object {
-        @JvmStatic
-        fun newInstance() =
-            SetTimerFragment()
+    override fun onDestroy() {
+        timerViewModel.setTime = setTime
+        super.onDestroy()
     }
 
     private fun changeTextViewColor(input: String) {
@@ -330,7 +352,20 @@ class SetTimerFragment : Fragment() {
         btnStartTimer.visibility = if (input.isEmpty()) View.GONE else View.VISIBLE
     }
 
-    private fun setTime() {
-        timerViewModel.setTimer(timerViewModel.timer.value)
+    private fun setTime(input: String) {
+        timerViewModel.addTimer(input)
+        navigateToRunTimerScreen()
     }
+
+    private fun navigateToRunTimerScreen() {
+        timerViewModel.currentFragment = 1
+
+        val runTimerFrag = RunTimerFragment.newInstance().apply {
+            this.passViewModel(timerViewModel)
+        }
+
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.timer_fragment_layout, runTimerFrag).addToBackStack(null).commit()
+    }
+
 }

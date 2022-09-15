@@ -165,7 +165,7 @@ class MainActivity : AppCompatActivity(), AlarmRecyclerViewAdapter.CallbackInter
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putInt(FRAGMENT_ID, currentFragment) // Save most recent fragment in current session
+        outState.putInt(FRAGMENT_ID, currentFragment)// Save most recent fragment in current session
         super.onSaveInstanceState(outState)
     }
 }
