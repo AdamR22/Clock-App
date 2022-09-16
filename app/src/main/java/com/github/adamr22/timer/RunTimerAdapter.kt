@@ -2,6 +2,7 @@ package com.github.adamr22.timer
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,7 +26,15 @@ class RunTimerAdapter(
 ) :
     RecyclerView.Adapter<RunTimerAdapter.RunTimerViewHolder>() {
 
+    private val TAG = "RunTimerAdapter"
+
     private var listOfTimers = mutableListOf<TimerModel>()
+
+    private enum class TimerStates {
+        PAUSED, RUNNING, STOPPED
+    }
+
+    private var timerState = TimerStates.RUNNING
 
     inner class RunTimerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -76,11 +85,26 @@ class RunTimerAdapter(
         if (hours != 0)
             timeSetTextView.text = "$hours:$minutes:$seconds"
 
-        holder.addLabel.text = listOfTimers[position].label ?: ""
+        holder.addLabel.text =
+            listOfTimers[position].label ?: context.resources.getString(R.string.label)
+
+        Log.d(TAG, "onBindViewHolder: label text; ${holder.addLabel.text}")
 
         holder.addLabel.setOnClickListener {
-            AddLabelDialog.newInstance(position, null, viewModel)
+            Log.d(TAG, "onBindViewHolder: Add Label Clicked")
+            AddLabelDialog.newInstance(position, null, viewModel).show(fragmentManager, "Timer Label")
+
+            (context as AppCompatActivity).lifecycleScope.launchWhenCreated {
+                viewModel.timerLabelState.collectLatest {
+                    if (it is TimerViewModel.TimerLabelState.Changed) notifyItemChanged(position)
+                }
+            }
         }
+
+        holder.tvAddOneMinOrReset.text =
+            if (timerState == TimerStates.RUNNING) context.resources.getString(R.string.add_1_min) else context.resources.getString(
+                R.string.reset
+            )
 
         holder.btnDeleteTimer.setOnClickListener {
             viewModel.deleteTimer(position)
@@ -108,8 +132,23 @@ class RunTimerAdapter(
             fragmentManager.popBackStack()
         }
 
+        holder.btnPauseTimer.visibility =
+            if (timerState == TimerStates.RUNNING) View.VISIBLE else View.GONE
+
         holder.btnPauseTimer.setOnClickListener {
             // TODO: Function to stop timer
+            Log.d(TAG, "onBindViewHolder: pause button pressed")
+            timerState = TimerStates.PAUSED
+            notifyItemChanged(position)
+        }
+
+        holder.btnPlayTimer.visibility =
+            if (timerState == TimerStates.PAUSED || timerState == TimerStates.STOPPED) View.VISIBLE else View.GONE
+
+        holder.btnPlayTimer.setOnClickListener {
+            // TODO: Function to resume timer
+            timerState = TimerStates.RUNNING
+            notifyItemChanged(position)
         }
     }
 

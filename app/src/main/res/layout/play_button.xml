@@ -4,7 +4,7 @@
     android:id="@+id/play"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginTop="32dp"
+    android:layout_marginTop="28dp"
     android:clickable="true"
     android:focusable="true"
     android:contentDescription="@string/start_timer"

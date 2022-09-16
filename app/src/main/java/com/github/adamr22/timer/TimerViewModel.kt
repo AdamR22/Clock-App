@@ -8,19 +8,24 @@ import java.util.*
 class TimerViewModel: ViewModel() {
     private val UNIT = 60 // to determine seconds, minutes or hours depending on input string value
     var setTime = "" // prevents data loss as a result of screen rotation
-    var newTimerAdded = false // allows for navigation between run timer layout and add timer layout
     var currentFragment = 0 // 0 for setTimerFragment, 1 for runTimerFragment
 
     private val timerRepository = TimerRepository()
     private var _timers = MutableStateFlow<TimerFragmentUIState>(TimerFragmentUIState.Empty)
+    private var _timerLabelState = MutableStateFlow<TimerLabelState>(TimerLabelState.Unchanged)
 
     val timers: StateFlow<TimerFragmentUIState> = _timers
+    val timerLabelState: StateFlow<TimerLabelState> = _timerLabelState
 
     sealed class TimerFragmentUIState {
         data class Timers(val timerInstances: List<TimerModel>) : TimerFragmentUIState()
         object Empty : TimerFragmentUIState()
     }
 
+    sealed class TimerLabelState {
+        object Changed: TimerLabelState()
+        object Unchanged: TimerLabelState()
+    }
 
     fun addTimer(input: String) {
         val c = Calendar.getInstance().apply {
@@ -191,11 +196,11 @@ class TimerViewModel: ViewModel() {
         _timers.value = TimerFragmentUIState.Timers(timerRepository.getTimersList())
     }
 
-    fun addNewTimer() { newTimerAdded = !newTimerAdded }
-
     fun addLabel(index: Int, label: String) {
+        _timerLabelState.value = TimerLabelState.Unchanged
         timerRepository.addLabel(index, label)
         _timers.value = TimerFragmentUIState.Timers(timerRepository.getTimersList())
+        _timerLabelState.value = TimerLabelState.Changed
     }
 
     fun deleteTimer(index: Int) {
