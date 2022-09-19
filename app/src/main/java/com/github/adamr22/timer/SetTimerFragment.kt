@@ -93,7 +93,7 @@ class SetTimerFragment : Fragment() {
 
         timerNumpad.setOnItemClickListener { _, _, position, _ ->
             if (timerNumpadText[position] == "X" && setTime.isNotEmpty()) {
-                setTime = setTime.dropLast(1)
+                setTime = setTime.replace(setTime, "")
             }
 
             if (setTime.length < 6 && timerNumpadText[position] != "X") {

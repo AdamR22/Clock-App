@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -70,6 +71,8 @@ class RunTimerAdapter(
     override fun onBindViewHolder(holder: RunTimerViewHolder, position: Int) {
         val timeInstance = listOfTimers[position].setTime
 
+        val animation = AnimationUtils.loadAnimation(context.applicationContext, R.anim.blink)
+
         val hours = timeInstance.get(Calendar.HOUR_OF_DAY)
         val minutes = timeInstance.get(Calendar.MINUTE)
         val seconds = timeInstance.get(Calendar.SECOND)
@@ -90,9 +93,14 @@ class RunTimerAdapter(
 
         Log.d(TAG, "onBindViewHolder: label text; ${holder.addLabel.text}")
 
+        if (timerState == TimerStates.PAUSED || timerState == TimerStates.STOPPED) timeSetTextView.startAnimation(
+            animation
+        ) else timeSetTextView.clearAnimation()
+
         holder.addLabel.setOnClickListener {
             Log.d(TAG, "onBindViewHolder: Add Label Clicked")
-            AddLabelDialog.newInstance(position, null, viewModel).show(fragmentManager, "Timer Label")
+            AddLabelDialog.newInstance(position, null, viewModel)
+                .show(fragmentManager, "Timer Label")
 
             (context as AppCompatActivity).lifecycleScope.launchWhenCreated {
                 viewModel.timerLabelState.collectLatest {
