@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.*
 
-class TimerViewModel: ViewModel() {
+class TimerViewModel : ViewModel() {
     private val UNIT = 60 // to determine seconds, minutes or hours depending on input string value
     var setTime = "" // prevents data loss as a result of screen rotation
     var currentFragment = 0 // 0 for setTimerFragment, 1 for runTimerFragment
@@ -13,9 +13,11 @@ class TimerViewModel: ViewModel() {
     private val timerRepository = TimerRepository()
     private var _timers = MutableStateFlow<TimerFragmentUIState>(TimerFragmentUIState.Empty)
     private var _timerLabelState = MutableStateFlow<TimerLabelState>(TimerLabelState.Unchanged)
+    private var _timerState = MutableStateFlow<TimerState>(TimerState.Changed(TimerStates.RUNNING))
 
     val timers: StateFlow<TimerFragmentUIState> = _timers
     val timerLabelState: StateFlow<TimerLabelState> = _timerLabelState
+    val timerState: StateFlow<TimerState> = _timerState
 
     sealed class TimerFragmentUIState {
         data class Timers(val timerInstances: List<TimerModel>) : TimerFragmentUIState()
@@ -25,6 +27,15 @@ class TimerViewModel: ViewModel() {
     sealed class TimerLabelState {
         object Changed: TimerLabelState()
         object Unchanged: TimerLabelState()
+    }
+
+    sealed class TimerState {
+        data class Changed(val state: TimerStates): TimerState()
+        object Unchanged: TimerState()
+    }
+
+    enum class TimerStates {
+        PAUSED, RUNNING, STOPPED
     }
 
     fun addTimer(input: String) {
@@ -206,6 +217,12 @@ class TimerViewModel: ViewModel() {
     fun deleteTimer(index: Int) {
         timerRepository.deleteTimer(index)
         _timers.value = TimerFragmentUIState.Timers(timerRepository.getTimersList())
+    }
+
+    fun changeTimerState(index: Int, state: TimerStates) {
+        _timerState.value = TimerState.Unchanged
+        timerRepository.changeTimerState(index, state)
+        _timerState.value = TimerState.Changed(state)
     }
 
 }

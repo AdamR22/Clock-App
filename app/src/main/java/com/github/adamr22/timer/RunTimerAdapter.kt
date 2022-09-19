@@ -2,10 +2,12 @@ package com.github.adamr22.timer
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageButton
 import android.widget.ProgressBar
@@ -31,12 +33,6 @@ class RunTimerAdapter(
 
     private var listOfTimers = mutableListOf<TimerModel>()
 
-    private enum class TimerStates {
-        PAUSED, RUNNING, STOPPED
-    }
-
-    private var timerState = TimerStates.RUNNING
-
     inner class RunTimerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         val addLabel: TextView
@@ -48,6 +44,8 @@ class RunTimerAdapter(
         val btnAddTimer: FloatingActionButton
         val btnPauseTimer: ImageButton
         val pbTimer: ProgressBar
+
+        var viewHolderTimerState: TimerViewModel.TimerStates = TimerViewModel.TimerStates.RUNNING
 
         init {
             btnPlayTimer = itemView.findViewById(R.id.play)
@@ -67,9 +65,19 @@ class RunTimerAdapter(
         return RunTimerViewHolder(view)
     }
 
+    override fun onViewAttachedToWindow(holder: RunTimerViewHolder) {
+        val animation = AnimationUtils.loadAnimation(context.applicationContext, R.anim.blink)
+
+        if (holder.viewHolderTimerState == TimerViewModel.TimerStates.PAUSED || holder.viewHolderTimerState == TimerViewModel.TimerStates.STOPPED) holder.tvSetTime.startAnimation(
+            animation
+        ) else holder.viewHolderTimerState
+        super.onViewAttachedToWindow(holder)
+    }
+
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: RunTimerViewHolder, position: Int) {
         val timeInstance = listOfTimers[position].setTime
+        var timer = listOfTimers[position].timer
 
         val animation = AnimationUtils.loadAnimation(context.applicationContext, R.anim.blink)
 
@@ -93,9 +101,15 @@ class RunTimerAdapter(
 
         Log.d(TAG, "onBindViewHolder: label text; ${holder.addLabel.text}")
 
-        if (timerState == TimerStates.PAUSED || timerState == TimerStates.STOPPED) timeSetTextView.startAnimation(
-            animation
-        ) else timeSetTextView.clearAnimation()
+        timer = object : CountDownTimer(2000, 0) {
+            override fun onTick(p0: Long) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onFinish() {
+                TODO("Not yet implemented")
+            }
+        }
 
         holder.addLabel.setOnClickListener {
             Log.d(TAG, "onBindViewHolder: Add Label Clicked")
@@ -108,11 +122,6 @@ class RunTimerAdapter(
                 }
             }
         }
-
-        holder.tvAddOneMinOrReset.text =
-            if (timerState == TimerStates.RUNNING) context.resources.getString(R.string.add_1_min) else context.resources.getString(
-                R.string.reset
-            )
 
         holder.btnDeleteTimer.setOnClickListener {
             viewModel.deleteTimer(position)
@@ -140,23 +149,29 @@ class RunTimerAdapter(
             fragmentManager.popBackStack()
         }
 
-        holder.btnPauseTimer.visibility =
-            if (timerState == TimerStates.RUNNING) View.VISIBLE else View.GONE
-
         holder.btnPauseTimer.setOnClickListener {
             // TODO: Function to stop timer
             Log.d(TAG, "onBindViewHolder: pause button pressed")
-            timerState = TimerStates.PAUSED
-            notifyItemChanged(position)
-        }
+            (context as AppCompatActivity).lifecycleScope.launchWhenCreated {
+                // Render view according to timer state
+                viewModel.timerState.collectLatest {
+                    renderViewAppropriately(animation, holder, it, timeSetTextView)
+                }
 
-        holder.btnPlayTimer.visibility =
-            if (timerState == TimerStates.PAUSED || timerState == TimerStates.STOPPED) View.VISIBLE else View.GONE
+            }
+            viewModel.changeTimerState(position, TimerViewModel.TimerStates.PAUSED)
+        }
 
         holder.btnPlayTimer.setOnClickListener {
             // TODO: Function to resume timer
-            timerState = TimerStates.RUNNING
-            notifyItemChanged(position)
+            (context as AppCompatActivity).lifecycleScope.launchWhenCreated {
+                // Render view according to timer state
+                viewModel.timerState.collectLatest { timerState ->
+                    renderViewAppropriately(animation, holder, timerState, timeSetTextView)
+                }
+
+            }
+            viewModel.changeTimerState(position, TimerViewModel.TimerStates.RUNNING)
         }
     }
 
@@ -172,4 +187,33 @@ class RunTimerAdapter(
         }
         notifyDataSetChanged()
     }
+
+    private fun renderViewAppropriately(
+        animation: Animation,
+        holder: RunTimerViewHolder,
+        timerState: TimerViewModel.TimerState,
+        timeSetTextView: TextView
+    ) {
+        if (timerState is TimerViewModel.TimerState.Changed) {
+            holder.viewHolderTimerState = timerState.state
+
+            holder.btnPlayTimer.visibility =
+                if (timerState.state == TimerViewModel.TimerStates.PAUSED || timerState.state == TimerViewModel.TimerStates.STOPPED) View.VISIBLE else View.GONE
+
+            holder.btnPauseTimer.visibility =
+                if (timerState.state == TimerViewModel.TimerStates.RUNNING) View.VISIBLE else View.GONE
+
+            holder.tvAddOneMinOrReset.text =
+                if (timerState.state == TimerViewModel.TimerStates.RUNNING) context.resources.getString(
+                    R.string.add_1_min
+                ) else context.resources.getString(
+                    R.string.reset
+                )
+
+            if (timerState.state == TimerViewModel.TimerStates.PAUSED || timerState.state == TimerViewModel.TimerStates.STOPPED) timeSetTextView.startAnimation(
+                animation
+            ) else timeSetTextView.clearAnimation()
+        }
+    }
+
 }

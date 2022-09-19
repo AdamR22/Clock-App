@@ -94,6 +94,9 @@ class SetTimerFragment : Fragment() {
         timerNumpad.setOnItemClickListener { _, _, position, _ ->
             if (timerNumpadText[position] == "X" && setTime.isNotEmpty()) {
                 setTime = setTime.replace(setTime, "")
+                tvHours.text = String.format(getString(R.string.timer_text, "00", "h"))
+                tvMinutes.text = String.format(getString(R.string.timer_text, "00", "m"))
+                tvSeconds.text = String.format(getString(R.string.timer_text, "00", "s"))
             }
 
             if (setTime.length < 6 && timerNumpadText[position] != "X") {
@@ -122,7 +125,22 @@ class SetTimerFragment : Fragment() {
                         R.color.grey_50
                     )
                 )
-                this.text = String.format(getString(R.string.timer_text, "00", "s"))
+                tvMinutes.apply {
+                    this.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.grey_50
+                        )
+                    )
+                }
+                tvHours.apply {
+                    this.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.grey_50
+                        )
+                    )
+                }
             }
             1 -> {
                 tvSeconds.apply {
