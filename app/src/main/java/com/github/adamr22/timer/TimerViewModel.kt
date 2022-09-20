@@ -55,7 +55,8 @@ class TimerViewModel : ViewModel() {
                         this.set(Calendar.SECOND, seconds)
                     }
 
-                    this.set(Calendar.SECOND, input.toInt())
+                    if (input.toInt() < 60) this.set(Calendar.SECOND, input.toInt())
+
                 }
 
                 3 -> {

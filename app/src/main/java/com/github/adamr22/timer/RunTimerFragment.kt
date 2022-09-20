@@ -81,6 +81,7 @@ class RunTimerFragment : Fragment() {
             timer.timer = object: CountDownTimer(timeInMilliseconds, 1000) {
                 override fun onTick(timerUntilFinished: Long) {
                     Log.d(TAG, "onTick: Timer position: $timerPosition")
+                    Log.d(TAG, "onTick: ${timers[timerPosition].setTime.get(Calendar.MINUTE)}")
                     Log.d(TAG, "onTick: Time till finish: ${timerUntilFinished/1000} seconds")
                 }
 
