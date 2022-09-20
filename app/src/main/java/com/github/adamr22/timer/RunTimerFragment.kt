@@ -1,6 +1,8 @@
 package com.github.adamr22.timer
 
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,8 +13,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.R
 import kotlinx.coroutines.flow.collectLatest
 import ru.tinkoff.scrollingpagerindicator.ScrollingPagerIndicator
+import java.util.Calendar
 
 class RunTimerFragment : Fragment() {
+
+    private val TAG = "RunTimerFragment"
 
     private lateinit var mRecyclerView: RecyclerView
     private lateinit var mRecyclerViewAdapter: RunTimerAdapter
@@ -48,9 +53,10 @@ class RunTimerFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
             timerViewModel.timers.collectLatest {
                 when (it) {
-                    is TimerViewModel.TimerFragmentUIState.Timers ->
+                    is TimerViewModel.TimerFragmentUIState.Timers -> {
                         mRecyclerViewAdapter.updateList(it.timerInstances)
-
+                        runTimers(it.timerInstances)
+                    }
                     else -> {}
                 }
             }
@@ -63,4 +69,34 @@ class RunTimerFragment : Fragment() {
         fun newInstance() =
             RunTimerFragment()
     }
+
+    private fun runTimers(timers: List<TimerModel>) {
+        if (timers.isEmpty()) return
+
+        timers.forEach { timer ->
+            val timerPosition = timers.indexOf(timer)
+
+            val timeInMilliseconds = convertTimeToMilliseconds(timer.setTime)
+
+            timer.timer = object: CountDownTimer(timeInMilliseconds, 1000) {
+                override fun onTick(timerUntilFinished: Long) {
+                    Log.d(TAG, "onTick: Timer position: $timerPosition")
+                    Log.d(TAG, "onTick: Time till finish: ${timerUntilFinished/1000} seconds")
+                }
+
+                override fun onFinish() {
+                    timer.timer?.cancel()
+                }
+            }.start()
+        }
+    }
+
+    private fun convertTimeToMilliseconds(setTimeInstance: Calendar): Long {
+        val hoursInMilli = setTimeInstance.get(Calendar.HOUR_OF_DAY) * 3600 * 1000
+        val minutesInMilli = setTimeInstance.get(Calendar.MINUTE) * 60 * 1000
+        val secondsInMilli = setTimeInstance.get(Calendar.SECOND) * 1000
+
+        return (hoursInMilli + minutesInMilli + secondsInMilli).toLong()
+    }
+
 }

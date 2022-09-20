@@ -2,7 +2,6 @@ package com.github.adamr22.timer
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -66,6 +65,8 @@ class RunTimerAdapter(
     }
 
     override fun onViewAttachedToWindow(holder: RunTimerViewHolder) {
+        // TODO: Solve animations occuring at same time issue
+
         val animation = AnimationUtils.loadAnimation(context.applicationContext, R.anim.blink)
 
         if (holder.viewHolderTimerState == TimerViewModel.TimerStates.PAUSED || holder.viewHolderTimerState == TimerViewModel.TimerStates.STOPPED) holder.tvSetTime.startAnimation(
@@ -77,7 +78,7 @@ class RunTimerAdapter(
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: RunTimerViewHolder, position: Int) {
         val timeInstance = listOfTimers[position].setTime
-        var timer = listOfTimers[position].timer
+        val timer = listOfTimers[position].timer
 
         val animation = AnimationUtils.loadAnimation(context.applicationContext, R.anim.blink)
 
@@ -101,16 +102,6 @@ class RunTimerAdapter(
 
         Log.d(TAG, "onBindViewHolder: label text; ${holder.addLabel.text}")
 
-        timer = object : CountDownTimer(2000, 0) {
-            override fun onTick(p0: Long) {
-                TODO("Not yet implemented")
-            }
-
-            override fun onFinish() {
-                TODO("Not yet implemented")
-            }
-        }
-
         holder.addLabel.setOnClickListener {
             Log.d(TAG, "onBindViewHolder: Add Label Clicked")
             AddLabelDialog.newInstance(position, null, viewModel)
@@ -124,6 +115,7 @@ class RunTimerAdapter(
         }
 
         holder.btnDeleteTimer.setOnClickListener {
+            timer?.cancel()
             viewModel.deleteTimer(position)
 
             (context as AppCompatActivity).lifecycleScope.launchWhenCreated {
@@ -152,6 +144,8 @@ class RunTimerAdapter(
         holder.btnPauseTimer.setOnClickListener {
             // TODO: Function to stop timer
             Log.d(TAG, "onBindViewHolder: pause button pressed")
+            viewModel.changeTimerState(position, TimerViewModel.TimerStates.PAUSED)
+            timer?.cancel()
             (context as AppCompatActivity).lifecycleScope.launchWhenCreated {
                 // Render view according to timer state
                 viewModel.timerState.collectLatest {
@@ -159,11 +153,12 @@ class RunTimerAdapter(
                 }
 
             }
-            viewModel.changeTimerState(position, TimerViewModel.TimerStates.PAUSED)
         }
 
         holder.btnPlayTimer.setOnClickListener {
             // TODO: Function to resume timer
+            viewModel.changeTimerState(position, TimerViewModel.TimerStates.RUNNING)
+            timer?.start()
             (context as AppCompatActivity).lifecycleScope.launchWhenCreated {
                 // Render view according to timer state
                 viewModel.timerState.collectLatest { timerState ->
@@ -171,7 +166,6 @@ class RunTimerAdapter(
                 }
 
             }
-            viewModel.changeTimerState(position, TimerViewModel.TimerStates.RUNNING)
         }
     }
 
