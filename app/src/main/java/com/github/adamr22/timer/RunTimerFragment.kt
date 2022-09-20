@@ -37,7 +37,8 @@ class RunTimerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         mRecyclerView = view.findViewById(R.id.rv_run_timer)
-        mRecyclerViewAdapter = RunTimerAdapter(requireContext(), parentFragmentManager, timerViewModel)
+        mRecyclerViewAdapter =
+            RunTimerAdapter(requireContext(), parentFragmentManager, timerViewModel)
         mRecyclerViewIndicator = view.findViewById(R.id.set_timer_indicator)
 
         mRecyclerView.adapter = mRecyclerViewAdapter
@@ -76,13 +77,13 @@ class RunTimerFragment : Fragment() {
         timers.forEach { timer ->
             val timerPosition = timers.indexOf(timer)
 
-            val timeInMilliseconds = convertTimeToMilliseconds(timer.setTime)
+            val timeInMilliseconds = timerViewModel.convertTimeToMilliseconds(timer.setTime)
 
-            timer.timer = object: CountDownTimer(timeInMilliseconds, 1000) {
+            timerViewModel.updateRemainingTime(timerPosition, timeInMilliseconds)
+
+            timer.timer = object : CountDownTimer(timeInMilliseconds, 1000) {
                 override fun onTick(timerUntilFinished: Long) {
-                    Log.d(TAG, "onTick: Timer position: $timerPosition")
-                    Log.d(TAG, "onTick: ${timers[timerPosition].setTime.get(Calendar.MINUTE)}")
-                    Log.d(TAG, "onTick: Time till finish: ${timerUntilFinished/1000} seconds")
+                    timerViewModel.updateRemainingTime(timerPosition, timerUntilFinished)
                 }
 
                 override fun onFinish() {
@@ -90,14 +91,6 @@ class RunTimerFragment : Fragment() {
                 }
             }.start()
         }
-    }
-
-    private fun convertTimeToMilliseconds(setTimeInstance: Calendar): Long {
-        val hoursInMilli = setTimeInstance.get(Calendar.HOUR_OF_DAY) * 3600 * 1000
-        val minutesInMilli = setTimeInstance.get(Calendar.MINUTE) * 60 * 1000
-        val secondsInMilli = setTimeInstance.get(Calendar.SECOND) * 1000
-
-        return (hoursInMilli + minutesInMilli + secondsInMilli).toLong()
     }
 
 }

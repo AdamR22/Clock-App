@@ -2,6 +2,7 @@ package com.github.adamr22.timer
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -77,8 +78,8 @@ class RunTimerAdapter(
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: RunTimerViewHolder, position: Int) {
-        val timeInstance = listOfTimers[position].setTime
-        val timer = listOfTimers[position].timer
+        val timeInstance = listOfTimers[holder.adapterPosition].setTime
+        var timer = listOfTimers[holder.adapterPosition].timer
 
         val animation = AnimationUtils.loadAnimation(context.applicationContext, R.anim.blink)
 
@@ -98,9 +99,11 @@ class RunTimerAdapter(
             timeSetTextView.text = "$hours:$minutes:$seconds"
 
         holder.addLabel.text =
-            listOfTimers[position].label ?: context.resources.getString(R.string.label)
+            listOfTimers[holder.adapterPosition].label ?: context.resources.getString(R.string.label)
 
         Log.d(TAG, "onBindViewHolder: label text; ${holder.addLabel.text}")
+
+        holder.pbTimer.progress = viewModel.convertTimeToMilliseconds(timeInstance).toInt()
 
         holder.addLabel.setOnClickListener {
             Log.d(TAG, "onBindViewHolder: Add Label Clicked")
@@ -109,13 +112,12 @@ class RunTimerAdapter(
 
             (context as AppCompatActivity).lifecycleScope.launchWhenCreated {
                 viewModel.timerLabelState.collectLatest {
-                    if (it is TimerViewModel.TimerLabelState.Changed) notifyItemChanged(position)
+                    if (it is TimerViewModel.TimerLabelState.Changed) notifyItemChanged(holder.adapterPosition)
                 }
             }
         }
 
         holder.btnDeleteTimer.setOnClickListener {
-            timer?.cancel()
             viewModel.deleteTimer(position)
 
             (context as AppCompatActivity).lifecycleScope.launchWhenCreated {
@@ -158,7 +160,16 @@ class RunTimerAdapter(
         holder.btnPlayTimer.setOnClickListener {
             // TODO: Function to resume timer
             viewModel.changeTimerState(position, TimerViewModel.TimerStates.RUNNING)
-            timer?.start()
+            timer = object: CountDownTimer(viewModel.timeRemainingList.value[holder.adapterPosition], 1000) {
+                override fun onTick(timeUntilFinished: Long) {
+                    holder.pbTimer.progress = timeUntilFinished.toInt()
+                    viewModel.updateRemainingTime(holder.adapterPosition, timeUntilFinished)
+                }
+
+                override fun onFinish() {
+                    timer?.cancel()
+                }
+            }.start()
             (context as AppCompatActivity).lifecycleScope.launchWhenCreated {
                 // Render view according to timer state
                 viewModel.timerState.collectLatest { timerState ->
@@ -167,6 +178,18 @@ class RunTimerAdapter(
 
             }
         }
+
+
+        (context as AppCompatActivity).lifecycleScope.launchWhenCreated {
+            viewModel.timeRemainingList.collectLatest {
+                if (it.isNotEmpty()) {
+                    Log.d(TAG, "onBindViewHolder: time -> ${it[position] / 1000} seconds")
+                    holder.pbTimer.progress = it[holder.adapterPosition].toInt()
+                    holder.pbTimer.progressDrawable.mutate()
+                }
+            }
+        }
+
     }
 
     override fun getItemCount(): Int {

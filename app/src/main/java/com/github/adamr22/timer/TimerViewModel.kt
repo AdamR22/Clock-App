@@ -15,6 +15,9 @@ class TimerViewModel : ViewModel() {
     private var _timerLabelState = MutableStateFlow<TimerLabelState>(TimerLabelState.Unchanged)
     private var _timerState = MutableStateFlow<TimerState>(TimerState.Changed(TimerStates.RUNNING))
 
+    private var _timeRemainingList = MutableStateFlow<MutableList<Long>>(mutableListOf()) // Keeps track of timer which helps progress bar
+    val timeRemainingList = _timeRemainingList
+
     val timers: StateFlow<TimerFragmentUIState> = _timers
     val timerLabelState: StateFlow<TimerLabelState> = _timerLabelState
     val timerState: StateFlow<TimerState> = _timerState
@@ -216,6 +219,7 @@ class TimerViewModel : ViewModel() {
     }
 
     fun deleteTimer(index: Int) {
+        _timeRemainingList.value.removeAt(index)
         timerRepository.deleteTimer(index)
         _timers.value = TimerFragmentUIState.Timers(timerRepository.getTimersList())
     }
@@ -224,6 +228,20 @@ class TimerViewModel : ViewModel() {
         _timerState.value = TimerState.Unchanged
         timerRepository.changeTimerState(index, state)
         _timerState.value = TimerState.Changed(state)
+    }
+
+    fun updateRemainingTime(index: Int, remainingTime: Long) {
+        val timeList = mutableListOf<Long>()
+        timeList.add(index, remainingTime)
+        _timeRemainingList.value = timeList
+    }
+
+    fun convertTimeToMilliseconds(setTimeInstance: Calendar): Long {
+        val hoursInMilli = setTimeInstance.get(Calendar.HOUR_OF_DAY) * 3600 * 1000
+        val minutesInMilli = setTimeInstance.get(Calendar.MINUTE) * 60 * 1000
+        val secondsInMilli = setTimeInstance.get(Calendar.SECOND) * 1000
+
+        return (hoursInMilli + minutesInMilli + secondsInMilli).toLong()
     }
 
 }

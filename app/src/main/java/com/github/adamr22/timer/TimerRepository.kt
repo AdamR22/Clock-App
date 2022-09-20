@@ -17,6 +17,7 @@ class TimerRepository {
     }
 
     fun deleteTimer(timerInstanceIndex: Int) {
+        timersList[timerInstanceIndex].timer?.cancel()
         timersList.removeAt(timerInstanceIndex)
     }
 
