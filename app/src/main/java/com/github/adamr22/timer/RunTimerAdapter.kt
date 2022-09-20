@@ -125,6 +125,7 @@ class RunTimerAdapter(
                     when (it) {
                         is TimerViewModel.TimerFragmentUIState.Timers -> {
                             if (it.timerInstances.isEmpty()) {
+                                timer?.cancel()
                                 viewModel.currentFragment = 0
                                 fragmentManager.popBackStack()
                             }
@@ -144,7 +145,6 @@ class RunTimerAdapter(
         }
 
         holder.btnPauseTimer.setOnClickListener {
-            // TODO: Function to stop timer
             Log.d(TAG, "onBindViewHolder: pause button pressed")
             viewModel.changeTimerState(position, TimerViewModel.TimerStates.PAUSED)
             timer?.cancel()
@@ -158,11 +158,11 @@ class RunTimerAdapter(
         }
 
         holder.btnPlayTimer.setOnClickListener {
-            // TODO: Function to resume timer
             viewModel.changeTimerState(position, TimerViewModel.TimerStates.RUNNING)
             timer = object: CountDownTimer(viewModel.timeRemainingList.value[holder.adapterPosition], 1000) {
                 override fun onTick(timeUntilFinished: Long) {
                     holder.pbTimer.progress = timeUntilFinished.toInt()
+                    holder.pbTimer.progressDrawable.mutate()
                     viewModel.updateRemainingTime(holder.adapterPosition, timeUntilFinished)
                 }
 
