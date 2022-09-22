@@ -7,22 +7,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".timer.RunTimerFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_run_timer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+<!--    <androidx.recyclerview.widget.RecyclerView-->
+<!--        android:id="@+id/rv_run_timer"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />-->
 
     <ru.tinkoff.scrollingpagerindicator.ScrollingPagerIndicator
         android:id="@+id/set_timer_indicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|end"
+        android:layout_gravity="center_horizontal|bottom"
         android:layout_margin="10dp"
         app:spi_dotColor="@color/grey_50"
         app:spi_dotSelectedColor="@color/black"
         app:spi_dotSelectedSize="20dp"
         app:spi_dotSize="8dp"
-        app:spi_orientation="vertical" />
+        app:spi_orientation="horizontal" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/run_timer_layout_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </FrameLayout>

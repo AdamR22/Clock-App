@@ -101,8 +101,6 @@ class RunTimerAdapter(
         holder.addLabel.text =
             listOfTimers[holder.adapterPosition].label ?: context.resources.getString(R.string.label)
 
-        Log.d(TAG, "onBindViewHolder: label text; ${holder.addLabel.text}")
-
         holder.pbTimer.progress = viewModel.convertTimeToMilliseconds(timeInstance).toInt()
 
         holder.addLabel.setOnClickListener {
@@ -162,7 +160,6 @@ class RunTimerAdapter(
             timer = object: CountDownTimer(viewModel.timeRemainingList.value[holder.adapterPosition], 1000) {
                 override fun onTick(timeUntilFinished: Long) {
                     holder.pbTimer.progress = timeUntilFinished.toInt()
-                    holder.pbTimer.progressDrawable.mutate()
                     viewModel.updateRemainingTime(holder.adapterPosition, timeUntilFinished)
                 }
 
@@ -178,18 +175,6 @@ class RunTimerAdapter(
 
             }
         }
-
-
-        (context as AppCompatActivity).lifecycleScope.launchWhenCreated {
-            viewModel.timeRemainingList.collectLatest {
-                if (it.isNotEmpty()) {
-                    Log.d(TAG, "onBindViewHolder: time -> ${it[position] / 1000} seconds")
-                    holder.pbTimer.progress = it[holder.adapterPosition].toInt()
-                    holder.pbTimer.progressDrawable.mutate()
-                }
-            }
-        }
-
     }
 
     override fun getItemCount(): Int {
@@ -232,5 +217,4 @@ class RunTimerAdapter(
             ) else timeSetTextView.clearAnimation()
         }
     }
-
 }

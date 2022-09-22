@@ -22,6 +22,8 @@ class TimerViewModel : ViewModel() {
     val timerLabelState: StateFlow<TimerLabelState> = _timerLabelState
     val timerState: StateFlow<TimerState> = _timerState
 
+    private val timeList = mutableListOf<Long>()
+
     sealed class TimerFragmentUIState {
         data class Timers(val timerInstances: List<TimerModel>) : TimerFragmentUIState()
         object Empty : TimerFragmentUIState()
@@ -221,7 +223,8 @@ class TimerViewModel : ViewModel() {
     fun deleteTimer(index: Int) {
         _timeRemainingList.value.removeAt(index)
         timerRepository.deleteTimer(index)
-        _timers.value = TimerFragmentUIState.Timers(timerRepository.getTimersList())
+        val timersList = timerRepository.getTimersList()
+        _timers.value = if (timersList.isEmpty()) TimerFragmentUIState.Empty else TimerFragmentUIState.Timers(timersList)
     }
 
     fun changeTimerState(index: Int, state: TimerStates) {
@@ -231,7 +234,6 @@ class TimerViewModel : ViewModel() {
     }
 
     fun updateRemainingTime(index: Int, remainingTime: Long) {
-        val timeList = mutableListOf<Long>()
         timeList.add(index, remainingTime)
         _timeRemainingList.value = timeList
     }
