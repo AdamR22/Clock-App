@@ -28,7 +28,9 @@ class RunTimerViewFragment(
     private var timeRemaining = 0L
     private var position = 0
 
-    fun setPos(pos: Int) { position = pos }
+    fun setPos(pos: Int) {
+        position = pos
+    }
 
     private lateinit var addLabel: TextView
     private lateinit var tvSetTime: TextView
@@ -60,6 +62,12 @@ class RunTimerViewFragment(
         tvSetTime = view.findViewById(R.id.tv_set_timer)
         tvAddOneMinOrReset = view.findViewById(R.id.tv_add_one_minute)
 
+        val time = timerViewModel.convertMillisecondsToHoursMinutesAndSeconds(
+            timerViewModel.convertTimeToMilliseconds(timerModel.setTime)
+        )
+
+        updateTimeText(time)
+
         super.onViewCreated(view, savedInstanceState)
     }
 
@@ -69,7 +77,8 @@ class RunTimerViewFragment(
 
         btnDeleteTimer.setOnClickListener {
             timerModel.timer?.cancel()
-            timerViewModel.deleteTimer(position, fragAdapter)
+            fragAdapter.notifyItemRemoved(position)
+            timerViewModel.deleteTimer(position)
         }
 
         btnAddTimer.setOnClickListener {
@@ -93,6 +102,29 @@ class RunTimerViewFragment(
                 fragManager,
                 adapter
             )
+    }
+
+    private fun updateTimeText(time: Triple<Long, Long, Long>) {
+        if (time.first != 0L) {
+            val hourText = "%02d".format(time.first.toInt())
+            val minuteText = "%02d".format(time.second.toInt())
+            val secondText = "%02d".format(time.third.toInt())
+
+            tvSetTime.text = String.format(resources.getString(R.string.running_timer_1_text), hourText, minuteText, secondText)
+        }
+
+        if (time.first == 0L && time.second != 0L) {
+            val minuteText = "%02d".format(time.second.toInt())
+            val secondText = "%02d".format(time.third.toInt())
+
+            tvSetTime.text = String.format(resources.getString(R.string.running_timer_2_text), minuteText, secondText)
+        }
+
+        if (time.first == 0L && time.second == 0L) {
+            val secondText = "%02d".format(time.third.toInt())
+
+            tvSetTime.text = String.format(resources.getString(R.string.running_timer_3_text), secondText)
+        }
     }
 
     private fun runTimer() {

@@ -3,10 +3,10 @@ package com.github.adamr22.timer.presentation.viewmodels
 import androidx.lifecycle.ViewModel
 import com.github.adamr22.timer.data.models.TimerModel
 import com.github.adamr22.timer.data.repository.TimerRepository
-import com.github.adamr22.timer.presentation.adapters.RunFragmentViewPagerAdapter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class TimerViewModel : ViewModel() {
     private val UNIT = 60 // to determine seconds, minutes or hours depending on input string value
@@ -18,7 +18,8 @@ class TimerViewModel : ViewModel() {
     private var _timerLabelState = MutableStateFlow<TimerLabelState>(TimerLabelState.Unchanged)
     private var _timerState = MutableStateFlow<TimerState>(TimerState.Changed(TimerStates.RUNNING))
 
-    private var _timeRemainingList = MutableStateFlow<MutableList<Long>>(mutableListOf()) // Keeps track of timer which helps progress bar
+    private var _timeRemainingList =
+        MutableStateFlow<MutableList<Long>>(mutableListOf()) // Keeps track of timer which helps progress bar
     val timeRemainingList = _timeRemainingList
 
     val timers: StateFlow<TimerFragmentUIState> = _timers
@@ -33,13 +34,13 @@ class TimerViewModel : ViewModel() {
     }
 
     sealed class TimerLabelState {
-        object Changed: TimerLabelState()
-        object Unchanged: TimerLabelState()
+        object Changed : TimerLabelState()
+        object Unchanged : TimerLabelState()
     }
 
     sealed class TimerState {
-        data class Changed(val state: TimerStates): TimerState()
-        object Unchanged: TimerState()
+        data class Changed(val state: TimerStates) : TimerState()
+        object Unchanged : TimerState()
     }
 
     enum class TimerStates {
@@ -223,14 +224,14 @@ class TimerViewModel : ViewModel() {
         _timerLabelState.value = TimerLabelState.Changed
     }
 
-    fun deleteTimer(position: Int, fragAdapter: RunFragmentViewPagerAdapter) {
-        fragAdapter.removeItem(position)
+    fun deleteTimer(position: Int) {
         _timeRemainingList.value.removeAt(position)
         timerRepository.deleteTimer(position)
         val timersList = timerRepository.getTimersList()
-        _timers.value = if (timersList.isEmpty()) TimerFragmentUIState.Empty else TimerFragmentUIState.Timers(
-            timersList
-        )
+        _timers.value =
+            if (timersList.isEmpty()) TimerFragmentUIState.Empty else TimerFragmentUIState.Timers(
+                timersList
+            )
     }
 
     fun changeTimerState(index: Int, state: TimerStates) {
@@ -245,11 +246,24 @@ class TimerViewModel : ViewModel() {
     }
 
     fun convertTimeToMilliseconds(setTimeInstance: Calendar): Long {
-        val hoursInMilli = setTimeInstance.get(Calendar.HOUR_OF_DAY) * 3600 * 1000
-        val minutesInMilli = setTimeInstance.get(Calendar.MINUTE) * 60 * 1000
-        val secondsInMilli = setTimeInstance.get(Calendar.SECOND) * 1000
+        val hoursInMilli =
+            TimeUnit.HOURS.toMillis(setTimeInstance.get(Calendar.HOUR_OF_DAY).toLong())
+        val minutesInMilli =
+            TimeUnit.MINUTES.toMillis(setTimeInstance.get(Calendar.MINUTE).toLong())
+        val secondsInMilli =
+            TimeUnit.SECONDS.toMillis(setTimeInstance.get(Calendar.SECOND).toLong())
 
-        return (hoursInMilli + minutesInMilli + secondsInMilli).toLong()
+        return (hoursInMilli + minutesInMilli + secondsInMilli)
+    }
+
+    fun convertMillisecondsToHoursMinutesAndSeconds(milliseconds: Long): Triple<Long, Long, Long> {
+        val hours = TimeUnit.MILLISECONDS.toHours(milliseconds)
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds - TimeUnit.HOURS.toMillis(hours))
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(
+            milliseconds - (TimeUnit.HOURS.toMillis(hours) + TimeUnit.MINUTES.toMillis(minutes))
+        )
+
+        return Triple(hours, minutes, seconds)
     }
 
 }

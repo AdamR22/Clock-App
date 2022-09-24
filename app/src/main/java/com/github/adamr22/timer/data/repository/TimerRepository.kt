@@ -1,5 +1,6 @@
 package com.github.adamr22.timer.data.repository
 
+import com.github.adamr22.timer.data.models.TimerModel
 import com.github.adamr22.timer.presentation.viewmodels.TimerViewModel
 
 class TimerRepository {
