@@ -1,4 +1,4 @@
-package com.github.adamr22.timer
+package com.github.adamr22.timer.presentation.views
 
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +11,9 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.FragmentManager
 import com.github.adamr22.R
+import com.github.adamr22.timer.presentation.viewmodels.TimerViewModel
+import com.github.adamr22.timer.data.models.TimerModel
+import com.github.adamr22.timer.presentation.adapters.RunFragmentViewPagerAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class RunTimerViewFragment(

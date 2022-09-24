@@ -1,6 +1,7 @@
-package com.github.adamr22.timer
+package com.github.adamr22.timer.data.models
 
 import android.os.CountDownTimer
+import com.github.adamr22.timer.presentation.viewmodels.TimerViewModel
 import java.util.*
 
 data class TimerModel(

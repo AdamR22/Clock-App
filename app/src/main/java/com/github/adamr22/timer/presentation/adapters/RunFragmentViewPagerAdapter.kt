@@ -1,4 +1,4 @@
-package com.github.adamr22.timer
+package com.github.adamr22.timer.presentation.adapters
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
@@ -7,6 +7,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.github.adamr22.timer.presentation.views.RunTimerViewFragment
+import com.github.adamr22.timer.presentation.viewmodels.TimerViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 class RunFragmentViewPagerAdapter(
@@ -25,12 +27,14 @@ class RunFragmentViewPagerAdapter(
                 when (it) {
                     is TimerViewModel.TimerFragmentUIState.Timers -> {
                         it.timerInstances.forEach { timerModel ->
-                            fragmentList.add(RunTimerViewFragment.newInstance(
-                                timerModel,
-                                viewModel,
-                                mFragmentManager,
-                                this@RunFragmentViewPagerAdapter
-                            ))
+                            fragmentList.add(
+                                RunTimerViewFragment.newInstance(
+                                    timerModel,
+                                    viewModel,
+                                    mFragmentManager,
+                                    this@RunFragmentViewPagerAdapter
+                                )
+                            )
                         }
                     }
                     is TimerViewModel.TimerFragmentUIState.Empty -> {

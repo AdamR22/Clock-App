@@ -1,4 +1,4 @@
-package com.github.adamr22.timer
+package com.github.adamr22.timer.presentation.views
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -11,6 +11,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
+import com.github.adamr22.timer.presentation.viewmodels.TimerViewModel
+import com.github.adamr22.timer.presentation.adapters.SetTimerAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.flow.collectLatest
 

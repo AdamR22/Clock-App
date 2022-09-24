@@ -1,6 +1,9 @@
-package com.github.adamr22.timer
+package com.github.adamr22.timer.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
+import com.github.adamr22.timer.data.models.TimerModel
+import com.github.adamr22.timer.data.repository.TimerRepository
+import com.github.adamr22.timer.presentation.adapters.RunFragmentViewPagerAdapter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.*
@@ -225,7 +228,9 @@ class TimerViewModel : ViewModel() {
         _timeRemainingList.value.removeAt(position)
         timerRepository.deleteTimer(position)
         val timersList = timerRepository.getTimersList()
-        _timers.value = if (timersList.isEmpty()) TimerFragmentUIState.Empty else TimerFragmentUIState.Timers(timersList)
+        _timers.value = if (timersList.isEmpty()) TimerFragmentUIState.Empty else TimerFragmentUIState.Timers(
+            timersList
+        )
     }
 
     fun changeTimerState(index: Int, state: TimerStates) {

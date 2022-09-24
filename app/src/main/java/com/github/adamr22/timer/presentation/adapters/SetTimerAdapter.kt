@@ -1,4 +1,4 @@
-package com.github.adamr22.timer
+package com.github.adamr22.timer.presentation.adapters
 
 import android.annotation.SuppressLint
 import android.content.Context

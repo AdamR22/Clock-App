@@ -1,4 +1,4 @@
-package com.github.adamr22.timer
+package com.github.adamr22.timer.presentation.views
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.viewpager2.widget.ViewPager2
 import com.github.adamr22.R
+import com.github.adamr22.timer.presentation.viewmodels.TimerViewModel
+import com.github.adamr22.timer.presentation.adapters.RunFragmentViewPagerAdapter
 import ru.tinkoff.scrollingpagerindicator.ScrollingPagerIndicator
 
 class RunTimerFragment : Fragment() {

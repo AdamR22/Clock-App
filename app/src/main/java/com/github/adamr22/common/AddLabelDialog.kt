@@ -6,7 +6,7 @@ import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import com.github.adamr22.R
 import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
-import com.github.adamr22.timer.TimerViewModel
+import com.github.adamr22.timer.presentation.viewmodels.TimerViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 

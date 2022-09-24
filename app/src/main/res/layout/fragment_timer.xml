@@ -3,13 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".timer.TimerFragment">
+    tools:context=".timer.presentation.views.TimerFragment">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/timer_fragment_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.github.adamr22.timer.SetTimerFragment"
+        android:name="com.github.adamr22.timer.presentation.views.SetTimerFragment"
         tools:layout="@layout/set_fragment_timer" />
 
 </FrameLayout>

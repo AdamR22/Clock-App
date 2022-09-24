@@ -1,4 +1,4 @@
-package com.github.adamr22.timer
+package com.github.adamr22.timer.presentation.views
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import com.github.adamr22.R
+import com.github.adamr22.timer.presentation.viewmodels.TimerViewModel
 
 class TimerFragment : Fragment() {
 
