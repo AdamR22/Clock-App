@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
+import com.github.adamr22.common.AddLabelDialog
 import com.github.adamr22.timer.presentation.viewmodels.TimerViewModel
 import com.github.adamr22.timer.data.models.TimerModel
 import com.github.adamr22.timer.presentation.adapters.RunFragmentViewPagerAdapter
@@ -88,8 +89,13 @@ class RunTimerViewFragment(
 
     override fun onResume() {
         Log.d(TAG, "onResume: $position")
+        monitorLabelChange()
         renderUIAccordingToTimerState()
         runTimer(timeRemaining)
+
+        addLabel.setOnClickListener {
+            AddLabelDialog.newInstance(position, null, timerViewModel).show(mFragmentManager, null)
+        }
 
         btnDeleteTimer.setOnClickListener {
             tvSetTime.clearAnimation()
@@ -172,6 +178,7 @@ class RunTimerViewFragment(
     }
 
     private fun runTimer(time: Long) {
+        tvSetTime.clearAnimation()
         timerViewModel.updateRemainingTime(position, time)
 
         timerModel.timer = object : CountDownTimer(time, 1000) {
@@ -229,6 +236,14 @@ class RunTimerViewFragment(
                         timeRemaining = timerViewModel.convertTimeToMilliseconds(timerModel.setTime) + 1000
                     }
                 }
+            }
+        }
+    }
+
+    private fun monitorLabelChange() {
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            timerViewModel.timerLabelState.collectLatest {
+                if (it is TimerViewModel.TimerLabelState.Changed) addLabel.text = timerModel.label
             }
         }
     }
