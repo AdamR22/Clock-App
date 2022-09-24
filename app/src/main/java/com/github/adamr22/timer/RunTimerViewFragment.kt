@@ -16,14 +16,17 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class RunTimerViewFragment(
     private val timerModel: TimerModel,
-    private val position: Int,
     private val timerViewModel: TimerViewModel,
-    val mFragmentManager: FragmentManager,
+    private val mFragmentManager: FragmentManager,
     private val fragAdapter: FragmentStateAdapter
 ) : Fragment() {
 
     private val TAG = "RunTimerViewFragment"
 
+    var timeRemaining = 0L
+    var position = 0
+
+    fun setPos(pos: Int) { position = pos }
 
     private lateinit var addLabel: TextView
     private lateinit var tvSetTime: TextView
@@ -59,12 +62,13 @@ class RunTimerViewFragment(
     }
 
     override fun onResume() {
+        Log.d(TAG, "onResume: $position")
         runTimer()
 
         btnDeleteTimer.setOnClickListener {
-            Log.d(TAG, "onResume: Deleted Position $position")
-            timerViewModel.deleteTimer(position)
-            fragAdapter.notifyItemRemoved(position)
+            timerModel.timer?.cancel()
+            timerViewModel.deleteTimer(timerModel, timeRemaining)
+            fragAdapter.notifyItemChanged(position)
         }
 
         btnAddTimer.setOnClickListener {
@@ -78,14 +82,12 @@ class RunTimerViewFragment(
         @JvmStatic
         fun newInstance(
             data: TimerModel,
-            position: Int,
             viewModel: TimerViewModel,
             fragManager: FragmentManager,
             adapter: FragmentStateAdapter
         ) =
             RunTimerViewFragment(
                 data,
-                position,
                 viewModel,
                 fragManager,
                 adapter
@@ -93,7 +95,7 @@ class RunTimerViewFragment(
     }
 
     private fun runTimer() {
-        val timeRemaining = timerViewModel.convertTimeToMilliseconds(timerModel.setTime)
+        timeRemaining = timerViewModel.convertTimeToMilliseconds(timerModel.setTime)
         timerViewModel.updateRemainingTime(position, timeRemaining)
     }
 }

@@ -16,9 +16,8 @@ class TimerRepository {
         timersList[index].label = label
     }
 
-    fun deleteTimer(timerInstanceIndex: Int) {
-        timersList[timerInstanceIndex].timer?.cancel()
-        timersList.removeAt(timerInstanceIndex)
+    fun deleteTimer(timer: TimerModel) {
+        timersList.remove(timer)
     }
 
     fun changeTimerState(index: Int, state: TimerViewModel.TimerStates) {

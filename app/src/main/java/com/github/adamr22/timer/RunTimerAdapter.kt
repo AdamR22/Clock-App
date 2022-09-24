@@ -116,7 +116,7 @@ class RunTimerAdapter(
         }
 
         holder.btnDeleteTimer.setOnClickListener {
-            viewModel.deleteTimer(position)
+//            viewModel.deleteTimer(position)
 
             (context as AppCompatActivity).lifecycleScope.launchWhenCreated {
                 viewModel.timers.collectLatest {

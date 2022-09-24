@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import kotlinx.coroutines.flow.collectLatest
 
@@ -18,39 +19,22 @@ open class RunFragmentViewPagerAdapter(
 
     private val TAG = "RunFragmentViewPagerAda"
 
-    override fun getItemCount(): Int {
-        var itemCount = 0
+    val fragmentList = mutableListOf<RunTimerViewFragment>()
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         (context as AppCompatActivity).lifecycleScope.launchWhenCreated {
             viewModel.timers.collectLatest {
-                itemCount = when (it) {
-                    is TimerViewModel.TimerFragmentUIState.Timers -> it.timerInstances.size
-                    is TimerViewModel.TimerFragmentUIState.Empty -> 0
-                }
-            }
-        }
-
-        return itemCount
-    }
-
-    override fun createFragment(position: Int): Fragment {
-        var fragment: RunTimerViewFragment? = null
-
-        (context as AppCompatActivity).lifecycleScope.launchWhenCreated {
-            viewModel.timers.collectLatest {
+                fragmentList.clear()
                 when (it) {
                     is TimerViewModel.TimerFragmentUIState.Timers -> {
                         it.timerInstances.forEach { timerModel ->
-                            val pos = it.timerInstances.indexOf(timerModel)
-                            Log.d(TAG, "createFragment: frag position: $pos")
-                            fragment = RunTimerViewFragment.newInstance(
+                            fragmentList.add(RunTimerViewFragment.newInstance(
                                 timerModel,
-                                pos,
                                 viewModel,
                                 mFragmentManager,
                                 this@RunFragmentViewPagerAdapter
-                            )
+                            ))
                         }
-
                     }
                     is TimerViewModel.TimerFragmentUIState.Empty -> {
                         mFragmentManager.popBackStack()
@@ -58,8 +42,25 @@ open class RunFragmentViewPagerAdapter(
                 }
             }
         }
-
-        return fragment!!
+        super.onAttachedToRecyclerView(recyclerView)
     }
 
+    override fun getItemCount(): Int {
+        if (fragmentList.isEmpty()) mFragmentManager.popBackStack()
+        return fragmentList.size
+    }
+
+    override fun createFragment(position: Int): Fragment {
+        return fragmentList[position].also {
+            it.setPos(position)
+        }
+    }
+
+    override fun getItemId(position: Int): Long {
+        return fragmentList[position].hashCode().toLong()
+    }
+
+    override fun containsItem(itemId: Long): Boolean {
+        return fragmentList.find { it.hashCode().toLong() == itemId } != null
+    }
 }
