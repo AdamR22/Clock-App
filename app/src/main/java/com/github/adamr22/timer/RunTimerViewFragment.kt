@@ -10,7 +10,6 @@ import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.FragmentManager
-import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.github.adamr22.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -18,13 +17,13 @@ class RunTimerViewFragment(
     private val timerModel: TimerModel,
     private val timerViewModel: TimerViewModel,
     private val mFragmentManager: FragmentManager,
-    private val fragAdapter: FragmentStateAdapter
+    private val fragAdapter: RunFragmentViewPagerAdapter
 ) : Fragment() {
 
     private val TAG = "RunTimerViewFragment"
 
-    var timeRemaining = 0L
-    var position = 0
+    private var timeRemaining = 0L
+    private var position = 0
 
     fun setPos(pos: Int) { position = pos }
 
@@ -67,8 +66,7 @@ class RunTimerViewFragment(
 
         btnDeleteTimer.setOnClickListener {
             timerModel.timer?.cancel()
-            timerViewModel.deleteTimer(timerModel, timeRemaining)
-            fragAdapter.notifyItemChanged(position)
+            timerViewModel.deleteTimer(position, fragAdapter)
         }
 
         btnAddTimer.setOnClickListener {
@@ -84,7 +82,7 @@ class RunTimerViewFragment(
             data: TimerModel,
             viewModel: TimerViewModel,
             fragManager: FragmentManager,
-            adapter: FragmentStateAdapter
+            adapter: RunFragmentViewPagerAdapter
         ) =
             RunTimerViewFragment(
                 data,

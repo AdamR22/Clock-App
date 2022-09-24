@@ -1,6 +1,5 @@
 package com.github.adamr22.timer
 
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,11 +23,6 @@ class TimerViewModel : ViewModel() {
     val timerState: StateFlow<TimerState> = _timerState
 
     private val timeList = mutableListOf<Long>()
-
-    private var _fragments = MutableStateFlow<MutableList<Fragment>>(mutableListOf())
-    val fragments = _fragments
-
-    private val fragmentList = mutableListOf<Fragment>()
 
     sealed class TimerFragmentUIState {
         data class Timers(val timerInstances: List<TimerModel>) : TimerFragmentUIState()
@@ -226,9 +220,10 @@ class TimerViewModel : ViewModel() {
         _timerLabelState.value = TimerLabelState.Changed
     }
 
-    fun deleteTimer(timer: TimerModel, timeRemaining: Long) {
-        _timeRemainingList.value.remove(timeRemaining)
-        timerRepository.deleteTimer(timer)
+    fun deleteTimer(position: Int, fragAdapter: RunFragmentViewPagerAdapter) {
+        fragAdapter.removeItem(position)
+        _timeRemainingList.value.removeAt(position)
+        timerRepository.deleteTimer(position)
         val timersList = timerRepository.getTimersList()
         _timers.value = if (timersList.isEmpty()) TimerFragmentUIState.Empty else TimerFragmentUIState.Timers(timersList)
     }
@@ -250,11 +245,6 @@ class TimerViewModel : ViewModel() {
         val secondsInMilli = setTimeInstance.get(Calendar.SECOND) * 1000
 
         return (hoursInMilli + minutesInMilli + secondsInMilli).toLong()
-    }
-
-    fun addFragment(fragment: RunTimerViewFragment) {
-        fragmentList.add(fragment)
-        fragments.value = fragmentList
     }
 
 }

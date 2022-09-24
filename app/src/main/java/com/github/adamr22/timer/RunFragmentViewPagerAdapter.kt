@@ -1,7 +1,6 @@
 package com.github.adamr22.timer
 
 import android.content.Context
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -10,16 +9,14 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import kotlinx.coroutines.flow.collectLatest
 
-open class RunFragmentViewPagerAdapter(
+class RunFragmentViewPagerAdapter(
     private val mFragmentManager: FragmentManager,
     fa: Fragment,
     val viewModel: TimerViewModel,
     val context: Context
 ) : FragmentStateAdapter(fa) {
 
-    private val TAG = "RunFragmentViewPagerAda"
-
-    val fragmentList = mutableListOf<RunTimerViewFragment>()
+    private val fragmentList = mutableListOf<RunTimerViewFragment>()
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         (context as AppCompatActivity).lifecycleScope.launchWhenCreated {
@@ -62,5 +59,10 @@ open class RunFragmentViewPagerAdapter(
 
     override fun containsItem(itemId: Long): Boolean {
         return fragmentList.find { it.hashCode().toLong() == itemId } != null
+    }
+
+    fun removeItem(position: Int) {
+        fragmentList.removeAt(position)
+        notifyItemRemoved(position)
     }
 }
