@@ -44,7 +44,7 @@ class TimerViewModel : ViewModel() {
     }
 
     enum class TimerStates {
-        PAUSED, RUNNING, STOPPED
+        PAUSED, RUNNING, FINISHED
     }
 
     fun addTimer(input: String) {

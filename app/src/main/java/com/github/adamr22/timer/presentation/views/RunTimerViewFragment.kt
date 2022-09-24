@@ -7,16 +7,20 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
 import com.github.adamr22.timer.presentation.viewmodels.TimerViewModel
 import com.github.adamr22.timer.data.models.TimerModel
 import com.github.adamr22.timer.presentation.adapters.RunFragmentViewPagerAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.flow.collectLatest
 
 class RunTimerViewFragment(
     private val timerModel: TimerModel,
@@ -33,6 +37,8 @@ class RunTimerViewFragment(
     fun setPos(pos: Int) {
         position = pos
     }
+
+    private lateinit var animation: Animation
 
     private lateinit var addLabel: TextView
     private lateinit var tvSetTime: TextView
@@ -54,6 +60,8 @@ class RunTimerViewFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
+        animation = AnimationUtils.loadAnimation(requireContext(), R.anim.blink)
+
         btnPlayTimer = view.findViewById(R.id.play)
         btnDeleteTimer = view.findViewById(R.id.btn_delete_timer)
         btnAddTimer = view.findViewById(R.id.btn_add_timer)
@@ -68,6 +76,9 @@ class RunTimerViewFragment(
             timerViewModel.convertTimeToMilliseconds(timerModel.setTime)
         )
 
+        timeRemaining =
+            timerViewModel.convertTimeToMilliseconds(timerModel.setTime) + 1000 // "Hack" preventing timer from starting a second too early
+
         pbTimer.max = timerViewModel.convertTimeToMilliseconds(timerModel.setTime).toInt()
 
         updateTimeText(time)
@@ -77,9 +88,11 @@ class RunTimerViewFragment(
 
     override fun onResume() {
         Log.d(TAG, "onResume: $position")
-        runTimer()
+        renderUIAccordingToTimerState()
+        runTimer(timeRemaining)
 
         btnDeleteTimer.setOnClickListener {
+            tvSetTime.clearAnimation()
             timerModel.timer?.cancel()
             fragAdapter.notifyItemRemoved(position)
             timerViewModel.deleteTimer(position)
@@ -87,6 +100,23 @@ class RunTimerViewFragment(
 
         btnAddTimer.setOnClickListener {
             mFragmentManager.popBackStack()
+        }
+
+        btnPauseTimer.setOnClickListener {
+            timerModel.timer?.cancel()
+            timerViewModel.changeTimerState(
+                position,
+                TimerViewModel.TimerStates.PAUSED
+            )
+        }
+
+        btnPlayTimer.setOnClickListener {
+            timerViewModel.changeTimerState(
+                position,
+                TimerViewModel.TimerStates.RUNNING
+            )
+
+            runTimer(timeRemaining)
         }
 
         super.onResume()
@@ -114,44 +144,92 @@ class RunTimerViewFragment(
             val minuteText = "%02d".format(time.second.toInt())
             val secondText = "%02d".format(time.third.toInt())
 
-            tvSetTime.text = String.format(resources.getString(R.string.running_timer_1_text), hourText, minuteText, secondText)
+            tvSetTime.text = String.format(
+                resources.getString(R.string.running_timer_1_text),
+                hourText,
+                minuteText,
+                secondText
+            )
         }
 
         if (time.first == 0L && time.second != 0L) {
             val minuteText = "%02d".format(time.second.toInt())
             val secondText = "%02d".format(time.third.toInt())
 
-            tvSetTime.text = String.format(resources.getString(R.string.running_timer_2_text), minuteText, secondText)
+            tvSetTime.text = String.format(
+                resources.getString(R.string.running_timer_2_text),
+                minuteText,
+                secondText
+            )
         }
 
         if (time.first == 0L && time.second == 0L) {
             val secondText = "%02d".format(time.third.toInt())
 
-            tvSetTime.text = String.format(resources.getString(R.string.running_timer_3_text), secondText)
+            tvSetTime.text =
+                String.format(resources.getString(R.string.running_timer_3_text), secondText)
         }
     }
 
-    private fun runTimer() {
-        timeRemaining = timerViewModel.convertTimeToMilliseconds(timerModel.setTime) + 1000 // "Hack" preventing timer from starting a second too early
-        timerViewModel.updateRemainingTime(position, timeRemaining)
+    private fun runTimer(time: Long) {
+        timerViewModel.updateRemainingTime(position, time)
 
-        timerModel.timer = object: CountDownTimer(timeRemaining, 1000) {
+        timerModel.timer = object : CountDownTimer(time, 1000) {
             override fun onTick(timeRemainingUntilFinished: Long) {
-                timerViewModel.updateRemainingTime(position, timeRemainingUntilFinished)
-                updateTimeText(timerViewModel.convertMillisecondsToHoursMinutesAndSeconds(timeRemainingUntilFinished))
-                Log.d(TAG, "onTick: $timeRemainingUntilFinished")
-                updateProgressBar(timeRemainingUntilFinished - 1000)
+                timeRemaining = timeRemainingUntilFinished
+                timerViewModel.updateRemainingTime(position, timeRemaining)
+                updateTimeText(
+                    timerViewModel.convertMillisecondsToHoursMinutesAndSeconds(
+                        timeRemainingUntilFinished
+                    )
+                )
+                Log.d(TAG, "onTick: $timeRemaining")
+                updateProgressBar(timeRemaining - 1000)
             }
 
             override fun onFinish() {
                 // TODO: Function to show notification and also play timer song
                 timerModel.timer?.cancel()
-                Toast.makeText(requireContext(), "timer finished", Toast.LENGTH_SHORT).show() // Placeholder toast notification
+                timerViewModel.changeTimerState(position, TimerViewModel.TimerStates.FINISHED)
+                Toast.makeText(requireContext(), "timer finished", Toast.LENGTH_SHORT)
+                    .show() // Placeholder toast notification
             }
         }.start()
     }
 
     private fun updateProgressBar(timeRemaining: Long) {
         pbTimer.progress = timeRemaining.toInt()
+    }
+
+    private fun renderUIAccordingToTimerState() {
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            timerViewModel.timerState.collectLatest {
+                if (it is TimerViewModel.TimerState.Changed) {
+                    if (it.state == TimerViewModel.TimerStates.PAUSED || it.state == TimerViewModel.TimerStates.FINISHED) {
+                        tvSetTime.startAnimation(animation)
+                        tvAddOneMinOrReset.text = resources.getString(R.string.reset)
+                        btnPlayTimer.visibility = View.VISIBLE
+                        btnPauseTimer.visibility = View.GONE
+                    }
+
+                    if (it.state == TimerViewModel.TimerStates.RUNNING) {
+                        tvSetTime.clearAnimation()
+                        tvAddOneMinOrReset.text = resources.getString(R.string.add_1_min)
+                        btnPlayTimer.visibility = View.GONE
+                        btnPauseTimer.visibility = View.VISIBLE
+                    }
+
+                    if (it.state == TimerViewModel.TimerStates.FINISHED) {
+                        updateTimeText(
+                            timerViewModel.convertMillisecondsToHoursMinutesAndSeconds(
+                                timerViewModel.convertTimeToMilliseconds(timerModel.setTime)
+                            )
+                        )
+
+                        timeRemaining = timerViewModel.convertTimeToMilliseconds(timerModel.setTime) + 1000
+                    }
+                }
+            }
+        }
     }
 }
