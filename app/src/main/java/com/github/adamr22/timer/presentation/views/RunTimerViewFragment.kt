@@ -125,6 +125,20 @@ class RunTimerViewFragment(
             runTimer(timeRemaining)
         }
 
+        tvAddOneMinOrReset.setOnClickListener {
+            if (timerModel.timerState == TimerViewModel.TimerStates.PAUSED || timerModel.timerState == TimerViewModel.TimerStates.FINISHED) {
+                timeRemaining = timerViewModel.convertTimeToMilliseconds(timerModel.setTime)
+                pbTimer.max = timeRemaining.toInt()
+                updateTimeText(timerViewModel.convertMillisecondsToHoursMinutesAndSeconds(timeRemaining))
+            } else {
+                timeRemaining += 60000
+                pbTimer.max = timeRemaining.toInt()
+                updateTimeText(timerViewModel.convertMillisecondsToHoursMinutesAndSeconds(timeRemaining))
+                timerModel.timer?.cancel()
+                runTimer(timeRemaining)
+            }
+        }
+
         super.onResume()
     }
 
@@ -233,7 +247,8 @@ class RunTimerViewFragment(
                             )
                         )
 
-                        timeRemaining = timerViewModel.convertTimeToMilliseconds(timerModel.setTime) + 1000
+                        timeRemaining =
+                            timerViewModel.convertTimeToMilliseconds(timerModel.setTime) + 1000
                     }
                 }
             }
