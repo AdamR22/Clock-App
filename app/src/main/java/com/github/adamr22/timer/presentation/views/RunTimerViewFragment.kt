@@ -1,6 +1,7 @@
 package com.github.adamr22.timer.presentation.views
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import com.github.adamr22.R
 import com.github.adamr22.timer.presentation.viewmodels.TimerViewModel
@@ -65,6 +67,8 @@ class RunTimerViewFragment(
         val time = timerViewModel.convertMillisecondsToHoursMinutesAndSeconds(
             timerViewModel.convertTimeToMilliseconds(timerModel.setTime)
         )
+
+        pbTimer.max = timerViewModel.convertTimeToMilliseconds(timerModel.setTime).toInt()
 
         updateTimeText(time)
 
@@ -128,7 +132,26 @@ class RunTimerViewFragment(
     }
 
     private fun runTimer() {
-        timeRemaining = timerViewModel.convertTimeToMilliseconds(timerModel.setTime)
+        timeRemaining = timerViewModel.convertTimeToMilliseconds(timerModel.setTime) + 1000 // "Hack" preventing timer from starting a second too early
         timerViewModel.updateRemainingTime(position, timeRemaining)
+
+        timerModel.timer = object: CountDownTimer(timeRemaining, 1000) {
+            override fun onTick(timeRemainingUntilFinished: Long) {
+                timerViewModel.updateRemainingTime(position, timeRemainingUntilFinished)
+                updateTimeText(timerViewModel.convertMillisecondsToHoursMinutesAndSeconds(timeRemainingUntilFinished))
+                Log.d(TAG, "onTick: $timeRemainingUntilFinished")
+                updateProgressBar(timeRemainingUntilFinished - 1000)
+            }
+
+            override fun onFinish() {
+                // TODO: Function to show notification and also play timer song
+                timerModel.timer?.cancel()
+                Toast.makeText(requireContext(), "timer finished", Toast.LENGTH_SHORT).show() // Placeholder toast notification
+            }
+        }.start()
+    }
+
+    private fun updateProgressBar(timeRemaining: Long) {
+        pbTimer.progress = timeRemaining.toInt()
     }
 }
