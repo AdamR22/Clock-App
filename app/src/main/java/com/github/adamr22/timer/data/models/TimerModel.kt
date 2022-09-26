@@ -8,5 +8,7 @@ data class TimerModel(
     var setTime: Calendar,
     var label: String? = null,
     var timerState: TimerViewModel.TimerStates = TimerViewModel.TimerStates.RUNNING,
-    var timer: CountDownTimer? = null
+    var timer: CountDownTimer? = null,
+    val timerId: Int = Math.random().toInt(),
+    var timeRemaining: Long = TimerViewModel().convertTimeToMilliseconds(setTime)
 )

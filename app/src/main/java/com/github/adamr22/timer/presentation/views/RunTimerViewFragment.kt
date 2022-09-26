@@ -1,8 +1,9 @@
 package com.github.adamr22.timer.presentation.views
 
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -30,14 +31,16 @@ class RunTimerViewFragment(
     private val fragAdapter: RunFragmentViewPagerAdapter
 ) : Fragment() {
 
-    private val TAG = "RunTimerViewFragment"
-
     private var timeRemaining = 0L
     private var position = 0
 
     fun setPos(pos: Int) {
         position = pos
     }
+
+    private val sharedPreferenceTag = "RunTimerFragVal"
+    private val remainingTimeTag = "RunTimerVal: ${timerModel.timerId}"
+    private val timerStateTag = "RunTimerState: ${timerModel.timerId}"
 
     private lateinit var animation: Animation
 
@@ -50,6 +53,15 @@ class RunTimerViewFragment(
     private lateinit var btnAddTimer: FloatingActionButton
     private lateinit var btnPauseTimer: ImageButton
     private lateinit var pbTimer: ProgressBar
+
+    private lateinit var sharedPref: SharedPreferences
+
+    private lateinit var timerState: TimerViewModel.TimerStates
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        sharedPref = requireContext().getSharedPreferences(sharedPreferenceTag, MODE_PRIVATE)
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -77,8 +89,8 @@ class RunTimerViewFragment(
             timerViewModel.convertTimeToMilliseconds(timerModel.setTime)
         )
 
-        timeRemaining =
-            timerViewModel.convertTimeToMilliseconds(timerModel.setTime) + 1000 // "Hack" preventing timer from starting a second too early
+        timeRemaining = timerModel.timeRemaining
+        timerState = timerModel.timerState
 
         pbTimer.max = timerViewModel.convertTimeToMilliseconds(timerModel.setTime).toInt()
 
@@ -88,10 +100,21 @@ class RunTimerViewFragment(
     }
 
     override fun onResume() {
-        Log.d(TAG, "onResume: $position")
+
+        if (getSavedTimerValue() >= 0) timeRemaining = getSavedTimerValue()
+        timerState = getSavedTimerState()
+
+        if (timeRemaining == 0L) {
+            timerModel.timer?.cancel()
+            timerModel.timerState = TimerViewModel.TimerStates.FINISHED
+        }
+
         monitorLabelChange()
-        renderUIAccordingToTimerState()
-        runTimer(timeRemaining)
+        monitorTimerState()
+        monitorTimeRemainingChange()
+
+        if (timeRemaining != 0L)
+            runTimer(timeRemaining)
 
         addLabel.setOnClickListener {
             AddLabelDialog.newInstance(position, null, timerViewModel).show(mFragmentManager, null)
@@ -100,7 +123,11 @@ class RunTimerViewFragment(
         btnDeleteTimer.setOnClickListener {
             tvSetTime.clearAnimation()
             timerModel.timer?.cancel()
-            fragAdapter.notifyItemRemoved(position)
+
+            if (timerModel.timerState == TimerViewModel.TimerStates.PAUSED || timerModel.timerState == TimerViewModel.TimerStates.RUNNING)
+                deleteSharedPref()
+
+            fragAdapter.removeItem(position)
             timerViewModel.deleteTimer(position)
         }
 
@@ -114,6 +141,7 @@ class RunTimerViewFragment(
                 position,
                 TimerViewModel.TimerStates.PAUSED
             )
+            saveCurrentTimerState()
         }
 
         btnPlayTimer.setOnClickListener {
@@ -121,7 +149,7 @@ class RunTimerViewFragment(
                 position,
                 TimerViewModel.TimerStates.RUNNING
             )
-
+            saveCurrentTimerState()
             runTimer(timeRemaining)
         }
 
@@ -129,17 +157,40 @@ class RunTimerViewFragment(
             if (timerModel.timerState == TimerViewModel.TimerStates.PAUSED || timerModel.timerState == TimerViewModel.TimerStates.FINISHED) {
                 timeRemaining = timerViewModel.convertTimeToMilliseconds(timerModel.setTime)
                 pbTimer.max = timeRemaining.toInt()
-                updateTimeText(timerViewModel.convertMillisecondsToHoursMinutesAndSeconds(timeRemaining))
+                updateTimeText(
+                    timerViewModel.convertMillisecondsToHoursMinutesAndSeconds(
+                        timeRemaining
+                    )
+                )
             } else {
                 timeRemaining += 60000
                 pbTimer.max = timeRemaining.toInt()
-                updateTimeText(timerViewModel.convertMillisecondsToHoursMinutesAndSeconds(timeRemaining))
+                updateTimeText(
+                    timerViewModel.convertMillisecondsToHoursMinutesAndSeconds(
+                        timeRemaining
+                    )
+                )
                 timerModel.timer?.cancel()
                 runTimer(timeRemaining)
             }
         }
 
         super.onResume()
+    }
+
+    override fun onPause() {
+        if (timerModel.timerState == TimerViewModel.TimerStates.PAUSED || timerModel.timerState == TimerViewModel.TimerStates.FINISHED)
+            tvSetTime.clearAnimation()
+
+        if (timerState == TimerViewModel.TimerStates.RUNNING) timerModel.timer?.cancel()
+        saveCurrentTimerValue()
+        saveCurrentTimerState()
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        deleteSharedPref()
+        super.onDestroy()
     }
 
     companion object {
@@ -197,23 +248,24 @@ class RunTimerViewFragment(
 
         timerModel.timer = object : CountDownTimer(time, 1000) {
             override fun onTick(timeRemainingUntilFinished: Long) {
-                timeRemaining = timeRemainingUntilFinished
-                timerViewModel.updateRemainingTime(position, timeRemaining)
-                updateTimeText(
-                    timerViewModel.convertMillisecondsToHoursMinutesAndSeconds(
-                        timeRemainingUntilFinished
+                timerViewModel.updateRemainingTime(position, timeRemainingUntilFinished)
+                context?.let {
+                    updateTimeText(
+                        timerViewModel.convertMillisecondsToHoursMinutesAndSeconds(
+                            timeRemainingUntilFinished
+                        )
                     )
-                )
-                Log.d(TAG, "onTick: $timeRemaining")
+                }
                 updateProgressBar(timeRemaining - 1000)
             }
 
             override fun onFinish() {
-                // TODO: Function to show notification and also play timer song
-                timerModel.timer?.cancel()
                 timerViewModel.changeTimerState(position, TimerViewModel.TimerStates.FINISHED)
-                Toast.makeText(requireContext(), "timer finished", Toast.LENGTH_SHORT)
-                    .show() // Placeholder toast notification
+                deleteSharedPref()
+                context?.let {
+                    Toast.makeText(requireContext(), "timer finished", Toast.LENGTH_SHORT)
+                        .show() // Placeholder toast notification
+                }
             }
         }.start()
     }
@@ -222,34 +274,12 @@ class RunTimerViewFragment(
         pbTimer.progress = timeRemaining.toInt()
     }
 
-    private fun renderUIAccordingToTimerState() {
+    private fun monitorTimerState() {
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
             timerViewModel.timerState.collectLatest {
                 if (it is TimerViewModel.TimerState.Changed) {
-                    if (it.state == TimerViewModel.TimerStates.PAUSED || it.state == TimerViewModel.TimerStates.FINISHED) {
-                        tvSetTime.startAnimation(animation)
-                        tvAddOneMinOrReset.text = resources.getString(R.string.reset)
-                        btnPlayTimer.visibility = View.VISIBLE
-                        btnPauseTimer.visibility = View.GONE
-                    }
-
-                    if (it.state == TimerViewModel.TimerStates.RUNNING) {
-                        tvSetTime.clearAnimation()
-                        tvAddOneMinOrReset.text = resources.getString(R.string.add_1_min)
-                        btnPlayTimer.visibility = View.GONE
-                        btnPauseTimer.visibility = View.VISIBLE
-                    }
-
-                    if (it.state == TimerViewModel.TimerStates.FINISHED) {
-                        updateTimeText(
-                            timerViewModel.convertMillisecondsToHoursMinutesAndSeconds(
-                                timerViewModel.convertTimeToMilliseconds(timerModel.setTime)
-                            )
-                        )
-
-                        timeRemaining =
-                            timerViewModel.convertTimeToMilliseconds(timerModel.setTime) + 1000
-                    }
+                    timerState = timerModel.timerState
+                    renderUI()
                 }
             }
         }
@@ -260,6 +290,66 @@ class RunTimerViewFragment(
             timerViewModel.timerLabelState.collectLatest {
                 if (it is TimerViewModel.TimerLabelState.Changed) addLabel.text = timerModel.label
             }
+        }
+    }
+
+    private fun monitorTimeRemainingChange() {
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            timerViewModel.timeRemainingState.collectLatest {
+                if (it is TimerViewModel.TimeRemainingState.Changed) timeRemaining =
+                    timerModel.timeRemaining
+            }
+        }
+    }
+
+    private fun saveCurrentTimerValue() {
+        sharedPref.edit().putLong(remainingTimeTag, timeRemaining).apply()
+    }
+
+    private fun saveCurrentTimerState() {
+        sharedPref.edit().putInt(timerStateTag, timerState.ordinal).apply()
+    }
+
+    private fun getSavedTimerValue(): Long {
+        return sharedPref.getLong(remainingTimeTag, -1L)
+    }
+
+    private fun getSavedTimerState(): TimerViewModel.TimerStates {
+        val stateOrdinal =
+            sharedPref.getInt(timerStateTag, -1) // If no timer saved, timer state is set to running
+
+        return if (stateOrdinal < 0) TimerViewModel.TimerStates.RUNNING else TimerViewModel.TimerStates.values()[stateOrdinal]
+    }
+
+    private fun deleteSharedPref() {
+        sharedPref.edit().remove(remainingTimeTag).remove(timerStateTag).apply()
+    }
+
+    private fun renderUI() {
+        if (timerState == TimerViewModel.TimerStates.PAUSED || timerState == TimerViewModel.TimerStates.FINISHED) {
+            timerModel.timer?.cancel()
+            tvSetTime.startAnimation(animation)
+            tvAddOneMinOrReset.text = resources.getString(R.string.reset)
+            btnPlayTimer.visibility = View.VISIBLE
+            btnPauseTimer.visibility = View.GONE
+        }
+
+        if (timerState == TimerViewModel.TimerStates.RUNNING) {
+            tvSetTime.clearAnimation()
+            tvAddOneMinOrReset.text = resources.getString(R.string.add_1_min)
+            btnPlayTimer.visibility = View.GONE
+            btnPauseTimer.visibility = View.VISIBLE
+        }
+
+        if (timerState == TimerViewModel.TimerStates.FINISHED) {
+            updateTimeText(
+                timerViewModel.convertMillisecondsToHoursMinutesAndSeconds(
+                    timerViewModel.convertTimeToMilliseconds(timerModel.setTime)
+                )
+            )
+
+            timeRemaining =
+                timerViewModel.convertTimeToMilliseconds(timerModel.setTime) + 1000
         }
     }
 }

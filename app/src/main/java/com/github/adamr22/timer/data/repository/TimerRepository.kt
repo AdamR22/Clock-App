@@ -26,4 +26,8 @@ class TimerRepository {
     fun changeTimerState(index: Int, state: TimerViewModel.TimerStates) {
         timersList[index].timerState = state
     }
+
+    fun updateTimeRemaining(index: Int, time: Long) {
+        timersList[index].timeRemaining = time
+    }
 }

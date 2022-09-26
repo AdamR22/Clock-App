@@ -11,22 +11,20 @@ import java.util.concurrent.TimeUnit
 class TimerViewModel : ViewModel() {
     private val UNIT = 60 // to determine seconds, minutes or hours depending on input string value
     var setTime = "" // prevents data loss as a result of screen rotation
-    var currentFragment = 0 // 0 for setTimerFragment, 1 for runTimerFragment
 
     private val timerRepository = TimerRepository()
     private var _timers = MutableStateFlow<TimerFragmentUIState>(TimerFragmentUIState.Empty)
     private var _timerLabelState = MutableStateFlow<TimerLabelState>(TimerLabelState.Unchanged)
     private var _timerState = MutableStateFlow<TimerState>(TimerState.Changed(TimerStates.RUNNING))
 
-    private var _timeRemainingList =
-        MutableStateFlow<MutableList<Long>>(mutableListOf()) // Keeps track of timer which helps progress bar
-    val timeRemainingList = _timeRemainingList
+    private var _timeRemainingState =
+        MutableStateFlow<TimeRemainingState>(TimeRemainingState.Unchanged)
+
+    val timeRemainingState = _timeRemainingState
 
     val timers: StateFlow<TimerFragmentUIState> = _timers
     val timerLabelState: StateFlow<TimerLabelState> = _timerLabelState
     val timerState: StateFlow<TimerState> = _timerState
-
-    private val timeList = mutableListOf<Long>()
 
     sealed class TimerFragmentUIState {
         data class Timers(val timerInstances: List<TimerModel>) : TimerFragmentUIState()
@@ -41,6 +39,11 @@ class TimerViewModel : ViewModel() {
     sealed class TimerState {
         data class Changed(val state: TimerStates) : TimerState()
         object Unchanged : TimerState()
+    }
+
+    sealed class TimeRemainingState {
+        object Changed: TimeRemainingState()
+        object Unchanged: TimeRemainingState()
     }
 
     enum class TimerStates {
@@ -225,7 +228,6 @@ class TimerViewModel : ViewModel() {
     }
 
     fun deleteTimer(position: Int) {
-        _timeRemainingList.value.removeAt(position)
         timerRepository.deleteTimer(position)
         val timersList = timerRepository.getTimersList()
         _timers.value =
@@ -241,8 +243,9 @@ class TimerViewModel : ViewModel() {
     }
 
     fun updateRemainingTime(index: Int, remainingTime: Long) {
-        timeList.add(index, remainingTime)
-        _timeRemainingList.value = timeList
+        _timeRemainingState.value = TimeRemainingState.Unchanged
+        timerRepository.updateTimeRemaining(index, remainingTime)
+        _timeRemainingState.value = TimeRemainingState.Changed
     }
 
     fun convertTimeToMilliseconds(setTimeInstance: Calendar): Long {

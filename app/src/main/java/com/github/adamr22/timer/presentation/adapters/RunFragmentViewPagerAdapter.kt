@@ -37,9 +37,7 @@ class RunFragmentViewPagerAdapter(
                             )
                         }
                     }
-                    is TimerViewModel.TimerFragmentUIState.Empty -> {
-                        mFragmentManager.popBackStack()
-                    }
+                    is TimerViewModel.TimerFragmentUIState.Empty -> {}
                 }
             }
         }

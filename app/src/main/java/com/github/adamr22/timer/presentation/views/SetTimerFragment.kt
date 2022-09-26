@@ -378,8 +378,6 @@ class SetTimerFragment : Fragment() {
     }
 
     private fun navigateToRunTimerScreen() {
-        timerViewModel.currentFragment = 1
-
         val runTimerFrag = RunTimerFragment.newInstance().apply {
             this.passViewModel(timerViewModel)
         }

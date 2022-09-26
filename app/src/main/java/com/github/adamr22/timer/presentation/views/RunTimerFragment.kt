@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import com.github.adamr22.R
 import com.github.adamr22.timer.presentation.viewmodels.TimerViewModel
@@ -30,6 +31,7 @@ class RunTimerFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        (requireContext() as AppCompatActivity).supportActionBar?.title = "Timer"
         viewPager = view.findViewById(R.id.run_timer_layout_pager)
         val viewPagerAdapter = RunFragmentViewPagerAdapter(parentFragmentManager,this, timerViewModel, requireContext())
         viewPager.adapter = viewPagerAdapter
