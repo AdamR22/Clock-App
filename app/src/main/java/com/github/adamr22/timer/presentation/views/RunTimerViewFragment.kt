@@ -2,6 +2,7 @@ package com.github.adamr22.timer.presentation.views
 
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
+import android.media.RingtoneManager
 import android.os.Bundle
 import android.os.CountDownTimer
 import androidx.fragment.app.Fragment
@@ -13,7 +14,6 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
@@ -53,6 +53,12 @@ class RunTimerViewFragment(
     private lateinit var btnAddTimer: FloatingActionButton
     private lateinit var btnPauseTimer: ImageButton
     private lateinit var pbTimer: ProgressBar
+
+    private val timerRingtone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+
+    private val ringtoneAlarm by lazy {
+        RingtoneManager.getRingtone(requireContext().applicationContext, timerRingtone)
+    }
 
     private lateinit var sharedPref: SharedPreferences
 
@@ -123,6 +129,7 @@ class RunTimerViewFragment(
         btnDeleteTimer.setOnClickListener {
             tvSetTime.clearAnimation()
             timerModel.timer?.cancel()
+            ringtoneAlarm.stop()
 
             if (timerModel.timerState == TimerViewModel.TimerStates.PAUSED || timerModel.timerState == TimerViewModel.TimerStates.RUNNING)
                 deleteSharedPref()
@@ -145,10 +152,13 @@ class RunTimerViewFragment(
         }
 
         btnPlayTimer.setOnClickListener {
+            if (timerModel.timerState == TimerViewModel.TimerStates.FINISHED) ringtoneAlarm.stop()
+
             timerViewModel.changeTimerState(
                 position,
                 TimerViewModel.TimerStates.RUNNING
             )
+
             saveCurrentTimerState()
             runTimer(timeRemaining)
         }
@@ -185,6 +195,7 @@ class RunTimerViewFragment(
         if (timerState == TimerViewModel.TimerStates.RUNNING) timerModel.timer?.cancel()
         saveCurrentTimerValue()
         saveCurrentTimerState()
+        ringtoneAlarm.stop()
         super.onPause()
     }
 
@@ -262,10 +273,7 @@ class RunTimerViewFragment(
             override fun onFinish() {
                 timerViewModel.changeTimerState(position, TimerViewModel.TimerStates.FINISHED)
                 deleteSharedPref()
-                context?.let {
-                    Toast.makeText(requireContext(), "timer finished", Toast.LENGTH_SHORT)
-                        .show() // Placeholder toast notification
-                }
+                ringtoneAlarm.play()
             }
         }.start()
     }
