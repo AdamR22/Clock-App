@@ -1,7 +1,5 @@
 package com.github.adamr22.timer.presentation.views
 
-import android.content.Context.MODE_PRIVATE
-import android.content.SharedPreferences
 import android.media.RingtoneManager
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -38,10 +36,6 @@ class RunTimerViewFragment(
         position = pos
     }
 
-    private val sharedPreferenceTag = "RunTimerFragVal"
-    private val remainingTimeTag = "RunTimerVal: ${timerModel.timerId}"
-    private val timerStateTag = "RunTimerState: ${timerModel.timerId}"
-
     private lateinit var animation: Animation
 
     private lateinit var addLabel: TextView
@@ -60,14 +54,7 @@ class RunTimerViewFragment(
         RingtoneManager.getRingtone(requireContext().applicationContext, timerRingtone)
     }
 
-    private lateinit var sharedPref: SharedPreferences
-
     private lateinit var timerState: TimerViewModel.TimerStates
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        sharedPref = requireContext().getSharedPreferences(sharedPreferenceTag, MODE_PRIVATE)
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -106,11 +93,6 @@ class RunTimerViewFragment(
     }
 
     override fun onResume() {
-        if (timeRemaining == 0L) {
-            timerModel.timer?.cancel()
-            timerModel.timerState = TimerViewModel.TimerStates.FINISHED
-        }
-
         monitorLabelChange()
         renderUI()
 
@@ -125,9 +107,6 @@ class RunTimerViewFragment(
             tvSetTime.clearAnimation()
             timerModel.timer?.cancel()
             ringtoneAlarm.stop()
-
-            if (timerModel.timerState == TimerViewModel.TimerStates.PAUSED || timerModel.timerState == TimerViewModel.TimerStates.RUNNING)
-                deleteSharedPref()
 
             fragAdapter.removeItem(position)
             timerViewModel.deleteTimer(position)
@@ -186,7 +165,6 @@ class RunTimerViewFragment(
     }
 
     override fun onDestroy() {
-        deleteSharedPref()
         ringtoneAlarm.stop()
         super.onDestroy()
     }
@@ -277,10 +255,6 @@ class RunTimerViewFragment(
                 if (it is TimerViewModel.TimerLabelState.Changed) addLabel.text = timerModel.label
             }
         }
-    }
-
-    private fun deleteSharedPref() {
-        sharedPref.edit().remove(remainingTimeTag).remove(timerStateTag).apply()
     }
 
     private fun renderUI() {
