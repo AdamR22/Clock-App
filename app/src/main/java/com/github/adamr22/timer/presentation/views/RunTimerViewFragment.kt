@@ -1,6 +1,7 @@
 package com.github.adamr22.timer.presentation.views
 
 import android.content.Context.MODE_PRIVATE
+import android.content.Intent
 import android.content.SharedPreferences
 import android.media.RingtoneManager
 import android.os.Bundle
@@ -21,6 +22,7 @@ import com.github.adamr22.common.AddLabelDialog
 import com.github.adamr22.timer.presentation.viewmodels.TimerViewModel
 import com.github.adamr22.timer.data.models.TimerModel
 import com.github.adamr22.timer.presentation.adapters.RunFragmentViewPagerAdapter
+import com.github.adamr22.timer.services.TimerFragInBackgroundService
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.flow.collectLatest
 
@@ -30,6 +32,8 @@ class RunTimerViewFragment(
     private val mFragmentManager: FragmentManager,
     private val fragAdapter: RunFragmentViewPagerAdapter
 ) : Fragment() {
+
+    private val TIMERS_LIST = "timers list"
 
     private var timeRemaining = 0L
     private var position = 0
@@ -106,6 +110,8 @@ class RunTimerViewFragment(
     }
 
     override fun onResume() {
+
+        requireActivity().stopService(Intent(requireActivity(), TimerFragInBackgroundService::class.java)) // Stop service if service is running
 
         if (getSavedTimerValue() >= 0) timeRemaining = getSavedTimerValue()
         timerState = getSavedTimerState()
@@ -196,11 +202,13 @@ class RunTimerViewFragment(
         saveCurrentTimerValue()
         saveCurrentTimerState()
         ringtoneAlarm.stop()
+        startBackgroundService()
         super.onPause()
     }
 
     override fun onDestroy() {
         deleteSharedPref()
+        ringtoneAlarm.stop()
         super.onDestroy()
     }
 
@@ -358,6 +366,29 @@ class RunTimerViewFragment(
 
             timeRemaining =
                 timerViewModel.convertTimeToMilliseconds(timerModel.setTime) + 1000
+        }
+    }
+
+    private fun startBackgroundService() {
+        val timersArrayList = ArrayList<TimerModel>()
+
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            timerViewModel.timers.collectLatest {
+                if (it is TimerViewModel.TimerFragmentUIState.Timers) {
+                    it.timerInstances.forEach { timer ->
+                        timersArrayList.add(timer)
+                    }
+                }
+            }
+        }
+
+        if (timersArrayList.isEmpty()) return
+
+        Intent(requireActivity(), TimerFragInBackgroundService::class.java).also {
+            val bundle = Bundle()
+            bundle.putParcelableArrayList(TIMERS_LIST, timersArrayList)
+            it.putExtras(bundle)
+            requireActivity().startService(it)
         }
     }
 }
