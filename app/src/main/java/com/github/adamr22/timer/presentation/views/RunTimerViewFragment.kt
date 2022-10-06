@@ -1,7 +1,6 @@
 package com.github.adamr22.timer.presentation.views
 
 import android.content.Context.MODE_PRIVATE
-import android.content.Intent
 import android.content.SharedPreferences
 import android.media.RingtoneManager
 import android.os.Bundle
@@ -22,7 +21,6 @@ import com.github.adamr22.common.AddLabelDialog
 import com.github.adamr22.timer.presentation.viewmodels.TimerViewModel
 import com.github.adamr22.timer.data.models.TimerModel
 import com.github.adamr22.timer.presentation.adapters.RunFragmentViewPagerAdapter
-import com.github.adamr22.timer.services.TimerFragInBackgroundService
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.flow.collectLatest
 
@@ -32,8 +30,6 @@ class RunTimerViewFragment(
     private val mFragmentManager: FragmentManager,
     private val fragAdapter: RunFragmentViewPagerAdapter
 ) : Fragment() {
-
-    private val TIMERS_LIST = "timers list"
 
     private var timeRemaining = 0L
     private var position = 0
@@ -110,20 +106,13 @@ class RunTimerViewFragment(
     }
 
     override fun onResume() {
-
-        requireActivity().stopService(Intent(requireActivity(), TimerFragInBackgroundService::class.java)) // Stop service if service is running
-
-        if (getSavedTimerValue() >= 0) timeRemaining = getSavedTimerValue()
-        timerState = getSavedTimerState()
-
         if (timeRemaining == 0L) {
             timerModel.timer?.cancel()
             timerModel.timerState = TimerViewModel.TimerStates.FINISHED
         }
 
         monitorLabelChange()
-        monitorTimerState()
-        monitorTimeRemainingChange()
+        renderUI()
 
         if (timeRemaining != 0L)
             runTimer(timeRemaining)
@@ -150,22 +139,18 @@ class RunTimerViewFragment(
 
         btnPauseTimer.setOnClickListener {
             timerModel.timer?.cancel()
-            timerViewModel.changeTimerState(
-                position,
-                TimerViewModel.TimerStates.PAUSED
-            )
-            saveCurrentTimerState()
+            timerModel.timerState = TimerViewModel.TimerStates.PAUSED
+
+            renderUI()
         }
 
         btnPlayTimer.setOnClickListener {
-            if (timerModel.timerState == TimerViewModel.TimerStates.FINISHED) ringtoneAlarm.stop()
+            ringtoneAlarm.stop()
 
-            timerViewModel.changeTimerState(
-                position,
-                TimerViewModel.TimerStates.RUNNING
-            )
+            timerModel.timerState = TimerViewModel.TimerStates.RUNNING
 
-            saveCurrentTimerState()
+            renderUI()
+
             runTimer(timeRemaining)
         }
 
@@ -197,12 +182,6 @@ class RunTimerViewFragment(
     override fun onPause() {
         if (timerModel.timerState == TimerViewModel.TimerStates.PAUSED || timerModel.timerState == TimerViewModel.TimerStates.FINISHED)
             tvSetTime.clearAnimation()
-
-        if (timerState == TimerViewModel.TimerStates.RUNNING) timerModel.timer?.cancel()
-        saveCurrentTimerValue()
-        saveCurrentTimerState()
-        ringtoneAlarm.stop()
-        startBackgroundService()
         super.onPause()
     }
 
@@ -263,11 +242,11 @@ class RunTimerViewFragment(
 
     private fun runTimer(time: Long) {
         tvSetTime.clearAnimation()
-        timerViewModel.updateRemainingTime(position, time)
 
         timerModel.timer = object : CountDownTimer(time, 1000) {
             override fun onTick(timeRemainingUntilFinished: Long) {
-                timerViewModel.updateRemainingTime(position, timeRemainingUntilFinished)
+                timeRemaining = timeRemainingUntilFinished
+                timerModel.timeRemaining = timeRemainingUntilFinished
                 context?.let {
                     updateTimeText(
                         timerViewModel.convertMillisecondsToHoursMinutesAndSeconds(
@@ -279,8 +258,10 @@ class RunTimerViewFragment(
             }
 
             override fun onFinish() {
-                timerViewModel.changeTimerState(position, TimerViewModel.TimerStates.FINISHED)
-                deleteSharedPref()
+                timerModel.timerState = TimerViewModel.TimerStates.FINISHED
+                context?.let {
+                    renderUI()
+                }
                 ringtoneAlarm.play()
             }
         }.start()
@@ -288,17 +269,6 @@ class RunTimerViewFragment(
 
     private fun updateProgressBar(timeRemaining: Long) {
         pbTimer.progress = timeRemaining.toInt()
-    }
-
-    private fun monitorTimerState() {
-        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-            timerViewModel.timerState.collectLatest {
-                if (it is TimerViewModel.TimerState.Changed) {
-                    timerState = timerModel.timerState
-                    renderUI()
-                }
-            }
-        }
     }
 
     private fun monitorLabelChange() {
@@ -309,40 +279,12 @@ class RunTimerViewFragment(
         }
     }
 
-    private fun monitorTimeRemainingChange() {
-        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-            timerViewModel.timeRemainingState.collectLatest {
-                if (it is TimerViewModel.TimeRemainingState.Changed) timeRemaining =
-                    timerModel.timeRemaining
-            }
-        }
-    }
-
-    private fun saveCurrentTimerValue() {
-        sharedPref.edit().putLong(remainingTimeTag, timeRemaining).apply()
-    }
-
-    private fun saveCurrentTimerState() {
-        sharedPref.edit().putInt(timerStateTag, timerState.ordinal).apply()
-    }
-
-    private fun getSavedTimerValue(): Long {
-        return sharedPref.getLong(remainingTimeTag, -1L)
-    }
-
-    private fun getSavedTimerState(): TimerViewModel.TimerStates {
-        val stateOrdinal =
-            sharedPref.getInt(timerStateTag, -1) // If no timer saved, timer state is set to running
-
-        return if (stateOrdinal < 0) TimerViewModel.TimerStates.RUNNING else TimerViewModel.TimerStates.values()[stateOrdinal]
-    }
-
     private fun deleteSharedPref() {
         sharedPref.edit().remove(remainingTimeTag).remove(timerStateTag).apply()
     }
 
     private fun renderUI() {
-        if (timerState == TimerViewModel.TimerStates.PAUSED || timerState == TimerViewModel.TimerStates.FINISHED) {
+        if (timerModel.timerState == TimerViewModel.TimerStates.PAUSED || timerModel.timerState == TimerViewModel.TimerStates.FINISHED) {
             timerModel.timer?.cancel()
             tvSetTime.startAnimation(animation)
             tvAddOneMinOrReset.text = resources.getString(R.string.reset)
@@ -350,14 +292,14 @@ class RunTimerViewFragment(
             btnPauseTimer.visibility = View.GONE
         }
 
-        if (timerState == TimerViewModel.TimerStates.RUNNING) {
+        if (timerModel.timerState == TimerViewModel.TimerStates.RUNNING) {
             tvSetTime.clearAnimation()
             tvAddOneMinOrReset.text = resources.getString(R.string.add_1_min)
             btnPlayTimer.visibility = View.GONE
             btnPauseTimer.visibility = View.VISIBLE
         }
 
-        if (timerState == TimerViewModel.TimerStates.FINISHED) {
+        if (timerModel.timerState == TimerViewModel.TimerStates.FINISHED) {
             updateTimeText(
                 timerViewModel.convertMillisecondsToHoursMinutesAndSeconds(
                     timerViewModel.convertTimeToMilliseconds(timerModel.setTime)
@@ -366,29 +308,6 @@ class RunTimerViewFragment(
 
             timeRemaining =
                 timerViewModel.convertTimeToMilliseconds(timerModel.setTime) + 1000
-        }
-    }
-
-    private fun startBackgroundService() {
-        val timersArrayList = ArrayList<TimerModel>()
-
-        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-            timerViewModel.timers.collectLatest {
-                if (it is TimerViewModel.TimerFragmentUIState.Timers) {
-                    it.timerInstances.forEach { timer ->
-                        timersArrayList.add(timer)
-                    }
-                }
-            }
-        }
-
-        if (timersArrayList.isEmpty()) return
-
-        Intent(requireActivity(), TimerFragInBackgroundService::class.java).also {
-            val bundle = Bundle()
-            bundle.putParcelableArrayList(TIMERS_LIST, timersArrayList)
-            it.putExtras(bundle)
-            requireActivity().startService(it)
         }
     }
 }

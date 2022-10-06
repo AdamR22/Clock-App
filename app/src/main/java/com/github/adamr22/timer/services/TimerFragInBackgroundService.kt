@@ -14,6 +14,7 @@ class TimerFragInBackgroundService : Service() {
     private val TAG = "TimerService"
 
     private val TIMERS_LIST = "timers list"
+
     private val sharedPreferenceTag = "RunTimerFragVal"
 
     private val sharedPref by lazy {
@@ -23,11 +24,9 @@ class TimerFragInBackgroundService : Service() {
     private lateinit var timersList: ArrayList<TimerModel>
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Toast.makeText(applicationContext, "Service Started", Toast.LENGTH_SHORT).show()
         Log.d(TAG, "onStartCommand: Timer Service started")
         val bundle = intent?.extras
 
-        @Suppress("UNCHECKED_CAST")
         timersList =
             bundle?.getParcelableArrayList(TIMERS_LIST)!!
 
@@ -40,8 +39,9 @@ class TimerFragInBackgroundService : Service() {
     }
 
     override fun onDestroy() {
-        cancelTimers(timersList)
         super.onDestroy()
+        Log.d(TAG, "onDestroy: Service Destroyed")
+        cancelTimers(timersList)
     }
 
     private fun runTimers(timersList: ArrayList<TimerModel>) {
@@ -92,6 +92,8 @@ class TimerFragInBackgroundService : Service() {
         val remainingTimeTag = "RunTimerVal: ${timerModel.timerId}"
         val timerStateTag = "RunTimerState: ${timerModel.timerId}"
 
+        Log.d(TAG, "cancelTimer: Timer Model Id: ${timerModel.timerId}")
+
         timerModel.timer?.cancel()
         timersList.remove(timerModel)
 
@@ -99,5 +101,9 @@ class TimerFragInBackgroundService : Service() {
             .putLong(remainingTimeTag, timerModel.timeRemaining)
             .putInt(timerStateTag, timerModel.timerState.ordinal)
             .apply()
+
+        val timeRemaining = sharedPref.getLong(remainingTimeTag, -1L)
+
+        Log.d(TAG, "cancelTimer: Stored val: ${timeRemaining / 1000} seconds")
     }
 }
