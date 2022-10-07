@@ -82,10 +82,12 @@ class RunTimerViewFragment(
             timerViewModel.convertTimeToMilliseconds(timerModel.setTime)
         )
 
-        timeRemaining = timerModel.timeRemaining
         timerState = timerModel.timerState
 
         pbTimer.max = timerViewModel.convertTimeToMilliseconds(timerModel.setTime).toInt()
+
+        timeRemaining = timerModel.timeRemaining
+        runTimer(timeRemaining)
 
         updateTimeText(time)
 
@@ -96,8 +98,9 @@ class RunTimerViewFragment(
         monitorLabelChange()
         renderUI()
 
-        if (timeRemaining != 0L)
-            runTimer(timeRemaining)
+        if (timerModel.timerFinished) playRingtone()
+
+        if (!timerModel.timerFinished) ringtoneAlarm.stop()
 
         addLabel.setOnClickListener {
             AddLabelDialog.newInstance(position, null, timerViewModel).show(mFragmentManager, null)
@@ -127,6 +130,7 @@ class RunTimerViewFragment(
             ringtoneAlarm.stop()
 
             timerModel.timerState = TimerViewModel.TimerStates.RUNNING
+            timerModel.timerFinished = false
 
             renderUI()
 
@@ -236,11 +240,11 @@ class RunTimerViewFragment(
             }
 
             override fun onFinish() {
+                timerModel.timerFinished = true
                 timerModel.timerState = TimerViewModel.TimerStates.FINISHED
                 context?.let {
                     renderUI()
                 }
-                ringtoneAlarm.play()
             }
         }.start()
     }
@@ -283,5 +287,10 @@ class RunTimerViewFragment(
             timeRemaining =
                 timerViewModel.convertTimeToMilliseconds(timerModel.setTime) + 1000
         }
+    }
+
+    private fun playRingtone() {
+        if (!ringtoneAlarm.isPlaying)
+            ringtoneAlarm.play()
     }
 }

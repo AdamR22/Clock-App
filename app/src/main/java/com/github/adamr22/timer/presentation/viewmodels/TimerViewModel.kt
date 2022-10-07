@@ -215,7 +215,7 @@ class TimerViewModel : ViewModel() {
             }
         }
 
-        val timerModel = TimerModel(setTime = c)
+        val timerModel = TimerModel(setTime = c, timerFinished = false)
         timerRepository.addTimer(timerModel)
         _timers.value = TimerFragmentUIState.Timers(timerRepository.getTimersList())
     }
