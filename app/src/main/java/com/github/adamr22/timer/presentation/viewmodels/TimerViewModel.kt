@@ -15,16 +15,9 @@ class TimerViewModel : ViewModel() {
     private val timerRepository = TimerRepository()
     private var _timers = MutableStateFlow<TimerFragmentUIState>(TimerFragmentUIState.Empty)
     private var _timerLabelState = MutableStateFlow<TimerLabelState>(TimerLabelState.Unchanged)
-    private var _timerState = MutableStateFlow<TimerState>(TimerState.Changed(TimerStates.RUNNING))
-
-    private var _timeRemainingState =
-        MutableStateFlow<TimeRemainingState>(TimeRemainingState.Unchanged)
-
-    val timeRemainingState = _timeRemainingState
 
     val timers: StateFlow<TimerFragmentUIState> = _timers
     val timerLabelState: StateFlow<TimerLabelState> = _timerLabelState
-    val timerState: StateFlow<TimerState> = _timerState
 
     sealed class TimerFragmentUIState {
         data class Timers(val timerInstances: List<TimerModel>) : TimerFragmentUIState()
@@ -34,16 +27,6 @@ class TimerViewModel : ViewModel() {
     sealed class TimerLabelState {
         object Changed : TimerLabelState()
         object Unchanged : TimerLabelState()
-    }
-
-    sealed class TimerState {
-        data class Changed(val state: TimerStates) : TimerState()
-        object Unchanged : TimerState()
-    }
-
-    sealed class TimeRemainingState {
-        object Changed: TimeRemainingState()
-        object Unchanged: TimeRemainingState()
     }
 
     enum class TimerStates {
@@ -234,18 +217,6 @@ class TimerViewModel : ViewModel() {
             if (timersList.isEmpty()) TimerFragmentUIState.Empty else TimerFragmentUIState.Timers(
                 timersList
             )
-    }
-
-    fun changeTimerState(index: Int, state: TimerStates) {
-        _timerState.value = TimerState.Unchanged
-        timerRepository.changeTimerState(index, state)
-        _timerState.value = TimerState.Changed(state)
-    }
-
-    fun updateRemainingTime(index: Int, remainingTime: Long) {
-        _timeRemainingState.value = TimeRemainingState.Unchanged
-        timerRepository.updateTimeRemaining(index, remainingTime)
-        _timeRemainingState.value = TimeRemainingState.Changed
     }
 
     fun convertTimeToMilliseconds(setTimeInstance: Calendar): Long {

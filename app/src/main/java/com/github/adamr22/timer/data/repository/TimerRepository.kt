@@ -1,7 +1,6 @@
 package com.github.adamr22.timer.data.repository
 
 import com.github.adamr22.timer.data.models.TimerModel
-import com.github.adamr22.timer.presentation.viewmodels.TimerViewModel
 
 class TimerRepository {
 
@@ -21,13 +20,5 @@ class TimerRepository {
 
     fun deleteTimer(position: Int) {
         timersList.removeAt(position)
-    }
-
-    fun changeTimerState(index: Int, state: TimerViewModel.TimerStates) {
-        timersList[index].timerState = state
-    }
-
-    fun updateTimeRemaining(index: Int, time: Long) {
-        timersList[index].timeRemaining = time
     }
 }

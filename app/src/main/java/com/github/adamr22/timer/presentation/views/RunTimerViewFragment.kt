@@ -29,6 +29,8 @@ class RunTimerViewFragment(
     private val fragAdapter: RunFragmentViewPagerAdapter
 ) : Fragment() {
 
+    // TODO: Create notification for timer finished, and timer ongoing when fragment is in background
+
     private var timeRemaining = 0L
     private var position = 0
 
