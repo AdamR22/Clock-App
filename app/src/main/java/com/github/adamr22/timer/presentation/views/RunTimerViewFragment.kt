@@ -12,10 +12,13 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
 import com.github.adamr22.common.AddLabelDialog
+import com.github.adamr22.common.NotificationHelper
 import com.github.adamr22.timer.presentation.viewmodels.TimerViewModel
 import com.github.adamr22.timer.data.models.TimerModel
 import com.github.adamr22.timer.presentation.adapters.RunFragmentViewPagerAdapter
@@ -29,14 +32,19 @@ class RunTimerViewFragment(
     private val fragAdapter: RunFragmentViewPagerAdapter
 ) : Fragment() {
 
-    // TODO: Create notification for timer finished, and timer ongoing when fragment is in background
-
     private var timeRemaining = 0L
     private var position = 0
 
     fun setPos(pos: Int) {
         position = pos
     }
+
+    private val TIMER_NOTIFICATION_ID = "Timer Notification"
+    private val TIMER_NOTIFICATION_CHANNEL_NAME = "Timer Notifications"
+
+    private val TIMER_NOTIFICATION_TITLE = "Timer Expired"
+    private val TIMER_NOTIFICATION_CONTENT =
+        if (timerModel.label == null) "Timer ${timerModel.timerId} expired" else "${timerModel.label} timer expired"
 
     private lateinit var animation: Animation
 
@@ -167,6 +175,9 @@ class RunTimerViewFragment(
     override fun onPause() {
         if (timerModel.timerState == TimerViewModel.TimerStates.PAUSED || timerModel.timerState == TimerViewModel.TimerStates.FINISHED)
             tvSetTime.clearAnimation()
+
+        if (timerModel.timerState == TimerViewModel.TimerStates.FINISHED) createTimerEndedNotification()
+
         super.onPause()
     }
 
@@ -242,11 +253,13 @@ class RunTimerViewFragment(
             }
 
             override fun onFinish() {
+                createTimerEndedNotification()
                 timerModel.timerFinished = true
                 timerModel.timerState = TimerViewModel.TimerStates.FINISHED
                 context?.let {
                     renderUI()
                 }
+                playRingtone()
             }
         }.start()
     }
@@ -294,5 +307,23 @@ class RunTimerViewFragment(
     private fun playRingtone() {
         if (!ringtoneAlarm.isPlaying)
             ringtoneAlarm.play()
+    }
+
+    private fun createTimerEndedNotification() {
+        NotificationHelper.createNotificationChannel(
+            TIMER_NOTIFICATION_ID,
+            TIMER_NOTIFICATION_CHANNEL_NAME,
+            requireContext()
+        )
+
+        val notification = NotificationCompat.Builder(requireContext(), TIMER_NOTIFICATION_ID)
+            .setContentTitle(TIMER_NOTIFICATION_TITLE)
+            .setContentText(TIMER_NOTIFICATION_CONTENT)
+            .setSmallIcon(R.drawable.ic_timer)
+            .build()
+
+        with(NotificationManagerCompat.from(requireContext())) {
+            this.notify(timerModel.timerId, notification)
+        }
     }
 }
