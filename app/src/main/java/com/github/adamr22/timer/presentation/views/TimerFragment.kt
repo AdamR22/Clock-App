@@ -6,18 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.github.adamr22.R
-import com.github.adamr22.timer.presentation.viewmodels.TimerViewModel
 
 class TimerFragment : Fragment() {
-
-    private lateinit var viewModel: TimerViewModel
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        viewModel = ViewModelProvider(requireActivity())[TimerViewModel::class.java]
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
