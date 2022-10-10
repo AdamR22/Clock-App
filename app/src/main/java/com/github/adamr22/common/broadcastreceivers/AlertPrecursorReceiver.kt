@@ -14,6 +14,6 @@ class AlertPrecursorReceiver: BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         Log.d(TAG, "onReceive: Triggered")
-        NotificationHelper.createNotification(ALARM_CHANNEL_ID, ALARM_CHANNEL_NAME, context!!)
+        NotificationHelper.createNotificationChannel(ALARM_CHANNEL_ID, ALARM_CHANNEL_NAME, context!!)
     }
 }

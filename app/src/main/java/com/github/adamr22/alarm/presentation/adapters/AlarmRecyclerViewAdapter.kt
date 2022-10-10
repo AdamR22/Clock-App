@@ -27,7 +27,7 @@ class AlarmRecyclerViewAdapter(
 ) :
     RecyclerView.Adapter<AlarmRecyclerViewAdapter.AlarmItemViewHolder>() {
 
-    private var data: List<AlarmItemModel> = mutableListOf()
+    private var data = mutableListOf<AlarmItemModel>()
 
     private var mExpandedPosition: Int = -1
     private lateinit var mRecyclerView: RecyclerView
@@ -119,7 +119,7 @@ class AlarmRecyclerViewAdapter(
         holder.currentTime.text = data[position].time
 
         holder.addLabel.setOnClickListener {
-            AddLabelDialog.newInstance(position, viewModel)
+            AddLabelDialog.newInstance(position, viewModel, null)
                 .show((context as AppCompatActivity).supportFragmentManager, "Add Label")
 
 
@@ -264,7 +264,7 @@ class AlarmRecyclerViewAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun updateAlarmList(newList: List<AlarmItemModel>) {
-        data = mutableListOf()
+        data.clear()
         newList.forEach {
             (data as MutableList<AlarmItemModel>).add(it)
         }
@@ -277,8 +277,8 @@ class AlarmRecyclerViewAdapter(
         val minute = Integer.parseInt(setTime[1])
 
         c.apply {
-            add(Calendar.HOUR, hour)
-            add(Calendar.MINUTE, minute)
+            this.set(Calendar.HOUR_OF_DAY, hour)
+            this.set(Calendar.MINUTE, minute)
 
             if (this.before(Calendar.getInstance())) {
                 add(Calendar.DATE, 1)

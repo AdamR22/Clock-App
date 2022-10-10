@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.github.adamr22">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -15,6 +14,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ClockApp">
+        <service
+            android:name=".timer.services.TimerFragInBackgroundService"
+            android:enabled="true"
+            android:exported="false"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -24,15 +28,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".common.broadcastreceivers.AlertReceiver"
-            android:exported="false"
-            android:enabled="false"/>
-        <receiver android:name=".common.broadcastreceivers.AlertPrecursorReceiver"
-            android:exported="false"
-            android:enabled="false"/>
-        <service android:name=".common.services.AlertPrecursorService"/>
-        <service android:name=".common.services.AlertService"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
+
+        <receiver
+            android:name=".common.broadcastreceivers.AlertReceiver"
+            android:enabled="false"
+            android:exported="false" />
+        <receiver
+            android:name=".common.broadcastreceivers.AlertPrecursorReceiver"
+            android:enabled="false"
+            android:exported="false" />
+
+        <service android:name=".common.services.AlertPrecursorService" />
+        <service
+            android:name=".common.services.AlertService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

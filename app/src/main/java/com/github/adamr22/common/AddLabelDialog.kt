@@ -6,10 +6,15 @@ import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import com.github.adamr22.R
 import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
+import com.github.adamr22.timer.presentation.viewmodels.TimerViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 
-class AddLabelDialog(private val position: Int, private val viewModel: AlarmViewModel) : DialogFragment() {
+class AddLabelDialog(
+    private val position: Int,
+    private val addAlarmLabel: AlarmViewModel?,
+    private val addTimerLabel: TimerViewModel?
+) : DialogFragment() {
 
     @SuppressLint("InflateParams")
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -22,7 +27,10 @@ class AddLabelDialog(private val position: Int, private val viewModel: AlarmView
                 .setPositiveButton("OK") { _, _ ->
                     val label: String =
                         dialog?.findViewById<TextInputEditText>(R.id.add_label_edit_text)?.text.toString()
-                    if (label.isNotEmpty()) viewModel.addLabel(label, position)
+                    if (label.isNotEmpty()) {
+                        addTimerLabel?.addLabel(position, label)
+                        addAlarmLabel?.addLabel(label, position)
+                    }
                 }
                 .setNegativeButton("CANCEL") { dialogInterface, _ ->
                     dialogInterface.cancel()
@@ -33,6 +41,11 @@ class AddLabelDialog(private val position: Int, private val viewModel: AlarmView
 
     companion object {
         @JvmStatic
-        fun newInstance(position: Int, viewModel: AlarmViewModel) = AddLabelDialog(position, viewModel)
+        fun newInstance(
+            position: Int,
+            funcAlarm: AlarmViewModel?,
+            funcTimer: TimerViewModel?
+        ) =
+            AddLabelDialog(position, funcAlarm, funcTimer)
     }
 }
