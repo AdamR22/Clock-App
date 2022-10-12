@@ -3,7 +3,6 @@ package com.github.adamr22.stopwatch
 import android.content.Context.MODE_PRIVATE
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -17,11 +16,8 @@ import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
 class StopWatchFragment : Fragment() {
-
-    private val TAG = "StopWatchFragment"
 
     var stateOrdinalValue = 0
 
@@ -91,8 +87,6 @@ class StopWatchFragment : Fragment() {
 
         stateOrdinalValue = if (savedOrdinalValue > -1) savedOrdinalValue else 0
 
-        Log.d(TAG, "onResume: State Ordinal Value: $stateOrdinalValue")
-
         lapTimeLists.visibility = if (timeStamps.isEmpty()) View.GONE else View.VISIBLE
 
         btnPause.setOnClickListener {
@@ -113,6 +107,10 @@ class StopWatchFragment : Fragment() {
             stateOrdinalValue = 0
             viewModel.resetStopWatch()
             viewModel.changeState(stateOrdinalValue)
+        }
+
+        btnAddLap.setOnClickListener {
+            viewModel.lapTime()
         }
 
         viewModel.changeState(stateOrdinalValue)

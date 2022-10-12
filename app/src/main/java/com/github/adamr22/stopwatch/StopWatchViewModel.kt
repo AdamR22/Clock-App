@@ -19,6 +19,12 @@ class StopWatchViewModel : ViewModel() {
         RUNNING,
     }
 
+    private var _lapTimes = MutableStateFlow(mutableListOf<String>())
+    val lapTimes: StateFlow<List<String>> = _lapTimes
+
+    private var _time = MutableStateFlow("")
+    val time: StateFlow<String> = _time
+
     private var _stopwatchState = MutableStateFlow(StopWatchStates.INITIAL)
     val stopwatchState: StateFlow<StopWatchStates> = _stopwatchState
 
@@ -32,6 +38,7 @@ class StopWatchViewModel : ViewModel() {
             while (true) {
                 delay(1000L)
                 timeInMillis += 1000
+                _time.value = timeInMillis.toString()
                 Log.d(TAG, "runStopwatch: time in mills: ${timeInMillis / 1000} seconds")
             }
         }
@@ -45,5 +52,13 @@ class StopWatchViewModel : ViewModel() {
 
     fun resetStopWatch() {
         cancelStopWatch()
+    }
+
+    fun lapTime() {
+        cancelStopWatch()
+        _lapTimes.value.add(_time.value)
+        _time.value = ""
+        Log.d(TAG, "lapTime: ${_lapTimes.value.size}")
+        runStopWatch()
     }
 }
