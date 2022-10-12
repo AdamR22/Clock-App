@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class StopWatchFragment : Fragment() {
 
@@ -85,6 +86,7 @@ class StopWatchFragment : Fragment() {
     }
 
     override fun onResume() {
+        super.onResume()
         val savedOrdinalValue = sharedPref.getInt(STATE_ORDINAL_KEY, -1)
 
         stateOrdinalValue = if (savedOrdinalValue > -1) savedOrdinalValue else 0
@@ -96,18 +98,26 @@ class StopWatchFragment : Fragment() {
         btnPause.setOnClickListener {
             stateOrdinalValue = 1
             viewModel.changeState(stateOrdinalValue)
+
+            viewModel.cancelStopWatch()
         }
 
         btnPlay.setOnClickListener {
             stateOrdinalValue = 2
+            viewModel.changeState(stateOrdinalValue)
+
+            viewModel.runStopWatch()
+        }
+
+        btnReset.setOnClickListener {
+            stateOrdinalValue = 0
+            viewModel.cancelStopWatch()
             viewModel.changeState(stateOrdinalValue)
         }
 
         viewModel.changeState(stateOrdinalValue)
 
         renderUI()
-
-        super.onResume()
     }
 
     override fun onPause() {
