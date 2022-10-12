@@ -111,7 +111,7 @@ class StopWatchFragment : Fragment() {
 
         btnReset.setOnClickListener {
             stateOrdinalValue = 0
-            viewModel.cancelStopWatch()
+            viewModel.resetStopWatch()
             viewModel.changeState(stateOrdinalValue)
         }
 

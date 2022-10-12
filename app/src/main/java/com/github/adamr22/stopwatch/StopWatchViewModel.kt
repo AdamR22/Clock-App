@@ -28,7 +28,7 @@ class StopWatchViewModel : ViewModel() {
 
     fun runStopWatch() {
         var timeInMillis = 0
-        job = viewModelScope.launch(Dispatchers.IO) {
+        job = viewModelScope.launch(Dispatchers.Main) {
             while (true) {
                 delay(1000L)
                 timeInMillis += 1000
@@ -44,7 +44,6 @@ class StopWatchViewModel : ViewModel() {
     }
 
     fun resetStopWatch() {
-        job.cancel()
-        runStopWatch()
+        cancelStopWatch()
     }
 }
