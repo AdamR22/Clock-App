@@ -1,5 +1,6 @@
 package com.github.adamr22.stopwatch
 
+import android.content.Context.MODE_PRIVATE
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.util.Log
@@ -21,6 +22,15 @@ class StopWatchFragment : Fragment() {
 
     private val TAG = "StopWatchFragment"
 
+    var stateOrdinalValue = 0
+
+    private val STATE_ORDINAL_SHARED_PREF = "State Ordinal Value"
+    private val STATE_ORDINAL_KEY = "Current State Ordinal Value"
+
+    private val sharedPref by lazy {
+        requireContext().getSharedPreferences(STATE_ORDINAL_SHARED_PREF, MODE_PRIVATE)
+    }
+
     companion object {
         fun newInstance() = StopWatchFragment()
     }
@@ -41,9 +51,6 @@ class StopWatchFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[StopWatchViewModel::class.java]
-        viewModel.changeState(viewModel.initialOrdinalValue)
-
-        Log.d(TAG, "onCreate: OnCreate Called")
     }
 
     override fun onCreateView(
@@ -78,20 +85,34 @@ class StopWatchFragment : Fragment() {
     }
 
     override fun onResume() {
+        val savedOrdinalValue = sharedPref.getInt(STATE_ORDINAL_KEY, -1)
+
+        stateOrdinalValue = if (savedOrdinalValue > -1) savedOrdinalValue else 0
+
+        Log.d(TAG, "onResume: State Ordinal Value: $stateOrdinalValue")
 
         lapTimeLists.visibility = if (timeStamps.isEmpty()) View.GONE else View.VISIBLE
 
         btnPause.setOnClickListener {
-            viewModel.changeState(viewModel.pauseOrdinalValue)
+            stateOrdinalValue = 1
+            viewModel.changeState(stateOrdinalValue)
         }
 
         btnPlay.setOnClickListener {
-            viewModel.changeState(viewModel.playOrdinalValue)
+            stateOrdinalValue = 2
+            viewModel.changeState(stateOrdinalValue)
         }
+
+        viewModel.changeState(stateOrdinalValue)
 
         renderUI()
 
         super.onResume()
+    }
+
+    override fun onPause() {
+        sharedPref.edit().putInt(STATE_ORDINAL_KEY, stateOrdinalValue).apply()
+        super.onPause()
     }
 
     private fun renderUI() {

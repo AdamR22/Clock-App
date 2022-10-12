@@ -5,9 +5,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class StopWatchViewModel : ViewModel() {
-    val initialOrdinalValue = 0
-    val pauseOrdinalValue = 1
-    val playOrdinalValue = 2
 
     enum class StopWatchStates {
         INITIAL,
