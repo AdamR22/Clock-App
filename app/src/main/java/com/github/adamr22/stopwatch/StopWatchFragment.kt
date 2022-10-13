@@ -3,7 +3,6 @@ package com.github.adamr22.stopwatch
 import android.content.Context.MODE_PRIVATE
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -20,8 +19,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.flow.collectLatest
 
 class StopWatchFragment : Fragment() {
-
-    private val TAG = "StopWatchFragment"
 
     var stateOrdinalValue = 0
 
@@ -150,6 +147,11 @@ class StopWatchFragment : Fragment() {
                         btnReset.visibility = View.GONE
                         btnPlay.visibility = View.VISIBLE
                         stopwatchTime.clearAnimation()
+                        stopwatchTime.text = String.format(
+                            resources.getString(R.string.running_stopwatch_1_text),
+                            "00",
+                            "00"
+                        )
                     }
                     StopWatchViewModel.StopWatchStates.PAUSED -> {
                         btnPause.visibility = View.GONE
