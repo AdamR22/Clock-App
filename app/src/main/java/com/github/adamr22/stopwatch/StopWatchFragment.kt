@@ -3,6 +3,7 @@ package com.github.adamr22.stopwatch
 import android.content.Context.MODE_PRIVATE
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +20,8 @@ import kotlinx.coroutines.flow.collectLatest
 
 class StopWatchFragment : Fragment() {
 
+    private val TAG = "StopWatchFragment"
+
     var stateOrdinalValue = 0
 
     private val STATE_ORDINAL_SHARED_PREF = "State Ordinal Value"
@@ -32,6 +35,8 @@ class StopWatchFragment : Fragment() {
         fun newInstance() = StopWatchFragment()
     }
 
+    private lateinit var adapter: ArrayAdapter<String>
+
     private lateinit var btnReset: FloatingActionButton
     private lateinit var btnPause: ImageButton
     private lateinit var btnPlay: FloatingActionButton
@@ -43,7 +48,7 @@ class StopWatchFragment : Fragment() {
     private lateinit var lapTimeLists: ListView
 
 
-    private val timeStamps = arrayOf<String>()
+    private val timeStamps = mutableListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +74,7 @@ class StopWatchFragment : Fragment() {
 
         lapTimeLists = view.findViewById(R.id.lap_list)
 
-        val adapter = ArrayAdapter(
+        adapter = ArrayAdapter(
             requireContext(),
             R.layout.lap_item_layout,
             R.id.tv_lap_time,
@@ -83,6 +88,9 @@ class StopWatchFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+
+        readLapTimeList()
+
         val savedOrdinalValue = sharedPref.getInt(STATE_ORDINAL_KEY, -1)
 
         stateOrdinalValue = if (savedOrdinalValue > -1) savedOrdinalValue else 0
@@ -107,6 +115,8 @@ class StopWatchFragment : Fragment() {
             stateOrdinalValue = 0
             viewModel.resetStopWatch()
             viewModel.changeState(stateOrdinalValue)
+            timeStamps.clear()
+            adapter.notifyDataSetChanged()
         }
 
         btnAddLap.setOnClickListener {
@@ -145,6 +155,24 @@ class StopWatchFragment : Fragment() {
                         btnReset.visibility = View.VISIBLE
                         btnPlay.visibility = View.GONE
                     }
+                }
+            }
+        }
+    }
+
+    private fun readLapTimeList() {
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            viewModel.lapTimes.collectLatest {
+
+                if (it.isEmpty()) lapTimeLists.visibility = View.GONE
+
+                if (it.isNotEmpty()) {
+                    lapTimeLists.visibility = View.VISIBLE
+                    timeStamps.clear()
+                    it.forEach { lap ->
+                        timeStamps.add(lap)
+                    }
+                    adapter.notifyDataSetChanged()
                 }
             }
         }
