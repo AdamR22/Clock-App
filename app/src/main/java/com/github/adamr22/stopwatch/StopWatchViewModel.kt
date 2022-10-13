@@ -12,6 +12,7 @@ class StopWatchViewModel : ViewModel() {
     private var job: Job = Job()
 
     private var timeInMillis = 0
+    private var elapsedTime = 0
 
     enum class StopWatchStates {
         INITIAL,
@@ -35,7 +36,9 @@ class StopWatchViewModel : ViewModel() {
     }
 
     fun runStopWatch() {
-        timeInMillis = 0
+
+        timeInMillis = if (elapsedTime != 0) elapsedTime else 0
+
         job = viewModelScope.launch(Dispatchers.IO) {
             while (true) {
                 delay(10L)
@@ -48,6 +51,7 @@ class StopWatchViewModel : ViewModel() {
     }
 
     fun cancelStopWatch() {
+        elapsedTime = timeInMillis
         if (job.isActive) job.cancel()
     }
 
