@@ -1,17 +1,17 @@
 package com.github.adamr22.stopwatch
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.util.concurrent.TimeUnit
 
 class StopWatchViewModel : ViewModel() {
 
-    private val TAG = "StopWatchViewModel"
-
     private var job: Job = Job()
+
+    private var timeInMillis = 0
 
     enum class StopWatchStates {
         INITIAL,
@@ -35,13 +35,12 @@ class StopWatchViewModel : ViewModel() {
     }
 
     fun runStopWatch() {
-        var timeInMillis = 0
+        timeInMillis = 0
         job = viewModelScope.launch(Dispatchers.IO) {
             while (true) {
-                delay(1000L)
-                timeInMillis += 1000
+                delay(10L)
+                timeInMillis += 10
                 _time.value = timeInMillis.toString()
-                Log.d(TAG, "runStopwatch: time in mills: ${timeInMillis / 1000} seconds")
             }
         }
 
@@ -64,7 +63,22 @@ class StopWatchViewModel : ViewModel() {
 
         _time.value = ""
 
-        Log.d(TAG, "lapTime: ${_lapTimes.value.size}")
         runStopWatch()
+    }
+
+    fun formatTime(time: String): List<Long> {
+        val hours = TimeUnit.MILLISECONDS.toHours(time.toLong())
+        val minutes =
+            TimeUnit.MILLISECONDS.toMinutes(time.toLong() - TimeUnit.HOURS.toMillis(hours))
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(
+            time.toLong() - (TimeUnit.HOURS.toMillis(hours) + TimeUnit.MINUTES.toMillis(minutes))
+        )
+        val milliseconds = TimeUnit.MILLISECONDS.toMillis(
+            time.toLong() - (TimeUnit.HOURS.toMillis(hours) + TimeUnit.MINUTES.toMillis(minutes) + TimeUnit.SECONDS.toMillis(
+                seconds
+            ))
+        )
+
+        return listOf(hours, minutes, seconds, milliseconds)
     }
 }

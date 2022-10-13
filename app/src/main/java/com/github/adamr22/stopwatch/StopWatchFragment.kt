@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import android.widget.ListView
@@ -29,6 +30,10 @@ class StopWatchFragment : Fragment() {
 
     private val sharedPref by lazy {
         requireContext().getSharedPreferences(STATE_ORDINAL_SHARED_PREF, MODE_PRIVATE)
+    }
+
+    private val animation by lazy {
+        AnimationUtils.loadAnimation(requireContext(), R.anim.blink)
     }
 
     companion object {
@@ -91,6 +96,8 @@ class StopWatchFragment : Fragment() {
 
         readLapTimeList()
 
+        readStopWatchTime()
+
         val savedOrdinalValue = sharedPref.getInt(STATE_ORDINAL_KEY, -1)
 
         stateOrdinalValue = if (savedOrdinalValue > -1) savedOrdinalValue else 0
@@ -142,18 +149,21 @@ class StopWatchFragment : Fragment() {
                         btnAddLap.visibility = View.GONE
                         btnReset.visibility = View.GONE
                         btnPlay.visibility = View.VISIBLE
+                        stopwatchTime.clearAnimation()
                     }
                     StopWatchViewModel.StopWatchStates.PAUSED -> {
                         btnPause.visibility = View.GONE
                         btnAddLap.visibility = View.GONE
                         btnReset.visibility = View.VISIBLE
                         btnPlay.visibility = View.VISIBLE
+                        stopwatchTime.startAnimation(animation)
                     }
                     StopWatchViewModel.StopWatchStates.RUNNING -> {
                         btnPause.visibility = View.VISIBLE
                         btnAddLap.visibility = View.VISIBLE
                         btnReset.visibility = View.VISIBLE
                         btnPlay.visibility = View.GONE
+                        stopwatchTime.clearAnimation()
                     }
                 }
             }
@@ -175,6 +185,71 @@ class StopWatchFragment : Fragment() {
                     adapter.notifyDataSetChanged()
                 }
             }
+        }
+    }
+
+    private fun readStopWatchTime() {
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            viewModel.time.collectLatest {
+                if (it.isEmpty()) stopwatchTime.text = String.format(
+                    resources.getString(R.string.running_stopwatch_1_text),
+                    "00",
+                    "00"
+                )
+
+                if (it.isNotEmpty()) {
+                    val formattedTimeList = viewModel.formatTime(it)
+
+                    updateTimeText(formattedTimeList)
+                }
+            }
+        }
+    }
+
+    private fun updateTimeText(time: List<Long>) {
+
+        val hourText = "%02d".format(time[0].toInt())
+        val minuteText = "%02d".format(time[1].toInt())
+        val secondText = "%02d".format(time[2].toInt())
+        val milliSecondText = "%02d".format(time[3].toInt())
+
+        if (time[0] != 0L) {
+
+            stopwatchTime.text = String.format(
+                resources.getString(R.string.running_stopwatch_4_text),
+                hourText,
+                minuteText,
+                secondText
+            )
+        }
+
+        if (time[0] == 0L && time[1] != 0L) {
+
+            if (time[1] >= 10) {
+                stopwatchTime.text = String.format(
+                    resources.getString(R.string.running_stopwatch_3_text),
+                    minuteText,
+                    secondText
+                )
+            }
+
+            if (time[1] < 10) {
+                stopwatchTime.text = String.format(
+                    resources.getString(R.string.running_stopwatch_2_text),
+                    minuteText,
+                    secondText,
+                    milliSecondText
+                )
+            }
+
+        }
+
+        if (time[0] == 0L && time[1] == 0L) {
+            stopwatchTime.text = String.format(
+                resources.getString(R.string.running_stopwatch_1_text),
+                secondText,
+                milliSecondText
+            )
         }
     }
 }
