@@ -20,6 +20,8 @@ import kotlinx.coroutines.flow.collectLatest
 
 class StopWatchFragment : Fragment() {
 
+    // TODO: Make stopwatch run in background
+
     var stateOrdinalValue = 0
 
     private val STATE_ORDINAL_SHARED_PREF = "State Ordinal Value"
@@ -119,8 +121,6 @@ class StopWatchFragment : Fragment() {
             stateOrdinalValue = 0
             viewModel.resetStopWatch()
             viewModel.changeState(stateOrdinalValue)
-            timeStamps.clear()
-            adapter.notifyDataSetChanged()
         }
 
         btnAddLap.setOnClickListener {
@@ -182,7 +182,12 @@ class StopWatchFragment : Fragment() {
                     lapTimeLists.visibility = View.VISIBLE
                     timeStamps.clear()
                     it.forEach { lap ->
-                        timeStamps.add(lap)
+
+                        val formattedTimeList = viewModel.formatTime(lap)
+
+                        val formattedLapTime = "#${it.indexOf(lap) + 1} ${formatLapTime(formattedTimeList)}"
+
+                        timeStamps.add(formattedLapTime)
                     }
                     adapter.notifyDataSetChanged()
                 }
@@ -253,5 +258,56 @@ class StopWatchFragment : Fragment() {
                 milliSecondText
             )
         }
+    }
+
+    private fun formatLapTime(time: List<Long>): String {
+
+        var lapTime = ""
+
+        val hourText = "%02d".format(time[0].toInt())
+        val minuteText = "%02d".format(time[1].toInt())
+        val secondText = "%02d".format(time[2].toInt())
+        val milliSecondText = "%02d".format(time[3].toInt())
+
+        if (time[0] != 0L) {
+
+            lapTime = String.format(
+                resources.getString(R.string.running_stopwatch_4_text),
+                hourText,
+                minuteText,
+                secondText
+            )
+        }
+
+        if (time[0] == 0L && time[1] != 0L) {
+
+            if (time[1] >= 10) {
+                lapTime = String.format(
+                    resources.getString(R.string.running_stopwatch_3_text),
+                    minuteText,
+                    secondText
+                )
+            }
+
+            if (time[1] < 10) {
+                lapTime = String.format(
+                    resources.getString(R.string.running_stopwatch_2_text),
+                    minuteText,
+                    secondText,
+                    milliSecondText
+                )
+            }
+
+        }
+
+        if (time[0] == 0L && time[1] == 0L) {
+            lapTime = String.format(
+                resources.getString(R.string.running_stopwatch_1_text),
+                secondText,
+                milliSecondText
+            )
+        }
+
+        return lapTime
     }
 }

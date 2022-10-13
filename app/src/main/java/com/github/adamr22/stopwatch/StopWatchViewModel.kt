@@ -37,7 +37,7 @@ class StopWatchViewModel : ViewModel() {
 
     fun runStopWatch() {
 
-        timeInMillis = if (elapsedTime != 0) elapsedTime else 0
+        timeInMillis = if (elapsedTime > 0) elapsedTime else 0
 
         job = viewModelScope.launch(Dispatchers.IO) {
             while (true) {
@@ -57,10 +57,17 @@ class StopWatchViewModel : ViewModel() {
 
     fun resetStopWatch() {
         cancelStopWatch()
+        elapsedTime = 0
+        _time.value = ""
+
+        lapTimeStamps.clear()
+        _lapTimes.value = lapTimeStamps.toList()
+
     }
 
     fun lapTime() {
         cancelStopWatch()
+        elapsedTime = 0
 
         lapTimeStamps.add(_time.value)
         _lapTimes.value = lapTimeStamps.toList()
