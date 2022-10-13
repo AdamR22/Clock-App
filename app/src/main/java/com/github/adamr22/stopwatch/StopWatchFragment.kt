@@ -20,8 +20,6 @@ import kotlinx.coroutines.flow.collectLatest
 
 class StopWatchFragment : Fragment() {
 
-    // TODO: Make stopwatch run in background
-
     var stateOrdinalValue = 0
 
     private val STATE_ORDINAL_SHARED_PREF = "State Ordinal Value"
