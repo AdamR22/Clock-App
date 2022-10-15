@@ -36,6 +36,7 @@ class AlarmFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+        (requireActivity() as AppCompatActivity).supportActionBar?.title = resources.getString(R.string.alarm)
         return inflater.inflate(R.layout.fragment_alarm, container, false)
     }
 
@@ -73,8 +74,6 @@ class AlarmFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-
-        (activity as AppCompatActivity).supportActionBar?.title = "Alarm"
 
         addAlarmButton.setOnClickListener {
             picker.show(parentFragmentManager, "Alarm Picker")

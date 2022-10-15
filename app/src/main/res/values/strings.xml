@@ -46,4 +46,14 @@
     <string name="running_stopwatch_2_text">%s:%s\n\t\t\%s</string>
     <string name="running_stopwatch_3_text">%s:%s</string>
     <string name="running_stopwatch_4_text">%s:%s:%s</string>
+    <string name="bedtime_schedule_icon">Bedtime Schedule Icon</string>
+    <string name="schedule">Schedule</string>
+    <string name="bedtime_capitalized">BEDTIME</string>
+    <string name="wake_up">WAKE UP</string>
+    <string name="set_time_text">%s:%s</string>
+    <string name="sleep_sounds">Sleep Sounds</string>
+    <string name="music_tone_icon">Music Tone Icon</string>
+    <string name="play_sleep_sound">Play Sleep Sound</string>
+    <string name="choose_another_sound">Choose another sound</string>
+    <string name="default_time">00:00</string>
 </resources>

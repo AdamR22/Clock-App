@@ -26,6 +26,7 @@ class ClockFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        (requireActivity() as AppCompatActivity).supportActionBar?.title = resources.getString(R.string.clock)
         return inflater.inflate(R.layout.fragment_clock, container, false)
     }
 
@@ -40,10 +41,5 @@ class ClockFragment : Fragment() {
                 }"
         }
         super.onViewCreated(view, savedInstanceState)
-    }
-
-    override fun onResume() {
-        (activity as AppCompatActivity).supportActionBar?.title = "Clock"
-        super.onResume()
     }
 }

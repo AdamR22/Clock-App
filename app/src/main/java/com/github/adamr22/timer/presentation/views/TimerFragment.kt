@@ -19,7 +19,7 @@ class TimerFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        (requireContext() as AppCompatActivity).supportActionBar?.title = "Timer"
+        (requireContext() as AppCompatActivity).supportActionBar?.title = resources.getString(R.string.timer)
         super.onViewCreated(view, savedInstanceState)
     }
 
