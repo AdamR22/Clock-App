@@ -56,4 +56,16 @@
     <string name="play_sleep_sound">Play Sleep Sound</string>
     <string name="choose_another_sound">Choose another sound</string>
     <string name="default_time">00:00</string>
+    <string name="bottom_sheet_icon">Bottom Sheet Icon</string>
+    <string name="bedtime_not_set">No Bedtime Set</string>
+    <string name="bedtime_not_set_text">Reminder notification and bedtime mode are off. The selected time will be used to show your recent bedtime activity.</string>
+    <string name="wake_up_time_not_set">No wake-up alarm set</string>
+    <string name="wake_up_time_not_set_text">Even though the alarm isn’t on, the selected time will be used to turn off Bedtime mode and show your recent Bedtime activity.</string>
+    <string name="reminder_notification">Reminder Notification</string>
+    <string name="reminder_notification_text">15 minutes before bedtime</string>
+    <string name="sunrise_alarm">Sunrise Alarm</string>
+    <string name="sunrise_alarm_description">Slowly brighten screen before alarm</string>
+    <string name="sound">Sound</string>
+    <string name="sun_icon">Sun Icon</string>
+    <string name="vibrate_icon">Vibrate Icon</string>
 </resources>
