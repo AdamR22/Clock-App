@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/black">
+
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RadioButton
+            android:id="@+id/btn_15_minutes_before_reminder"
+            android:text="@string/fifteen_min_reminder"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:fontFamily="@font/poppins_medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <RadioButton
+            android:id="@+id/btn_30_minutes_before_reminder"
+            android:text="@string/thirty_min_reminder"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:fontFamily="@font/poppins_medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <RadioButton
+            android:id="@+id/btn_45_minutes_before_reminder"
+            android:text="@string/forty_five_min_reminder"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:fontFamily="@font/poppins_medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <RadioButton
+            android:id="@+id/btn_1_hour_before_reminder"
+            android:text="@string/one_hr_reminder"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:fontFamily="@font/poppins_medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <RadioButton
+            android:id="@+id/btn_off"
+            android:text="@string/off"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:fontFamily="@font/poppins_medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </RadioGroup>
+</androidx.constraintlayout.widget.ConstraintLayout>

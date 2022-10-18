@@ -13,10 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.R
 import com.github.adamr22.alarm.data.models.AlarmItemModel
 import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
-import com.github.adamr22.common.AddLabelDialog
-import com.github.adamr22.common.AlarmHelper
+import com.github.adamr22.common.*
 import com.github.adamr22.common.TimePicker
-import com.github.adamr22.common.VibrateSingleton
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.flow.collectLatest
 import java.util.*
@@ -31,21 +29,16 @@ class AlarmRecyclerViewAdapter(
 
     private var mExpandedPosition: Int = -1
     private lateinit var mRecyclerView: RecyclerView
-    private val mCallbackInterface: CallbackInterface
     private lateinit var currentTitle: String
     private var c = Calendar.getInstance()
+
+    private val pickAlarmInterface by lazy {
+        context as PickAlarmInterface
+    }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         mRecyclerView = recyclerView
-    }
-
-    interface CallbackInterface {
-        fun selectChosenTone(index: Int, viewModel: AlarmViewModel, recyclerView: RecyclerView)
-    }
-
-    init {
-        mCallbackInterface = context as CallbackInterface
     }
 
     inner class AlarmItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -253,7 +246,7 @@ class AlarmRecyclerViewAdapter(
         holder.selectSong.text = data[position].ringtoneTitle
 
         holder.selectSong.setOnClickListener {
-            mCallbackInterface.selectChosenTone(position, viewModel, mRecyclerView)
+            pickAlarmInterface.selectAlarmTone()
         }
 
     }

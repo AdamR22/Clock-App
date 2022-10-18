@@ -1,5 +1,7 @@
 package com.github.adamr22.bedtime
 
+import android.content.Context
+import android.media.RingtoneManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,11 +9,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
+import com.github.adamr22.common.PickAlarmInterface
+import com.github.adamr22.common.VibrateSingleton
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.flow.collectLatest
@@ -37,9 +42,23 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
     private lateinit var reminderNotificationSetTime: TextView
 
     private lateinit var wakeUpTextContent: ConstraintLayout
-    private lateinit var btnSunriseAlarm: RadioButton
+    private lateinit var btnSunriseAlarm: SwitchMaterial
     private lateinit var tvDefaultSound: TextView
-    private lateinit var btnVibrate: RadioButton
+    private lateinit var btnVibrate: SwitchMaterial
+
+    private val defaultRingtoneUri by lazy {
+        RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+    }
+
+    private val defaultRingtoneTitle by lazy {
+        RingtoneManager.getRingtone(requireContext(), defaultRingtoneUri).getTitle(requireContext())
+    }
+
+    private var isVibrate = true
+
+    private val pickAlarmInterface by lazy {
+        requireActivity() as PickAlarmInterface
+    }
 
     companion object {
         const val TAG = "BedTime Modal Bottom Sheet"
@@ -79,6 +98,8 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
         btnSunriseAlarm = view.findViewById(R.id.btn_sunrise_alarm)
         tvDefaultSound = view.findViewById(R.id.tv_default_sound) // clickable
         btnVibrate = view.findViewById(R.id.btn_vibrate)
+
+        tvDefaultSound.text = defaultRingtoneTitle
     }
 
     override fun onResume() {
@@ -91,6 +112,32 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
 
             if (inflateWakeUpLayout!!) viewModel.scheduleWakeUpTime()
         }
+
+        reminderNotificationText.setOnClickListener {
+            NotificationReminderDialog().show(parentFragmentManager, NotificationReminderDialog.TAG)
+        }
+
+        btnVibrate.isChecked = isVibrate
+
+        btnVibrate.setOnCheckedChangeListener { btn, _ ->
+            if (btn.isChecked) {
+                isVibrate = true
+                VibrateSingleton.vibrateDeviceOnce(requireContext(), true)
+            }
+
+            if (!btn.isChecked) {
+                isVibrate = false
+                VibrateSingleton.vibrateDeviceOnce(requireContext(), false)
+            }
+        }
+
+        tvDefaultSound.setOnClickListener {
+            pickAlarmInterface.selectAlarmTone()
+        }
+
+        if (pickAlarmInterface.returnSelectedTone() != null) {
+            tvDefaultSound.text = pickAlarmInterface.returnSelectedTone()!!.second
+        }
     }
 
     private fun renderUI() {
@@ -99,7 +146,12 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
 
     private fun renderBottomSheetText() {
         if (inflateBedTimeLayout!!) {
-            bottomSheetIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_bedtime))
+            bottomSheetIcon.setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_bedtime
+                )
+            )
             bottomSheetText.text = resources.getString(R.string.bedtime)
 
             bedtimeNotTextContent.visibility = View.VISIBLE
@@ -109,7 +161,12 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
         } else bedtimeNotTextContent.visibility = View.GONE
 
         if (inflateWakeUpLayout!!) {
-            bottomSheetIcon.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_bed))
+            bottomSheetIcon.setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_bed
+                )
+            )
             bottomSheetText.text = resources.getString(R.string.wake_up)
 
             wakeUpNotTextContent.visibility = View.VISIBLE

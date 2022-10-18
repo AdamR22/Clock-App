@@ -68,4 +68,9 @@
     <string name="sound">Sound</string>
     <string name="sun_icon">Sun Icon</string>
     <string name="vibrate_icon">Vibrate Icon</string>
+    <string name="fifteen_min_reminder">15 minutes before bedtime</string>
+    <string name="thirty_min_reminder">30 minutes before bedtime</string>
+    <string name="forty_five_min_reminder">45 minutes before bedtime</string>
+    <string name="one_hr_reminder">1 hour before bedtime</string>
+    <string name="off">Off</string>
 </resources>
