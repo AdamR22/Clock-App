@@ -1,6 +1,5 @@
 package com.github.adamr22.bedtime
 
-import android.content.Context
 import android.media.RingtoneManager
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,8 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -107,6 +104,8 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
 
         renderUI()
 
+        changeNotificationReminderText()
+
         scheduleTime.setOnClickListener {
             if (inflateBedTimeLayout!!) viewModel.scheduleBedTime()
 
@@ -114,7 +113,7 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
         }
 
         reminderNotificationText.setOnClickListener {
-            NotificationReminderDialog().show(parentFragmentManager, NotificationReminderDialog.TAG)
+            NotificationReminderDialog(viewModel).show(parentFragmentManager, NotificationReminderDialog.TAG)
         }
 
         btnVibrate.isChecked = isVibrate
@@ -208,6 +207,14 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
                         wakeUpNotTextContent.visibility = View.VISIBLE
                     }
                 }
+            }
+        }
+    }
+
+    private fun changeNotificationReminderText() {
+        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+            viewModel.notificationReminderText.collectLatest {
+                if (it.isNotEmpty()) reminderNotificationSetTime.text = it
             }
         }
     }
