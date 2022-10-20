@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
 import com.github.adamr22.common.PickAlarmInterface
+import com.github.adamr22.common.TimePicker
 import com.github.adamr22.common.VibrateSingleton
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -22,6 +23,8 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
 
     private val BEDTIME_TAG = "Bedtime"
     private val WAKEUP_TAG = "Wakeup"
+
+    private val SELECT_TIME_TAG = "Select Time"
 
     private var inflateBedTimeLayout: Boolean? = null
     private var inflateWakeUpLayout: Boolean? = null
@@ -43,12 +46,18 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
     private lateinit var tvDefaultSound: TextView
     private lateinit var btnVibrate: SwitchMaterial
 
+    private lateinit var tvSetTime: TextView
+
     private val defaultRingtoneUri by lazy {
         RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
     }
 
     private val defaultRingtoneTitle by lazy {
         RingtoneManager.getRingtone(requireContext(), defaultRingtoneUri).getTitle(requireContext())
+    }
+
+    private val timePicker by lazy {
+        TimePicker.buildPicker(SELECT_TIME_TAG)
     }
 
     private var isVibrate = true
@@ -96,6 +105,8 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
         tvDefaultSound = view.findViewById(R.id.tv_default_sound) // clickable
         btnVibrate = view.findViewById(R.id.btn_vibrate)
 
+        tvSetTime = view.findViewById(R.id.tv_set_time)
+
         tvDefaultSound.text = defaultRingtoneTitle
     }
 
@@ -113,7 +124,10 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
         }
 
         reminderNotificationText.setOnClickListener {
-            NotificationReminderDialog(viewModel).show(parentFragmentManager, NotificationReminderDialog.TAG)
+            NotificationReminderDialog(viewModel).show(
+                parentFragmentManager,
+                NotificationReminderDialog.TAG
+            )
         }
 
         btnVibrate.isChecked = isVibrate
@@ -137,6 +151,17 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
         if (pickAlarmInterface.returnSelectedTone() != null) {
             tvDefaultSound.text = pickAlarmInterface.returnSelectedTone()!!.second
         }
+
+        tvSetTime.setOnClickListener {
+            timePicker.show(parentFragmentManager, TAG)
+            timePicker.addOnPositiveButtonClickListener {
+                tvSetTime.text = String.format(
+                    resources.getString(R.string.default_time_2),
+                    "%02d".format(timePicker.hour),
+                    "%02d".format(timePicker.minute)
+                )
+            }
+        }
     }
 
     private fun renderUI() {
@@ -151,7 +176,7 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
                     R.drawable.ic_bedtime
                 )
             )
-            bottomSheetText.text = resources.getString(R.string.bedtime)
+            bottomSheetText.text = resources.getString(R.string.bedtime_capitalized)
 
             bedtimeNotTextContent.visibility = View.VISIBLE
             scheduleTime.isChecked = viewModel.bedTimeScheduled.value

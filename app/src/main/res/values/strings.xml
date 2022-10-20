@@ -56,6 +56,7 @@
     <string name="play_sleep_sound">Play Sleep Sound</string>
     <string name="choose_another_sound">Choose another sound</string>
     <string name="default_time">00:00</string>
+    <string name="default_time_2">%s:%s</string>
     <string name="bottom_sheet_icon">Bottom Sheet Icon</string>
     <string name="bedtime_not_set">No Bedtime Set</string>
     <string name="bedtime_not_set_text">Reminder notification and bedtime mode are off. The selected time will be used to show your recent bedtime activity.</string>
