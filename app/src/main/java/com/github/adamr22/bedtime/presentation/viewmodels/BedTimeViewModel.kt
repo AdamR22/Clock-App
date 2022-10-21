@@ -1,4 +1,4 @@
-package com.github.adamr22.bedtime
+package com.github.adamr22.bedtime.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

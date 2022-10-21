@@ -1,4 +1,4 @@
-package com.github.adamr22.bedtime
+package com.github.adamr22.bedtime.presentation.views
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -8,6 +8,7 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import androidx.fragment.app.DialogFragment
 import com.github.adamr22.R
+import com.github.adamr22.bedtime.presentation.viewmodels.BedTimeViewModel
 
 @SuppressLint("InflateParams")
 class NotificationReminderDialog(val viewModel: BedTimeViewModel) : DialogFragment() {

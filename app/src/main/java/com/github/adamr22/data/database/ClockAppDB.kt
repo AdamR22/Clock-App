@@ -13,6 +13,8 @@ class ClockAppDB(
     companion object {
         const val DATABASE_VERSION = 1
         const val DATABASE_NAME = "ClockApp.db"
+
+        fun getInstance(context: Context) = ClockAppDB(context)
     }
 
     override fun onCreate(db: SQLiteDatabase?) {

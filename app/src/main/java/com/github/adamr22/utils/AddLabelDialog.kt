@@ -29,7 +29,7 @@ class AddLabelDialog(
                         dialog?.findViewById<TextInputEditText>(R.id.add_label_edit_text)?.text.toString()
                     if (label.isNotEmpty()) {
                         addTimerLabel?.addLabel(position, label)
-                        addAlarmLabel?.addLabel(label, position)
+//                        addAlarmLabel?.addLabel(label, position)
                     }
                 }
                 .setNegativeButton("CANCEL") { dialogInterface, _ ->

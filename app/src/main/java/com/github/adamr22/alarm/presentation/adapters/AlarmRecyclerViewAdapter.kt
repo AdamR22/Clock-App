@@ -108,8 +108,8 @@ class AlarmRecyclerViewAdapter(
                 }.toString().replace("[", "").replace("]", "")
             }
         }
-
-        holder.currentTime.text = data[position].time
+//
+//        holder.currentTime.text = data[position].time
 
         holder.addLabel.setOnClickListener {
             AddLabelDialog.newInstance(position, viewModel, null)
@@ -117,19 +117,12 @@ class AlarmRecyclerViewAdapter(
 
 
             context.lifecycleScope.launchWhenCreated {
-                viewModel.labelChanged.collectLatest {
-                    when (it) {
-                        is AlarmViewModel.LabelChangedState.Changed -> notifyItemChanged(position)
-                        else -> {}
-                    }
-                }
             }
 
         }
 
         holder.activateAlarm.setOnCheckedChangeListener { buttonView, _ ->
             if (buttonView.isChecked) {
-                setAlarm(data[position].time, holder.alarmSchedule)
                 Toast.makeText(context, context.resources.getString(R.string.alarm_activated), Toast.LENGTH_SHORT).show()
             } else {
                 holder.alarmSchedule.text = context.resources.getString(R.string.not_scheduled)
@@ -155,13 +148,11 @@ class AlarmRecyclerViewAdapter(
             val picker = TimePicker.buildPicker("Set Alarm")
             picker.show((context as AppCompatActivity).supportFragmentManager, "Reschedule Alarm")
             picker.addOnPositiveButtonClickListener {
-                viewModel.changeTime(position, "%02d:%02d".format(picker.hour, picker.minute))
                 notifyItemChanged(position)
             }
         }
 
         holder.delete.setOnClickListener {
-            viewModel.deleteItem(position)
             notifyItemRemoved(position)
         }
 
@@ -175,70 +166,56 @@ class AlarmRecyclerViewAdapter(
 
         holder.btnMonday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.addDayToSchedule(position, "Monday")
                 notifyItemChanged(position)
             } else {
-                viewModel.removeDayOnSchedule(position, "Monday")
                 notifyItemChanged(position)
             }
         }
 
         holder.btnTuesday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.addDayToSchedule(position, "Tuesday")
                 notifyItemChanged(position)
             } else {
-                viewModel.removeDayOnSchedule(position, "Tuesday")
                 notifyItemChanged(position)
             }
         }
 
         holder.btnWednesday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.addDayToSchedule(position, "Wednesday")
                 notifyItemChanged(position)
             } else {
-                viewModel.removeDayOnSchedule(position, "Wednesday")
                 notifyItemChanged(position)
             }
         }
 
         holder.btnThursday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.addDayToSchedule(position, "Thursday")
                 notifyItemChanged(position)
             } else {
-                viewModel.removeDayOnSchedule(position, "Thursday")
                 notifyItemChanged(position)
             }
         }
 
         holder.btnFriday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.addDayToSchedule(position, "Friday")
                 notifyItemChanged(position)
             } else {
-                viewModel.removeDayOnSchedule(position, "Friday")
                 notifyItemChanged(position)
             }
         }
 
         holder.btnSaturday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.addDayToSchedule(position, "Saturday")
                 notifyItemChanged(position)
             } else {
-                viewModel.removeDayOnSchedule(position, "Saturday")
                 notifyItemChanged(position)
             }
         }
 
         holder.btnSunday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.addDayToSchedule(position, "Saturday")
                 notifyItemChanged(position)
             } else {
-                viewModel.removeDayOnSchedule(position, "Sunday")
                 notifyItemChanged(position)
             }
         }

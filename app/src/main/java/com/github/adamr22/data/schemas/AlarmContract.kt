@@ -7,7 +7,8 @@ object AlarmContract {
         const val COLUMN_NAME_LABEL = "label"
         const val COLUMN_NAME_RINGTONE_TITLE = "ringtone_title"
         const val COLUMN_NAME_RINGTONE_URI = "ringtone_uri"
-        const val COLUMN_NAME_TIMESTAMP = "timestamp"
+        const val COLUMN_NAME_HOUR = "hour"
+        const val COLUMN_NAME_MINUTE = "minute"
         const val COLUMN_NAME_IS_SCHEDULED = "is_scheduled"
         const val COLUMN_NAME_REMINDER = "alarm_reminder"
     }
@@ -18,7 +19,8 @@ object AlarmContract {
             ${AlarmEntry.COLUMN_NAME_LABEL} TEXT,
             ${AlarmEntry.COLUMN_NAME_RINGTONE_TITLE} TEXT,
             ${AlarmEntry.COLUMN_NAME_RINGTONE_URI} TEXT,
-            ${AlarmEntry.COLUMN_NAME_TIMESTAMP} INTEGER,
+            ${AlarmEntry.COLUMN_NAME_HOUR} INTEGER,
+            ${AlarmEntry.COLUMN_NAME_MINUTE} INTEGER,
             ${AlarmEntry.COLUMN_NAME_IS_SCHEDULED} BIT,
             ${AlarmEntry.COLUMN_NAME_REMINDER} INTEGER DEFAULT 15,
         )

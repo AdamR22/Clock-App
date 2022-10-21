@@ -1,4 +1,4 @@
-package com.github.adamr22.bedtime
+package com.github.adamr22.bedtime.presentation.views
 
 import android.media.RingtoneManager
 import android.os.Bundle
@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
+import com.github.adamr22.bedtime.presentation.viewmodels.BedTimeViewModel
 import com.github.adamr22.utils.PickAlarmInterface
 import com.github.adamr22.utils.TimePicker
 import com.github.adamr22.utils.VibrateSingleton

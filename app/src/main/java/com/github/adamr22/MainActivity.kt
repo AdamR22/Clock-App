@@ -9,7 +9,7 @@ import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
 import com.github.adamr22.alarm.presentation.views.AlarmFragment
-import com.github.adamr22.bedtime.BedTimeFragment
+import com.github.adamr22.bedtime.presentation.views.BedTimeFragment
 import com.github.adamr22.clock.ClockFragment
 import com.github.adamr22.utils.PickAlarmInterface
 import com.github.adamr22.stopwatch.StopWatchFragment

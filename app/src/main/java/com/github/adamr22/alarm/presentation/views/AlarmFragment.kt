@@ -2,7 +2,6 @@ package com.github.adamr22.alarm.presentation.views
 
 import android.media.RingtoneManager
 import android.os.Bundle
-import android.provider.Settings
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -55,20 +54,7 @@ class AlarmFragment : Fragment() {
         alarmRecyclerView.hasFixedSize()
 
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-            alarmViewModel.alarmItems.collectLatest {
-                when (it) {
-                    is AlarmViewModel.AlarmUIState.AlarmItems -> {
-                        alarmRecyclerView.visibility = View.VISIBLE
-                        emptyAlarmContent.visibility = View.GONE
-                        alarmAdapter.updateAlarmList(it.alarmItems)
-                    }
 
-                    is AlarmViewModel.AlarmUIState.Empty -> {
-                        alarmRecyclerView.visibility = View.GONE
-                        emptyAlarmContent.visibility = View.VISIBLE
-                    }
-                }
-            }
         }
     }
 
@@ -86,18 +72,6 @@ class AlarmFragment : Fragment() {
 
     private fun addAlarmItem() {
         val chosenTime = "%02d:%02d".format(picker.hour, picker.minute)
-        val alarm = AlarmItemModel(
-            chosenTime,
-            RingtoneManager.getRingtone(
-                requireActivity(),
-                Settings.System.DEFAULT_ALARM_ALERT_URI
-            ).getTitle(requireContext()),
-            RingtoneManager.getActualDefaultRingtoneUri(
-                requireContext(),
-                RingtoneManager.TYPE_ALARM
-            ),
-        )
-        alarmViewModel.addAlarmItem(alarm)
     }
 
     companion object {

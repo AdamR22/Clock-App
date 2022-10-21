@@ -12,7 +12,7 @@ object ScheduleContract {
         CREATE TABLE IF NOT EXISTS ${ScheduleEntry.TABLE_NAME} (
             ${ScheduleEntry.COLUMN_NAME_ID} INTEGER PRIMARY KEY AUTOINCREMENT,
             ${ScheduleEntry.COLUMN_NAME_DAY} TEXT,
-            ${ScheduleEntry.COLUMN_NAME_ALARM_ID} INTEGER FOREIGN KEY REFERENCES ${AlarmContract.AlarmEntry.TABLE_NAME}${(ScheduleEntry.COLUMN_NAME_ALARM_ID)} ON DELETE CASCADE
+            ${ScheduleEntry.COLUMN_NAME_ALARM_ID} INTEGER UNIQUE FOREIGN KEY REFERENCES ${AlarmContract.AlarmEntry.TABLE_NAME}${(ScheduleEntry.COLUMN_NAME_ALARM_ID)}
         )
     """
 
