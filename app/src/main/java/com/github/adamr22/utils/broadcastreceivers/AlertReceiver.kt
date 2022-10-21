@@ -1,4 +1,4 @@
-package com.github.adamr22.common.broadcastreceivers
+package com.github.adamr22.utils.broadcastreceivers
 
 import android.content.BroadcastReceiver
 import android.content.Context

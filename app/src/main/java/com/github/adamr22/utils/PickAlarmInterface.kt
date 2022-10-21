@@ -1,4 +1,4 @@
-package com.github.adamr22.common
+package com.github.adamr22.utils
 
 import android.net.Uri
 

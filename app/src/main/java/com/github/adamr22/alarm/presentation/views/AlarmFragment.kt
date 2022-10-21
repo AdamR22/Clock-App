@@ -17,7 +17,7 @@ import com.github.adamr22.R
 import com.github.adamr22.alarm.data.models.AlarmItemModel
 import com.github.adamr22.alarm.presentation.adapters.AlarmRecyclerViewAdapter
 import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
-import com.github.adamr22.common.TimePicker
+import com.github.adamr22.utils.TimePicker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.timepicker.MaterialTimePicker
 import kotlinx.coroutines.flow.collectLatest

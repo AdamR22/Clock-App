@@ -1,11 +1,11 @@
-package com.github.adamr22.common
+package com.github.adamr22.utils
 
 import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import com.github.adamr22.common.broadcastreceivers.AlertPrecursorReceiver
+import com.github.adamr22.utils.broadcastreceivers.AlertPrecursorReceiver
 import java.util.*
 
 object AlarmHelper {

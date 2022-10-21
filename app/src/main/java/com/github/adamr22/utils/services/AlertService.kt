@@ -1,4 +1,4 @@
-package com.github.adamr22.common.services
+package com.github.adamr22.utils.services
 
 import android.app.job.JobParameters
 import android.app.job.JobService

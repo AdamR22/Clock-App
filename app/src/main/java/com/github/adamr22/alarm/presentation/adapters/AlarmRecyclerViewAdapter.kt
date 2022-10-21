@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.R
 import com.github.adamr22.alarm.data.models.AlarmItemModel
 import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
-import com.github.adamr22.common.*
-import com.github.adamr22.common.TimePicker
+import com.github.adamr22.utils.*
+import com.github.adamr22.utils.TimePicker
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.flow.collectLatest
 import java.util.*

@@ -26,17 +26,17 @@
         </activity>
 
         <receiver
-            android:name=".common.broadcastreceivers.AlertReceiver"
+            android:name=".utils.broadcastreceivers.AlertReceiver"
             android:enabled="false"
             android:exported="false" />
         <receiver
-            android:name=".common.broadcastreceivers.AlertPrecursorReceiver"
+            android:name=".utils.broadcastreceivers.AlertPrecursorReceiver"
             android:enabled="false"
             android:exported="false" />
 
-        <service android:name=".common.services.AlertPrecursorService" />
+        <service android:name=".utils.services.AlertPrecursorService" />
         <service
-            android:name=".common.services.AlertService"
+            android:name=".utils.services.AlertService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <meta-data

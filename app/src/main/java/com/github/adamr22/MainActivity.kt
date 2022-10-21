@@ -11,7 +11,7 @@ import androidx.appcompat.widget.Toolbar
 import com.github.adamr22.alarm.presentation.views.AlarmFragment
 import com.github.adamr22.bedtime.BedTimeFragment
 import com.github.adamr22.clock.ClockFragment
-import com.github.adamr22.common.PickAlarmInterface
+import com.github.adamr22.utils.PickAlarmInterface
 import com.github.adamr22.stopwatch.StopWatchFragment
 import com.github.adamr22.timer.presentation.views.TimerFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView

@@ -12,9 +12,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
-import com.github.adamr22.common.PickAlarmInterface
-import com.github.adamr22.common.TimePicker
-import com.github.adamr22.common.VibrateSingleton
+import com.github.adamr22.utils.PickAlarmInterface
+import com.github.adamr22.utils.TimePicker
+import com.github.adamr22.utils.VibrateSingleton
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.flow.collectLatest

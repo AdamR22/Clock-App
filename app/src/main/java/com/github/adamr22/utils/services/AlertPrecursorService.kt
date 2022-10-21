@@ -1,4 +1,4 @@
-package com.github.adamr22.common.services
+package com.github.adamr22.utils.services
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -7,7 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
-import com.github.adamr22.common.broadcastreceivers.AlertPrecursorReceiver
+import com.github.adamr22.utils.broadcastreceivers.AlertPrecursorReceiver
 import java.util.*
 
 class AlertPrecursorService : Service() {

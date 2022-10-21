@@ -1,10 +1,10 @@
-package com.github.adamr22.common.broadcastreceivers
+package com.github.adamr22.utils.broadcastreceivers
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.github.adamr22.common.NotificationHelper
+import com.github.adamr22.utils.NotificationHelper
 
 class AlertPrecursorReceiver: BroadcastReceiver() {
     private val ALARM_CHANNEL_ID = "alarm channel id"
