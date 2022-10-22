@@ -21,12 +21,11 @@ object AlarmContract {
             ${AlarmEntry.COLUMN_NAME_RINGTONE_URI} TEXT,
             ${AlarmEntry.COLUMN_NAME_HOUR} INTEGER,
             ${AlarmEntry.COLUMN_NAME_MINUTE} INTEGER,
-            ${AlarmEntry.COLUMN_NAME_IS_SCHEDULED} BIT,
-            ${AlarmEntry.COLUMN_NAME_REMINDER} INTEGER DEFAULT 15,
-        )
+            ${AlarmEntry.COLUMN_NAME_IS_SCHEDULED} BIT DEFAULT 1,
+            ${AlarmEntry.COLUMN_NAME_REMINDER} INTEGER DEFAULT 15);
     """
 
     const val SQL_DELETE_ALARM_ENTRIES = """
-        DROP TABLE IF EXISTS ${AlarmEntry.TABLE_NAME}
+        DROP TABLE IF EXISTS ${AlarmEntry.TABLE_NAME};
     """
 }

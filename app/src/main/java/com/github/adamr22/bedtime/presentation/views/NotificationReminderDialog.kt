@@ -11,7 +11,12 @@ import com.github.adamr22.R
 import com.github.adamr22.bedtime.presentation.viewmodels.BedTimeViewModel
 
 @SuppressLint("InflateParams")
-class NotificationReminderDialog(val viewModel: BedTimeViewModel) : DialogFragment() {
+class NotificationReminderDialog(
+    val viewModel: BedTimeViewModel,
+    val label: String,
+    val itemId: Int
+) :
+    DialogFragment() {
     private lateinit var radioGroup: RadioGroup
 
     private val dialogView by lazy {
@@ -37,7 +42,28 @@ class NotificationReminderDialog(val viewModel: BedTimeViewModel) : DialogFragme
 
             val radioButton = dialogView.findViewById<RadioButton>(selectedId)
 
-            viewModel.notificationReminderText(radioButton.text.toString())
+            when (radioButton.text.toString()) {
+                resources.getString(R.string.fifteen_min_reminder) -> viewModel.updateReminder(
+                    label,
+                    itemId,
+                    15
+                )
+                resources.getString(R.string.thirty_min_reminder) -> viewModel.updateReminder(
+                    label,
+                    itemId,
+                    30
+                )
+                resources.getString(R.string.forty_five_min_reminder) -> viewModel.updateReminder(
+                    label,
+                    itemId,
+                    45
+                )
+                resources.getString(R.string.one_hr_reminder) -> viewModel.updateReminder(
+                    label,
+                    itemId,
+                    60
+                )
+            }
         }
     }
 

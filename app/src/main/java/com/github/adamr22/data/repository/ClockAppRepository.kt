@@ -27,8 +27,8 @@ class ClockAppRepository(private val db: ClockAppDB) {
         hour: Int,
         minute: Int,
         label: String?,
-        ringtoneTitle: String,
-        ringtoneUri: String,
+        ringtoneTitle: String?,
+        ringtoneUri: String?,
     ) {
 
         val values = contentValues.apply {
@@ -181,15 +181,15 @@ class ClockAppRepository(private val db: ClockAppDB) {
         return schedule
     }
 
-    fun getItem(itemLabel: String): AlarmItemModel {
+    fun getItem(itemLabel: String, id: Int?): AlarmItemModel {
 
         lateinit var item: AlarmItemModel
 
         val cursor = readAppDb.query(
             ALARM_TABLE_NAME,
             null,
-            "${AlarmContract.AlarmEntry.COLUMN_NAME_LABEL} = ?",
-            arrayOf(itemLabel),
+            if (id == null ) "${AlarmContract.AlarmEntry.COLUMN_NAME_LABEL} = ?" else "${AlarmContract.AlarmEntry.COLUMN_NAME_ID} = ?",
+            if (id == null) arrayOf(itemLabel) else arrayOf(id.toString()),
             null,
             null,
             null
@@ -233,6 +233,24 @@ class ClockAppRepository(private val db: ClockAppDB) {
         cursor.close()
 
         return item
+    }
+
+    fun updateReminder(id: Int, time: Int) {
+        val whereClause = "${AlarmContract.AlarmEntry.COLUMN_NAME_ID} = ?"
+        val whereArgs = arrayOf(id.toString())
+
+        val values = contentValues.apply { this.put(AlarmContract.AlarmEntry.COLUMN_NAME_REMINDER, time) }
+
+        appDB.update(ALARM_TABLE_NAME, values, whereClause, whereArgs)
+    }
+
+    fun switchAlarmOnOff(id: Int, bit: Int) {
+        val whereClause = "${AlarmContract.AlarmEntry.COLUMN_NAME_IS_SCHEDULED} = ?"
+        val whereArgs = arrayOf(id.toString())
+
+        val values = contentValues.apply { this.put(AlarmContract.AlarmEntry.COLUMN_NAME_REMINDER, bit) }
+
+        appDB.update(ALARM_TABLE_NAME, values, whereClause, whereArgs)
     }
 
 }

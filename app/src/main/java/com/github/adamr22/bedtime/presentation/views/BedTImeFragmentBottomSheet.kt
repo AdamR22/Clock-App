@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
+import com.github.adamr22.alarm.data.models.AlarmItemModel
 import com.github.adamr22.bedtime.presentation.viewmodels.BedTimeViewModel
 import com.github.adamr22.utils.PickAlarmInterface
 import com.github.adamr22.utils.TimePicker
@@ -26,6 +27,8 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
     private val WAKEUP_TAG = "Wakeup"
 
     private val SELECT_TIME_TAG = "Select Time"
+
+    private var data: AlarmItemModel? = null
 
     private var inflateBedTimeLayout: Boolean? = null
     private var inflateWakeUpLayout: Boolean? = null
@@ -62,6 +65,8 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
     }
 
     private var isVibrate = true
+    private var isNewItem = false
+    private var isSunriseAlarm = true
 
     private val pickAlarmInterface by lazy {
         requireActivity() as PickAlarmInterface
@@ -114,21 +119,71 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
     override fun onResume() {
         super.onResume()
 
+        renderData()
+
         renderUI()
 
         changeNotificationReminderText()
 
-        scheduleTime.setOnClickListener {
-            if (inflateBedTimeLayout!!) viewModel.scheduleBedTime()
+        switchIsChecked()
 
-            if (inflateWakeUpLayout!!) viewModel.scheduleWakeUpTime()
+        scheduleTime.setOnClickListener {
+            if (isNewItem) {
+
+                if (inflateWakeUpLayout!!) {
+                    viewModel.setItem(
+                        timePicker.hour,
+                        timePicker.minute,
+                        bottomSheetText.text.toString(),
+                        defaultRingtoneTitle,
+                        defaultRingtoneUri
+                    )
+                }
+
+                if (inflateBedTimeLayout!!) {
+                    viewModel.setItem(
+                        timePicker.hour,
+                        timePicker.minute,
+                        bottomSheetText.text.toString(),
+                        null,
+                        null,
+                    )
+                }
+            }
+
+            if (!isNewItem) {
+                if (inflateWakeUpLayout!!) {
+                    viewModel.updateTime(
+                        bottomSheetText.text.toString(),
+                        data?.id!!,
+                        timePicker.hour,
+                        timePicker.minute
+                    )
+                }
+
+                if (inflateBedTimeLayout!!) {
+                    viewModel.updateTime(
+                        bottomSheetText.text.toString(),
+                        data?.id!!,
+                        timePicker.hour,
+                        timePicker.minute
+                    )
+                }
+            }
         }
 
         reminderNotificationText.setOnClickListener {
-            NotificationReminderDialog(viewModel).show(
+            NotificationReminderDialog(viewModel, bottomSheetText.text.toString(), data?.id!!).show(
                 parentFragmentManager,
                 NotificationReminderDialog.TAG
             )
+        }
+
+        btnSunriseAlarm.isChecked = isSunriseAlarm
+
+        btnSunriseAlarm.setOnCheckedChangeListener { btn, _ ->
+            if (btn.isChecked) isSunriseAlarm = true
+            if (!btn.isChecked) isSunriseAlarm = false
         }
 
         btnVibrate.isChecked = isVibrate
@@ -150,7 +205,10 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
         }
 
         if (pickAlarmInterface.returnSelectedTone() != null) {
-            tvDefaultSound.text = pickAlarmInterface.returnSelectedTone()!!.second
+            val title = pickAlarmInterface.returnSelectedTone()!!.second
+            val uri = pickAlarmInterface.returnSelectedTone()!!.first
+            tvDefaultSound.text = title
+            viewModel.updateAlarmTone(bottomSheetText.text.toString(), data?.id!!, title, uri)
         }
 
         tvSetTime.setOnClickListener {
@@ -180,7 +238,6 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
             bottomSheetText.text = resources.getString(R.string.bedtime_capitalized)
 
             bedtimeNotTextContent.visibility = View.VISIBLE
-            scheduleTime.isChecked = viewModel.bedTimeScheduled.value
 
             renderBedtimeTextContent()
         } else bedtimeNotTextContent.visibility = View.GONE
@@ -195,53 +252,74 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
             bottomSheetText.text = resources.getString(R.string.wake_up)
 
             wakeUpNotTextContent.visibility = View.VISIBLE
-            scheduleTime.isChecked = viewModel.wakeUpTimeScheduled.value
-
             renderWakeUpTextContent()
         } else wakeUpNotTextContent.visibility = View.GONE
     }
 
-    private fun renderBedtimeTextContent() {
-        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-            viewModel.bedTimeScheduled.collectLatest {
-                when (it) {
-                    true -> {
-                        bedtimeNotTextContent.visibility = View.GONE
-                        bedtimeTextContent.visibility = View.VISIBLE
-                    }
+    private fun renderData() {
+        if (inflateBedTimeLayout!!) {
+            viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                viewModel.bedtimeItem.collectLatest {
+                    isNewItem = it == null
+                    data = it
+                }
+            }
+        }
 
-                    false -> {
-                        bedtimeTextContent.visibility = View.GONE
-                        bedtimeNotTextContent.visibility = View.VISIBLE
-                    }
+        if (inflateWakeUpLayout!!) {
+            viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+                viewModel.wakeUpItem.collectLatest {
+                    isNewItem = it == null
+                    data = it
                 }
             }
         }
     }
 
-    private fun renderWakeUpTextContent() {
-        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-            viewModel.wakeUpTimeScheduled.collectLatest {
-                when (it) {
-                    true -> {
-                        wakeUpNotTextContent.visibility = View.GONE
-                        wakeUpTextContent.visibility = View.VISIBLE
-                    }
-
-                    false -> {
-                        wakeUpTextContent.visibility = View.GONE
-                        wakeUpNotTextContent.visibility = View.VISIBLE
-                    }
-                }
+    private fun renderBedtimeTextContent() {
+        when (data?.isScheduled) {
+            true -> {
+                bedtimeNotTextContent.visibility = View.GONE
+                bedtimeTextContent.visibility = View.VISIBLE
             }
+
+            false -> {
+                bedtimeTextContent.visibility = View.GONE
+                bedtimeNotTextContent.visibility = View.VISIBLE
+            }
+
+            else -> {}
+        }
+    }
+
+    private fun switchIsChecked() {
+        scheduleTime.isChecked = data?.isScheduled!!
+    }
+
+    private fun renderWakeUpTextContent() {
+
+        when (data?.isScheduled) {
+            true -> {
+                wakeUpNotTextContent.visibility = View.GONE
+                wakeUpTextContent.visibility = View.VISIBLE
+            }
+
+            false -> {
+                wakeUpTextContent.visibility = View.GONE
+                wakeUpNotTextContent.visibility = View.VISIBLE
+            }
+
+            else -> {}
         }
     }
 
     private fun changeNotificationReminderText() {
-        viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-            viewModel.notificationReminderText.collectLatest {
-                if (it.isNotEmpty()) reminderNotificationSetTime.text = it
-            }
+        reminderNotificationSetTime.text = when (data?.reminder!!) {
+            1 -> resources.getString(R.string.one_hr_reminder)
+            15 -> resources.getString(R.string.fifteen_min_reminder)
+            30 -> resources.getString(R.string.thirty_min_reminder)
+            45 -> resources.getString(R.string.forty_five_min_reminder)
+            else -> return
         }
     }
 

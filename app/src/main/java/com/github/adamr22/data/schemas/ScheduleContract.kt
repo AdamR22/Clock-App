@@ -12,11 +12,11 @@ object ScheduleContract {
         CREATE TABLE IF NOT EXISTS ${ScheduleEntry.TABLE_NAME} (
             ${ScheduleEntry.COLUMN_NAME_ID} INTEGER PRIMARY KEY AUTOINCREMENT,
             ${ScheduleEntry.COLUMN_NAME_DAY} TEXT,
-            ${ScheduleEntry.COLUMN_NAME_ALARM_ID} INTEGER UNIQUE FOREIGN KEY REFERENCES ${AlarmContract.AlarmEntry.TABLE_NAME}${(ScheduleEntry.COLUMN_NAME_ALARM_ID)}
-        )
+            ${ScheduleEntry.COLUMN_NAME_ALARM_ID} INTEGER UNIQUE, 
+            FOREIGN KEY (${ScheduleEntry.COLUMN_NAME_ALARM_ID}) REFERENCES ${AlarmContract.AlarmEntry.TABLE_NAME}(${(ScheduleEntry.COLUMN_NAME_ALARM_ID)}));
     """
 
     const val SQL_DELETE_SCHEDULE_ENTRIES = """
-        DROP TABLE IF NOT EXISTS ${ScheduleEntry.TABLE_NAME}
+        DROP TABLE IF NOT EXISTS ${ScheduleEntry.TABLE_NAME};
     """
 }

@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
 import com.github.adamr22.bedtime.presentation.viewmodels.BedTimeViewModel
+import com.github.adamr22.data.database.ClockAppDB
 import kotlinx.coroutines.flow.collectLatest
 
 class BedTimeFragment : Fragment() {
@@ -28,6 +29,9 @@ class BedTimeFragment : Fragment() {
 
     private lateinit var viewModel: BedTimeViewModel
 
+    private val db by lazy {
+        ClockAppDB.getInstance(requireContext())
+    }
 
     private lateinit var tvBedTimeLabel: TextView
     private lateinit var tvWakeUpLabel: TextView
@@ -35,10 +39,6 @@ class BedTimeFragment : Fragment() {
     private lateinit var tvBedtime: TextView
     private lateinit var tvWakeupTime: TextView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this)[BedTimeViewModel::class.java]
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,6 +47,10 @@ class BedTimeFragment : Fragment() {
 
         (requireActivity() as AppCompatActivity).supportActionBar?.title =
             resources.getString(R.string.bedtime)
+
+        viewModel = ViewModelProvider(this)[BedTimeViewModel::class.java].also {
+            it.setRepo(db)
+        }
 
         return inflater.inflate(R.layout.fragment_bed_time, container, false)
     }
@@ -57,14 +61,19 @@ class BedTimeFragment : Fragment() {
         tvBedTimeLabel = view.findViewById(R.id.bedtime_alarm_label)
         tvWakeUpLabel = view.findViewById(R.id.wakeup_alarm_label)
 
-        tvBedtime = view.findViewById(R.id.bedtime_alarm_time)
-        tvWakeupTime = view.findViewById(R.id.wakeup_alarm_time)
+        tvBedtime = view.findViewById<TextView?>(R.id.bedtime_alarm_time).also {
+            it.text = resources.getString(R.string.default_time)
+        }
+
+        tvWakeupTime = view.findViewById<TextView?>(R.id.wakeup_alarm_time).also {
+            it.text = resources.getString(R.string.default_time)
+        }
     }
 
     override fun onResume() {
         super.onResume()
 
-        changeTextColor()
+        changeTextAndTextColor()
 
         tvBedtime.setOnClickListener { openModalSheet(true) }
         tvWakeupTime.setOnClickListener { openModalSheet(false) }
@@ -85,37 +94,97 @@ class BedTimeFragment : Fragment() {
         bottomModalSheet.show(parentFragmentManager, BedTImeFragmentBottomSheet.TAG)
     }
 
-    private fun changeTextColor() {
+    private fun changeTextAndTextColor() {
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-            viewModel.bedTimeScheduled.collectLatest {
-                when (it) {
-                    true -> {
-                        tvBedTimeLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                        tvBedtime.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            viewModel.bedtimeItem.collectLatest {
+                if (it != null) {
+
+                     tvBedtime.text = String.format(
+                         resources.getString(R.string.default_time_2),
+                         "%02d".format(it.hour),
+                         "02d".format(it.minute)
+                     )
+
+                    if (it.isScheduled) {
+                        tvWakeUpLabel.setTextColor(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.white
+                            )
+                        )
+                        tvWakeupTime.setTextColor(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.white
+                            )
+                        )
                     }
 
-                    false -> {
-                        tvBedTimeLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
-                        tvBedtime.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
+                    if (!it.isScheduled) {
+                        tvWakeUpLabel.setTextColor(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.grey
+                            )
+                        )
+                        tvWakeupTime.setTextColor(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.grey
+                            )
+                        )
                     }
                 }
             }
         }
 
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-            viewModel.wakeUpTimeScheduled.collectLatest {
-                when (it) {
-                    true -> {
-                        tvWakeUpLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                        tvWakeupTime.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            viewModel.wakeUpItem.collectLatest {
+                if (it != null) {
+
+                    tvWakeupTime.text = String.format(
+                        resources.getString(R.string.default_time_2),
+                        "%02d".format(it.hour),
+                        "02d".format(it.minute)
+                    )
+
+                    if (it.isScheduled) {
+                        tvWakeUpLabel.setTextColor(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.white
+                            )
+                        )
+                        tvWakeupTime.setTextColor(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.white
+                            )
+                        )
                     }
 
-                    false -> {
-                        tvWakeUpLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
-                        tvWakeupTime.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))
+                    if (!it.isScheduled) {
+                        tvWakeUpLabel.setTextColor(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.grey
+                            )
+                        )
+                        tvWakeupTime.setTextColor(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.grey
+                            )
+                        )
                     }
                 }
+
             }
         }
+    }
+
+    override fun onDestroy() {
+        db.close()
+        super.onDestroy()
     }
 }

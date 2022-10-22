@@ -17,9 +17,14 @@ class ClockAppDB(
         fun getInstance(context: Context) = ClockAppDB(context)
     }
 
+    override fun onConfigure(db: SQLiteDatabase?) {
+        db?.setForeignKeyConstraintsEnabled(true)
+        super.onConfigure(db)
+
+    }
+
     override fun onCreate(db: SQLiteDatabase?) {
         db?.let {
-            it.setForeignKeyConstraintsEnabled(true)
             it.execSQL(AlarmContract.SQL_CREATE_ALARM_ENTRIES)
             it.execSQL(ScheduleContract.SQL_CREATE_SCHEDULE_ENTRIES)
             onCreate(it)

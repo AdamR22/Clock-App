@@ -15,8 +15,8 @@ class BedtimeRepository(private val db: ClockAppDB) {
         hour: Int,
         minute: Int,
         label: String,
-        title: String,
-        uri: Uri
+        title: String?,
+        uri: Uri?
     ) = databaseRepository.setTime(hour, minute, label, title, uri.toString())
 
     fun addSchedule(id: Int, schedule: Array<String>) = databaseRepository.addSchedule(id, schedule)
@@ -27,6 +27,10 @@ class BedtimeRepository(private val db: ClockAppDB) {
 
     fun updateAlarmTone(id: Int, title: String, uri: Uri) = databaseRepository.updateAlarmTone(id, title, uri.toString())
 
-    fun getLabeledItem(label: String): AlarmItemModel = databaseRepository.getItem(label)
+    fun getLabeledItem(label: String): AlarmItemModel = databaseRepository.getItem(label, null)
+
+    fun updateReminder(id: Int, time: Int) = databaseRepository.updateReminder(id, time)
+
+    fun alarmSwitch(id: Int, bit: Int) = databaseRepository.switchAlarmOnOff(id, bit)
 
 }
