@@ -1,40 +1,33 @@
 package com.github.adamr22.data.database
 
 import android.content.Context
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
-import com.github.adamr22.data.schemas.AlarmContract
-import com.github.adamr22.data.schemas.ScheduleContract
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import com.github.adamr22.data.DAO.AlarmDao
+import com.github.adamr22.data.DAO.ScheduleDao
+import com.github.adamr22.data.entities.Alarm
+import com.github.adamr22.data.entities.Schedule
 
-class ClockAppDB(
-    context: Context?,
-) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+@Database(entities = [Alarm::class, Schedule::class], version = 1)
+abstract class ClockAppDB : RoomDatabase() {
+    abstract fun alarmDao(): AlarmDao
+    abstract fun scheduleDao(): ScheduleDao
 
     companion object {
-        const val DATABASE_VERSION = 1
-        const val DATABASE_NAME = "ClockApp.db"
-    }
+        @Volatile
+        private var INSTANCE: ClockAppDB? = null
 
-    override fun onConfigure(db: SQLiteDatabase?) {
-        db?.setForeignKeyConstraintsEnabled(true)
-        super.onConfigure(db)
-
-    }
-
-    override fun onCreate(db: SQLiteDatabase?) {
-        db?.let {
-            it.execSQL(AlarmContract.SQL_CREATE_ALARM_ENTRIES)
-            it.execSQL(ScheduleContract.SQL_CREATE_SCHEDULE_ENTRIES)
-            onCreate(it)
-        }
-    }
-
-    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        db?.let {
-            it.setForeignKeyConstraintsEnabled(false)
-            it.execSQL(AlarmContract.SQL_DELETE_ALARM_ENTRIES)
-            it.execSQL(ScheduleContract.SQL_DELETE_SCHEDULE_ENTRIES)
-            onCreate(it)
+        fun getInstance(context: Context): ClockAppDB {
+            synchronized(this) {
+                return INSTANCE ?: Room.databaseBuilder(
+                    context,
+                    ClockAppDB::class.java,
+                    "clock_db"
+                ).build().also {
+                    INSTANCE = it
+                }
+            }
         }
     }
 }
