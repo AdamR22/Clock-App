@@ -29,16 +29,13 @@ class BedTimeFragment : Fragment() {
 
     private lateinit var viewModel: BedTimeViewModel
 
-    private val db by lazy {
-        ClockAppDB.getInstance(requireContext())
-    }
-
     private lateinit var tvBedTimeLabel: TextView
     private lateinit var tvWakeUpLabel: TextView
 
     private lateinit var tvBedtime: TextView
     private lateinit var tvWakeupTime: TextView
 
+    private var db: ClockAppDB? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,8 +45,10 @@ class BedTimeFragment : Fragment() {
         (requireActivity() as AppCompatActivity).supportActionBar?.title =
             resources.getString(R.string.bedtime)
 
+        db = ClockAppDB(requireContext())
+
         viewModel = ViewModelProvider(this)[BedTimeViewModel::class.java].also {
-            it.setRepo(db)
+            it.setRepo(db!!)
         }
 
         return inflater.inflate(R.layout.fragment_bed_time, container, false)
@@ -184,7 +183,7 @@ class BedTimeFragment : Fragment() {
     }
 
     override fun onDestroy() {
-        db.close()
+        db?.close()
         super.onDestroy()
     }
 }
