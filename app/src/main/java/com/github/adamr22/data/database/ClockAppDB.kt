@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.github.adamr22.data.DAO.AlarmDao
-import com.github.adamr22.data.DAO.ScheduleDao
+import com.github.adamr22.data.dao.AlarmDao
+import com.github.adamr22.data.dao.ScheduleDao
 import com.github.adamr22.data.entities.Alarm
 import com.github.adamr22.data.entities.Schedule
 

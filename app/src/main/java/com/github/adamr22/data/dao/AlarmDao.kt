@@ -1,4 +1,4 @@
-package com.github.adamr22.data.DAO
+package com.github.adamr22.data.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -8,22 +8,22 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import com.github.adamr22.data.entities.Alarm
-import com.github.adamr22.data.entities.AlarmAndSchedule
+import com.github.adamr22.data.entities.AlarmAndDay
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AlarmDao {
     @Transaction
     @Query("SELECT * FROM alarm")
-    fun getAllItems(): Flow<List<AlarmAndSchedule>?>
+    fun getAllItems(): Flow<List<AlarmAndDay>?>
 
     @Transaction
     @Query("SELECT * FROM alarm WHERE label = :bedtime")
-    fun getBedtimeItem(bedtime: String): Flow<AlarmAndSchedule?>
+    fun getBedtimeItem(bedtime: String): Flow<AlarmAndDay?>
 
     @Transaction
     @Query("SELECT * FROM alarm WHERE label = :wakeup")
-    fun getWakeUpItem(wakeup: String): Flow<AlarmAndSchedule?>
+    fun getWakeUpItem(wakeup: String): Flow<AlarmAndDay?>
 
     @Delete
     suspend fun deleteItem(alarm: Alarm)

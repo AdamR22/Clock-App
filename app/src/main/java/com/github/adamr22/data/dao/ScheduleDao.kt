@@ -1,4 +1,4 @@
-package com.github.adamr22.data.DAO
+package com.github.adamr22.data.dao
 
 import androidx.room.Delete
 import androidx.room.Insert

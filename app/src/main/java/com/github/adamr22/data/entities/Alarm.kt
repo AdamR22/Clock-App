@@ -12,7 +12,7 @@ data class Alarm(
     val id: Int? = null,
 
     @ColumnInfo(name = "label")
-    var label: String?,
+    var label: String? = null,
 
     @ColumnInfo(name = "ringtone_title")
     var title: String? = null,
@@ -24,10 +24,10 @@ data class Alarm(
     var isScheduled: Boolean = true,
 
     @ColumnInfo(name = "sunrise_mode_on")
-    var sunriseMode: Boolean,
+    var sunriseMode: Boolean = true,
 
     @ColumnInfo(name = "vibrate_on")
-    var vibrates: Boolean,
+    var vibrates: Boolean = true,
 
     var hour: Int,
 

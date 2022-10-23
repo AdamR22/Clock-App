@@ -3,7 +3,7 @@ package com.github.adamr22.data.entities
 import androidx.room.Embedded
 import androidx.room.Relation
 
-data class AlarmAndSchedule(
+data class AlarmAndDay(
     @Embedded val alarm: Alarm,
 
     @Relation(
@@ -11,5 +11,5 @@ data class AlarmAndSchedule(
         entityColumn = "schedule_owner_id"
     )
 
-    val schedule: Schedule
+    val schedule: List<Schedule>
 )

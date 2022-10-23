@@ -1,6 +1,5 @@
 package com.github.adamr22.alarm.presentation.views
 
-import android.media.RingtoneManager
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,13 +12,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.R
-import com.github.adamr22.alarm.data.models.AlarmItemModel
 import com.github.adamr22.alarm.presentation.adapters.AlarmRecyclerViewAdapter
 import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
 import com.github.adamr22.utils.TimePicker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.timepicker.MaterialTimePicker
-import kotlinx.coroutines.flow.collectLatest
 
 class AlarmFragment : Fragment() {
 
