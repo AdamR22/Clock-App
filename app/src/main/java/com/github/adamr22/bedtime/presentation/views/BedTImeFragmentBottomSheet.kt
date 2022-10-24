@@ -2,6 +2,7 @@ package com.github.adamr22.bedtime.presentation.views
 
 import android.media.RingtoneManager
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +15,6 @@ import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
 import com.github.adamr22.data.models.AlarmItemModel
 import com.github.adamr22.bedtime.presentation.viewmodels.BedTimeViewModel
-import com.github.adamr22.data.entities.Alarm
 import com.github.adamr22.data.entities.AlarmAndDay
 import com.github.adamr22.utils.PickAlarmInterface
 import com.github.adamr22.utils.TimePicker
@@ -28,12 +28,12 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
     private val BEDTIME_TAG = "Bedtime"
     private val WAKEUP_TAG = "Wakeup"
 
-    private var BEDTIME_LABEL = resources.getString(R.string.bedtime_capitalized)
-    private var WAKEUP_LABEL = resources.getString(R.string.wake_up)
+    private var BEDTIME_LABEL = ""
+    private var WAKEUP_LABEL = ""
 
     private val SELECT_TIME_TAG = "Select Time"
 
-    private var data: AlarmItemModel? = null
+    private val TAG = "BedTImeFragmentBottomSh"
 
     private var inflateBedTimeLayout: Boolean? = null
     private var inflateWakeUpLayout: Boolean? = null
@@ -69,8 +69,6 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
         TimePicker.buildPicker(SELECT_TIME_TAG)
     }
 
-    private var isNewItem = true
-
     private val pickAlarmInterface by lazy {
         requireActivity() as PickAlarmInterface
     }
@@ -91,6 +89,9 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        BEDTIME_LABEL = resources.getString(R.string.bedtime_capitalized)
+        WAKEUP_LABEL = resources.getString(R.string.wake_up)
+
         return inflater.inflate(R.layout.layout_bedtime_fragment_bottom_sheet, container, false)
     }
 
@@ -115,139 +116,34 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
         btnVibrate = view.findViewById(R.id.btn_vibrate)
 
         tvSetTime = view.findViewById(R.id.tv_set_time)
-
-        tvDefaultSound.text = defaultRingtoneTitle
     }
 
     override fun onResume() {
         super.onResume()
-
         renderData()
-
-        renderUI()
-
-        changeNotificationReminderText()
-
-        switchIsChecked()
 
         scheduleTime.setOnCheckedChangeListener { _, isChecked ->
 
-            if (isChecked) {
-                if (isNewItem) {
-                    viewModel.insertTime(
-                        Alarm(
-                            label = bottomSheetText.text.toString(),
-                            hour = timePicker.hour,
-                            minute = timePicker.minute
-                        )
-                    )
-                }
-
-                if (!isNewItem) {
-                    viewModel.updateTime(
-                        Alarm(
-                            hour = timePicker.hour,
-                            minute = timePicker.minute
-                        )
-                    )
-                }
-            }
-
-            if (!isChecked) {
-                viewModel.updateTime(
-                    Alarm(
-                        hour = timePicker.hour,
-                        minute = timePicker.minute,
-                        isScheduled = false
-                    )
-                )
-            }
         }
 
         reminderNotificationText.setOnClickListener {
-            NotificationReminderDialog(viewModel, data!!).show(
-                parentFragmentManager,
-                NotificationReminderDialog.TAG
-            )
+//            NotificationReminderDialog(viewModel, data!!).show(
+//                parentFragmentManager,
+//                NotificationReminderDialog.TAG
+//            )
         }
-
-        btnSunriseAlarm.isChecked = data?.isSunriseMode!!
 
         btnSunriseAlarm.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                VibrateSingleton.vibrateDeviceOnce(requireContext(), true)
-                viewModel.updateTime(
-                    Alarm(
-                        data?.id,
-                        data?.label,
-                        data?.ringtoneTitle,
-                        data?.ringtoneUri,
-                        data?.isScheduled!!,
-                        true,
-                        data?.isVibrate!!,
-                        data?.hour!!,
-                        data?.minute!!,
-                        data?.reminder!!
-                    )
-                )
-            }
 
-            if (!isChecked) {
-                VibrateSingleton.vibrateDeviceOnce(requireContext(), false)
-                viewModel.updateTime(
-                    Alarm(
-                        data?.id,
-                        data?.label,
-                        data?.ringtoneTitle,
-                        data?.ringtoneUri,
-                        data?.isScheduled!!,
-                        false,
-                        data?.isVibrate!!,
-                        data?.hour!!,
-                        data?.minute!!,
-                        data?.reminder!!
-                    )
-                )
-            }
         }
-
-        btnVibrate.isChecked = data?.isVibrate!!
 
         btnVibrate.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                VibrateSingleton.vibrateDeviceOnce(requireContext(), true)
-                viewModel.updateTime(
-                    Alarm(
-                        data?.id,
-                        data?.label,
-                        data?.ringtoneTitle,
-                        data?.ringtoneUri,
-                        data?.isScheduled!!,
-                        data?.isSunriseMode!!,
-                        true,
-                        data?.hour!!,
-                        data?.minute!!,
-                        data?.reminder!!
-                    )
-                )
+                // TODO: Update DB
             }
 
             if (!isChecked) {
-                VibrateSingleton.vibrateDeviceOnce(requireContext(), false)
-                viewModel.updateTime(
-                    Alarm(
-                        data?.id,
-                        data?.label,
-                        data?.ringtoneTitle,
-                        data?.ringtoneUri,
-                        data?.isScheduled!!,
-                        data?.isSunriseMode!!,
-                        false,
-                        data?.hour!!,
-                        data?.minute!!,
-                        data?.reminder!!
-                    )
-                )
+                // TODO: Update DB
             }
         }
 
@@ -259,22 +155,7 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
             val title = pickAlarmInterface.returnSelectedTone()!!.second
             val uri = pickAlarmInterface.returnSelectedTone()!!.first
             tvDefaultSound.text = title
-
-            viewModel.updateTime(
-                Alarm(
-                    data?.id,
-                    data?.label,
-                    title,
-                    uri,
-                    data?.isScheduled!!,
-                    data?.isSunriseMode!!,
-                    data?.isVibrate!!,
-                    data?.hour!!,
-                    data?.minute!!,
-                    data?.reminder!!
-                )
-            )
-
+            // TODO: Update DB
         }
 
         tvSetTime.setOnClickListener {
@@ -286,14 +167,17 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
                     "%02d".format(timePicker.minute)
                 )
             }
+            // TODO: Update DB with selected time
         }
+
+        super.onResume()
     }
 
-    private fun renderUI() {
-        renderBottomSheetText()
+    private fun renderUI(data: AlarmItemModel?) {
+        renderBottomSheetText(data)
     }
 
-    private fun renderBottomSheetText() {
+    private fun renderBottomSheetText(data: AlarmItemModel?) {
         if (inflateBedTimeLayout!!) {
             bottomSheetIcon.setImageDrawable(
                 ContextCompat.getDrawable(
@@ -303,9 +187,13 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
             )
             bottomSheetText.text = resources.getString(R.string.bedtime_capitalized)
 
+            data?.let {
+                renderViewText(tvSetTime, it.hour, it.minute)
+            }
+
             bedtimeNotTextContent.visibility = View.VISIBLE
 
-            renderBedtimeTextContent()
+            renderBedtimeTextContent(data)
         } else bedtimeNotTextContent.visibility = View.GONE
 
         if (inflateWakeUpLayout!!) {
@@ -317,21 +205,27 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
             )
             bottomSheetText.text = resources.getString(R.string.wake_up)
 
+            data?.let {
+                renderViewText(tvSetTime, it.hour, it.minute)
+            }
+
             wakeUpNotTextContent.visibility = View.VISIBLE
-            renderWakeUpTextContent()
+            renderWakeUpTextContent(data)
         } else wakeUpNotTextContent.visibility = View.GONE
     }
 
     private fun renderData() {
+        var item: AlarmItemModel?
+
         if (inflateBedTimeLayout!!) {
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                 viewModel.getBedtime(BEDTIME_LABEL).collectLatest {
                     it?.let {
-                        isNewItem = false
-                        data = encapsulateData(it)
+                        item = encapsulateData(it)
+                        renderUI(item)
+                        switchIsChecked(item)
+                        changeNotificationReminderText(item)
                     }
-
-                    if (it == null) isNewItem = true
                 }
             }
         }
@@ -340,18 +234,19 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
             viewLifecycleOwner.lifecycleScope.launchWhenCreated {
                 viewModel.getWakeup(WAKEUP_LABEL).collectLatest {
                     it?.let {
-                        isNewItem = false
-                        data = encapsulateData(it)
+                        item = encapsulateData(it)
+                        renderUI(item)
+                        isSunrise(item)
+                        selectedSound(item)
+                        isVibrate(item)
+                        switchIsChecked(item)
                     }
-
-                    if (it == null) isNewItem = true
                 }
             }
         }
-
     }
 
-    private fun renderBedtimeTextContent() {
+    private fun renderBedtimeTextContent(data: AlarmItemModel?) {
         when (data?.isScheduled) {
             true -> {
                 bedtimeNotTextContent.visibility = View.GONE
@@ -367,11 +262,41 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
         }
     }
 
-    private fun switchIsChecked() {
-        scheduleTime.isChecked = data?.isScheduled!!
+    private fun isSunrise(data: AlarmItemModel?) {
+        data?.let {
+            btnSunriseAlarm.isChecked = it.isSunriseMode
+        }
+
+        if (data == null) btnSunriseAlarm.isChecked = false
     }
 
-    private fun renderWakeUpTextContent() {
+    private fun isVibrate(data: AlarmItemModel?) {
+        data?.let {
+            btnVibrate.isChecked = it.isVibrate
+        }
+
+        if (data == null) btnSunriseAlarm.isChecked = false
+    }
+
+    private fun switchIsChecked(data: AlarmItemModel?) {
+        data?.let {
+            scheduleTime.isChecked = it.isScheduled
+            tvSetTime.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        }
+
+        if (data == null) scheduleTime.isChecked = false
+
+    }
+
+    private fun selectedSound(data: AlarmItemModel?) {
+        data?.let {
+            if (it.ringtoneTitle != null) tvDefaultSound.text = it.ringtoneTitle
+        }
+
+        if (data == null) tvDefaultSound.text = defaultRingtoneTitle
+    }
+
+    private fun renderWakeUpTextContent(data: AlarmItemModel?) {
 
         when (data?.isScheduled) {
             true -> {
@@ -388,22 +313,26 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
         }
     }
 
-    private fun changeNotificationReminderText() {
-        reminderNotificationSetTime.text = when (data?.reminder!!) {
-            1 -> resources.getString(R.string.one_hr_reminder)
-            15 -> resources.getString(R.string.fifteen_min_reminder)
-            30 -> resources.getString(R.string.thirty_min_reminder)
-            45 -> resources.getString(R.string.forty_five_min_reminder)
-            else -> return
+    private fun changeNotificationReminderText(data: AlarmItemModel?) {
+        data?.let {
+            reminderNotificationSetTime.text = when (it.reminder) {
+                1 -> resources.getString(R.string.one_hr_reminder)
+                15 -> resources.getString(R.string.fifteen_min_reminder)
+                30 -> resources.getString(R.string.thirty_min_reminder)
+                45 -> resources.getString(R.string.forty_five_min_reminder)
+                else -> return
+            }
         }
     }
 
     private fun encapsulateData(it: AlarmAndDay): AlarmItemModel {
         val schedule = ArrayList<String>()
 
-        it.schedule.forEach {
+        it.dayOfWeek.forEach {
             if (it.day != null) schedule.add(it.day!!)
         }
+
+        Log.d(TAG, "encapsulateData: Data: $it")
 
         return AlarmItemModel(
             it.alarm.id!!,
@@ -419,5 +348,14 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
             it.alarm.sunriseMode
         )
     }
+
+    private fun renderViewText(textView: TextView, hour: Int, minute: Int) {
+        textView.text = String.format(
+            resources.getString(R.string.default_time_2),
+            "%02d".format(hour),
+            "%02d".format(minute)
+        )
+    }
+
 
 }

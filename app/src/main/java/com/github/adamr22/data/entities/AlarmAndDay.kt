@@ -11,5 +11,5 @@ data class AlarmAndDay(
         entityColumn = "schedule_owner_id"
     )
 
-    val schedule: List<Schedule>
+    val dayOfWeek: List<DayOfWeek>
 )

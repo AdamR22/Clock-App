@@ -88,7 +88,7 @@ class AlarmRecyclerViewAdapter(
     override fun onBindViewHolder(holder: AlarmItemViewHolder, position: Int) {
         val isExpanded: Boolean = position == mExpandedPosition
 
-        currentTitle = data[position].ringtoneTitle
+//        currentTitle = data[position].ringtoneTitle
 
         if (data[position].label == "") {
             holder.addLabel.text = context.getText(R.string.add_label)

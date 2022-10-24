@@ -7,7 +7,7 @@ import com.github.adamr22.bedtime.data.BedtimeRepository
 import com.github.adamr22.data.database.ClockAppDB
 import com.github.adamr22.data.entities.Alarm
 import com.github.adamr22.data.entities.AlarmAndDay
-import com.github.adamr22.data.entities.Schedule
+import com.github.adamr22.data.entities.DayOfWeek
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -16,9 +16,9 @@ class BedTimeViewModel(application: Application) : AndroidViewModel(application)
     private val db = ClockAppDB.getInstance(application.applicationContext)
 
     private val alarmDao = db.alarmDao()
-    private val scheduleDao = db.scheduleDao()
+    private val dayOfWeekDao = db.dayOfWeekDao()
 
-    private val repository = BedtimeRepository(alarmDao, scheduleDao)
+    private val repository = BedtimeRepository(alarmDao, dayOfWeekDao)
 
     fun getBedtime(bedtimeLabel: String): Flow<AlarmAndDay?> =
         repository.getBedtime(bedtimeLabel)
@@ -34,11 +34,11 @@ class BedTimeViewModel(application: Application) : AndroidViewModel(application)
         repository.insertTime(alarm)
     }
 
-    fun insertSchedule(schedule: Schedule) = viewModelScope.launch(Dispatchers.IO) {
-        repository.insertSchedule(schedule)
+    fun insertSchedule(dayOfWeek: DayOfWeek) = viewModelScope.launch(Dispatchers.IO) {
+        repository.insertSchedule(dayOfWeek)
     }
 
-    fun updateSchedule(schedule: Schedule) = viewModelScope.launch(Dispatchers.IO) {
-        repository.updateSchedule(schedule)
+    fun updateSchedule(dayOfWeek: DayOfWeek) = viewModelScope.launch(Dispatchers.IO) {
+        repository.updateSchedule(dayOfWeek)
     }
 }

@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "schedule")
-data class Schedule(
+data class DayOfWeek(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "schedule_id")
     val id: Int? = null,

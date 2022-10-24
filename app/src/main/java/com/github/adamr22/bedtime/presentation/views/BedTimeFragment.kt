@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
 import com.github.adamr22.bedtime.presentation.viewmodels.BedTimeViewModel
@@ -24,13 +25,15 @@ class BedTimeFragment : Fragment() {
     private val BEDTIME_TAG = "Bedtime"
     private val WAKEUP_TAG = "Wakeup"
 
-    private var BEDTIME_LABEL = resources.getString(R.string.bedtime_capitalized)
-    private var WAKEUP_LABEL = resources.getString(R.string.wake_up)
+    private var BEDTIME_LABEL = ""
+    private var WAKEUP_LABEL = ""
 
     private val inflateBedTimeLayout = true
     private val inflateWakeUpLayout = true
 
-    private lateinit var viewModel: BedTimeViewModel
+    private val viewModel by lazy {
+        ViewModelProvider(requireActivity())[BedTimeViewModel::class.java]
+    }
 
     private lateinit var tvBedTimeLabel: TextView
     private lateinit var tvWakeUpLabel: TextView
@@ -45,6 +48,9 @@ class BedTimeFragment : Fragment() {
 
         (requireActivity() as AppCompatActivity).supportActionBar?.title =
             resources.getString(R.string.bedtime)
+
+        BEDTIME_LABEL = resources.getString(R.string.bedtime_capitalized)
+        WAKEUP_LABEL = resources.getString(R.string.wake_up)
 
         return inflater.inflate(R.layout.fragment_bed_time, container, false)
     }
@@ -143,15 +149,15 @@ class BedTimeFragment : Fragment() {
     private fun renderViewText(textView: TextView, hour: Int, minute: Int) {
         textView.text = String.format(
             resources.getString(R.string.default_time_2),
-            "02d".format(hour),
-            "02d".format(minute)
+            "%02d".format(hour),
+            "%02d".format(minute)
         )
     }
 
     private fun encapsulateData(it: AlarmAndDay): AlarmItemModel {
         val schedule = ArrayList<String>()
 
-        it.schedule.forEach {
+        it.dayOfWeek.forEach {
             if (it.day != null) schedule.add(it.day!!)
         }
 
