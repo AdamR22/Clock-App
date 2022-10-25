@@ -18,7 +18,6 @@ import com.github.adamr22.bedtime.presentation.viewmodels.BedTimeViewModel
 import com.github.adamr22.data.entities.AlarmAndDay
 import com.github.adamr22.utils.PickAlarmInterface
 import com.github.adamr22.utils.TimePicker
-import com.github.adamr22.utils.VibrateSingleton
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.flow.collectLatest
@@ -126,13 +125,6 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
 
         }
 
-        reminderNotificationText.setOnClickListener {
-//            NotificationReminderDialog(viewModel, data!!).show(
-//                parentFragmentManager,
-//                NotificationReminderDialog.TAG
-//            )
-        }
-
         btnSunriseAlarm.setOnCheckedChangeListener { _, isChecked ->
 
         }
@@ -225,6 +217,7 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
                         renderUI(item)
                         switchIsChecked(item)
                         changeNotificationReminderText(item)
+                        selectReminderNotificationText(reminderNotificationText, item!!)
                     }
                 }
             }
@@ -320,6 +313,7 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
                 15 -> resources.getString(R.string.fifteen_min_reminder)
                 30 -> resources.getString(R.string.thirty_min_reminder)
                 45 -> resources.getString(R.string.forty_five_min_reminder)
+                -1 -> resources.getString(R.string.off)
                 else -> return
             }
         }
@@ -357,5 +351,23 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
         )
     }
 
+    private fun selectReminderNotificationText(
+        notificationReminderText: TextView,
+        data: AlarmItemModel
+    ) {
+        notificationReminderText.setOnClickListener {
+            NotificationReminderDialog(data).show(
+                parentFragmentManager, NotificationReminderDialog.TAG
+            )
+        }
+    }
+
+    private fun updateSetTime(setTimeTextView: TextView, data: AlarmItemModel?) {
+
+    }
+
+    private fun schedulesTime(data: AlarmItemModel) {
+
+    }
 
 }
