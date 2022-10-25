@@ -21,7 +21,7 @@ class BedtimeRepository(
 
     suspend fun insertTime(alarm: Alarm) = alarmDao.insertItem(alarm)
 
-    suspend fun insertSchedule(dayOfWeek: DayOfWeek) = dayOfWeekDao.insertSchedule(dayOfWeek)
+    suspend fun insertSchedule(day: String, alarmId: Int) = dayOfWeekDao.insertSchedule(day, alarmId)
 
-    suspend fun updateSchedule(dayOfWeek: DayOfWeek) = dayOfWeekDao.updateSchedule(dayOfWeek)
+    suspend fun updateSchedule(day: String?, alarmId: Int) = dayOfWeekDao.updateSchedule(day, alarmId)
 }

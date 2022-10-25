@@ -34,11 +34,11 @@ class BedTimeViewModel(application: Application) : AndroidViewModel(application)
         repository.insertTime(alarm)
     }
 
-    fun insertSchedule(dayOfWeek: DayOfWeek) = viewModelScope.launch(Dispatchers.IO) {
-        repository.insertSchedule(dayOfWeek)
+    fun insertSchedule(day: String, alarmId: Int) = viewModelScope.launch(Dispatchers.IO) {
+        repository.insertSchedule(day, alarmId)
     }
 
-    fun updateSchedule(dayOfWeek: DayOfWeek) = viewModelScope.launch(Dispatchers.IO) {
-        repository.updateSchedule(dayOfWeek)
+    fun updateSchedule(day: String?, alarmId: Int) = viewModelScope.launch(Dispatchers.IO) {
+        repository.updateSchedule(day, alarmId)
     }
 }
