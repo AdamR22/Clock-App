@@ -12,6 +12,7 @@ import android.widget.TextView
 import android.widget.ToggleButton
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
 import com.github.adamr22.data.models.AlarmItemModel
@@ -25,7 +26,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.flow.collectLatest
 
-class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetDialogFragment() {
+class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
 
     private val BEDTIME_TAG = "Bedtime"
     private val WAKEUP_TAG = "Wakeup"
@@ -81,6 +82,10 @@ class BedTImeFragmentBottomSheet(val viewModel: BedTimeViewModel) : BottomSheetD
 
     private val pickAlarmInterface by lazy {
         requireActivity() as PickAlarmInterface
+    }
+
+    private val viewModel by lazy {
+        ViewModelProvider(requireActivity())[BedTimeViewModel::class.java]
     }
 
     companion object {

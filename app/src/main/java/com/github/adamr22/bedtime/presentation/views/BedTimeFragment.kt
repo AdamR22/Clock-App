@@ -87,7 +87,7 @@ class BedTimeFragment : Fragment() {
             )
         }
 
-        val bottomModalSheet = BedTImeFragmentBottomSheet(viewModel).also {
+        val bottomModalSheet = BedTImeFragmentBottomSheet().also {
             it.arguments = bundle
         }
 
