@@ -7,7 +7,6 @@ import com.github.adamr22.bedtime.data.BedtimeRepository
 import com.github.adamr22.data.database.ClockAppDB
 import com.github.adamr22.data.entities.Alarm
 import com.github.adamr22.data.entities.AlarmAndDay
-import com.github.adamr22.data.entities.DayOfWeek
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -38,7 +37,7 @@ class BedTimeViewModel(application: Application) : AndroidViewModel(application)
         repository.insertSchedule(day, alarmId)
     }
 
-    fun updateSchedule(day: String?, alarmId: Int) = viewModelScope.launch(Dispatchers.IO) {
-        repository.updateSchedule(day, alarmId)
+    fun deleteDayFromSchedule(day: String, alarmId: Int) = viewModelScope.launch(Dispatchers.IO) {
+        repository.deleteDayFromSchedule(day, alarmId)
     }
 }

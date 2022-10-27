@@ -568,58 +568,58 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
 
             btnMonday.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked)
-                    viewModel.updateSchedule(resources.getString(R.string.monday), it.alarm.id!!)
+                    viewModel.insertSchedule(resources.getString(R.string.monday), it.alarm.id!!)
 
                 if (!isChecked)
-                    viewModel.updateSchedule(null, it.alarm.id!!)
+                    viewModel.deleteDayFromSchedule(resources.getString(R.string.monday), it.alarm.id!!)
             }
 
             btnTuesday.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked)
-                    viewModel.updateSchedule(resources.getString(R.string.tuesday), it.alarm.id!!)
+                    viewModel.insertSchedule(resources.getString(R.string.tuesday), it.alarm.id!!)
 
                 if (!isChecked)
-                    viewModel.updateSchedule(null, it.alarm.id!!)
+                    viewModel.deleteDayFromSchedule(resources.getString(R.string.tuesday), it.alarm.id!!)
             }
 
             btnWednesday.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked)
-                    viewModel.updateSchedule(resources.getString(R.string.wednesday), it.alarm.id!!)
+                    viewModel.insertSchedule(resources.getString(R.string.wednesday), it.alarm.id!!)
 
                 if (!isChecked)
-                    viewModel.updateSchedule(null, it.alarm.id!!)
+                    viewModel.deleteDayFromSchedule(resources.getString(R.string.wednesday), it.alarm.id!!)
             }
 
             btnThursday.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked)
-                    viewModel.updateSchedule(resources.getString(R.string.thursday), it.alarm.id!!)
+                    viewModel.insertSchedule(resources.getString(R.string.thursday), it.alarm.id!!)
 
                 if (!isChecked)
-                    viewModel.updateSchedule(null, it.alarm.id!!)
+                    viewModel.deleteDayFromSchedule(resources.getString(R.string.thursday), it.alarm.id!!)
             }
 
             btnFriday.setOnCheckedChangeListener { _, isChecked ->
                 if  (isChecked)
-                    viewModel.updateSchedule(resources.getString(R.string.friday), it.alarm.id!!)
+                    viewModel.insertSchedule(resources.getString(R.string.friday), it.alarm.id!!)
 
                 if (!isChecked)
-                    viewModel.updateSchedule(null, it.alarm.id!!)
+                    viewModel.deleteDayFromSchedule(resources.getString(R.string.friday), it.alarm.id!!)
             }
 
             btnSaturday.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked)
-                    viewModel.updateSchedule(resources.getString(R.string.saturday), it.alarm.id!!)
+                    viewModel.insertSchedule(resources.getString(R.string.saturday), it.alarm.id!!)
 
                 if (!isChecked)
-                    viewModel.updateSchedule(null, it.alarm.id!!)
+                    viewModel.deleteDayFromSchedule(resources.getString(R.string.saturday), it.alarm.id!!)
             }
 
             btnSunday.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked)
-                    viewModel.updateSchedule(resources.getString(R.string.sunday), it.alarm.id!!)
+                    viewModel.insertSchedule(resources.getString(R.string.sunday), it.alarm.id!!)
 
                 if (!isChecked)
-                    viewModel.updateSchedule(null, it.alarm.id!!)
+                    viewModel.deleteDayFromSchedule(resources.getString(R.string.sunday), it.alarm.id!!)
             }
 
         }

@@ -4,7 +4,6 @@ import com.github.adamr22.data.dao.AlarmDao
 import com.github.adamr22.data.dao.DayOfWeekDao
 import com.github.adamr22.data.entities.Alarm
 import com.github.adamr22.data.entities.AlarmAndDay
-import com.github.adamr22.data.entities.DayOfWeek
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 
@@ -23,5 +22,5 @@ class BedtimeRepository(
 
     suspend fun insertSchedule(day: String, alarmId: Int) = dayOfWeekDao.insertSchedule(day, alarmId)
 
-    suspend fun updateSchedule(day: String?, alarmId: Int) = dayOfWeekDao.updateSchedule(day, alarmId)
+    suspend fun deleteDayFromSchedule(day: String, alarmId: Int) = dayOfWeekDao.deleteDayFromSchedule(day, alarmId)
 }

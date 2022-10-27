@@ -1,20 +1,33 @@
 package com.github.adamr22
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
 import com.github.adamr22.alarm.presentation.views.AlarmFragment
 import com.github.adamr22.bedtime.presentation.views.BedTimeFragment
 import com.github.adamr22.clock.ClockFragment
-import com.github.adamr22.utils.PickAlarmInterface
+import com.github.adamr22.data.entities.Alarm
+import com.github.adamr22.data.entities.AlarmAndDay
 import com.github.adamr22.stopwatch.StopWatchFragment
 import com.github.adamr22.timer.presentation.views.TimerFragment
+import com.github.adamr22.utils.AlertReceiver
+import com.github.adamr22.utils.PickAlarmInterface
+import com.github.adamr22.utils.ReminderReceiver
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.flow.collectLatest
+import java.util.*
 
 class MainActivity : AppCompatActivity(), PickAlarmInterface {
 
@@ -26,6 +39,14 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
     private val FRAG_KEY = "shared_pref_frag_id_key"
 
     private var selectedTone: Pair<Uri, String>? = null
+
+    private val viewModel by lazy {
+        ViewModelProvider(this)[AlarmViewModel::class.java]
+    }
+
+    private val alarmManager by lazy {
+        getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    }
 
     private val activityForResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -132,6 +153,18 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
                 else -> false
             }
         }
+
+        lifecycleScope.launchWhenCreated {
+            viewModel.getData().collectLatest {
+                it?.let {
+                    it.forEach { data ->
+                        if (data.alarm.isScheduled) {
+                            setAlarm(data)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun selectAlarmTone() {
@@ -162,5 +195,110 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putInt(FRAGMENT_ID, currentFragment)// Save most recent fragment in current session
         super.onSaveInstanceState(outState)
+    }
+
+    private fun cancelAlarm(
+        data: AlarmAndDay,
+    ) {
+        val alarmData = data.alarm
+        val listOfSchedule = data.dayOfWeek
+
+        val setHour: Int = alarmData.hour
+        val setMinute: Int = alarmData.minute
+
+        val setTime = Calendar.getInstance().apply {
+            this.set(Calendar.HOUR_OF_DAY, setHour)
+            this.set(Calendar.MINUTE, setMinute)
+        }
+
+        if (listOfSchedule.isEmpty()) {
+            if (setTime.before(Calendar.getInstance())) {
+                // If set time is before time alarm was set by user, set alarm to be triggered day after
+                setTime.add(Calendar.DAY_OF_WEEK, 1)
+            }
+        }
+
+        if (listOfSchedule.isNotEmpty()) {
+            listOfSchedule.forEach {
+                if (it.day == Calendar.getInstance()
+                        .getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
+                ) {
+
+                }
+            }
+        }
+    }
+
+    private fun setAlarm(
+        data: AlarmAndDay
+    ) {
+        val alarmData = data.alarm
+        val listOfSchedule = data.dayOfWeek
+
+        val setHour: Int = alarmData.hour
+        val setMinute: Int = alarmData.minute
+
+        val setTime = Calendar.getInstance().apply {
+            this.set(Calendar.HOUR_OF_DAY, setHour)
+            this.set(Calendar.MINUTE, setMinute)
+        }
+
+        if (listOfSchedule.isEmpty()) {
+            if (setTime.before(Calendar.getInstance())) {
+                // If set time is before time alarm was set by user, set alarm to be triggered day after
+                setTime.add(Calendar.DAY_OF_WEEK, 1)
+            }
+            setAlarmTrigger(data.alarm.id!!, setTime, data.alarm.reminder)
+        }
+
+        if (listOfSchedule.isNotEmpty()) {
+            listOfSchedule.forEach {
+                if (it.day == Calendar.getInstance()
+                        .getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
+                ) {
+
+                }
+            }
+        }
+    }
+
+    @SuppressLint("UnspecifiedImmutableFlag")
+    private fun setAlarmTrigger(alarmId: Int, timeInstance: Calendar, reminderTime: Int) {
+        val alarmRequestCode = 2
+        val reminderRequestCode = 1
+
+        val reminderTimeInstance = Calendar.getInstance().apply {
+            this.set(Calendar.DAY_OF_WEEK, timeInstance.get(Calendar.DAY_OF_WEEK))
+            this.set(Calendar.HOUR_OF_DAY, timeInstance.get(Calendar.HOUR_OF_DAY))
+            this.set(Calendar.MINUTE, timeInstance.get(Calendar.MINUTE) - reminderTime)
+        }
+
+        // Create reminder and alarm broadcast receivers
+        val alarmIntent = Intent(this, AlertReceiver::class.java)
+        val reminderIntent = Intent(this, ReminderReceiver::class.java)
+
+        // Create Pending Intents
+        val reminderPendingIntent = PendingIntent.getBroadcast(this, reminderRequestCode, reminderIntent, 0)
+        val alarmPendingIntent = PendingIntent.getBroadcast(this, alarmRequestCode, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminderTimeInstance.timeInMillis, reminderPendingIntent)
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, timeInstance.timeInMillis, alarmPendingIntent)
+    }
+
+    @SuppressLint("UnspecifiedImmutableFlag")
+    private fun cancelAlarm(timeInstance: Calendar) {
+        val alarmRequestCode = 2
+        val reminderRequestCode = 1
+
+        // Create reminder and alarm broadcast receivers
+        val alarmIntent = Intent(this, AlertReceiver::class.java)
+        val reminderIntent = Intent(this, ReminderReceiver::class.java)
+
+        // Create Pending Intents
+        val reminderPendingIntent = PendingIntent.getBroadcast(this, reminderRequestCode, reminderIntent, 0)
+        val alarmPendingIntent = PendingIntent.getBroadcast(this, alarmRequestCode, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        alarmManager.cancel(reminderPendingIntent)
+        alarmManager.cancel(alarmPendingIntent)
     }
 }

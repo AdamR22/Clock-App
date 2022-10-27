@@ -125,7 +125,6 @@ class AlarmRecyclerViewAdapter(
                 Toast.makeText(context, context.resources.getString(R.string.alarm_activated), Toast.LENGTH_SHORT).show()
             } else {
                 holder.alarmSchedule.text = context.resources.getString(R.string.not_scheduled)
-                AlarmHelper.cancelAlarm(context)
             }
         }
 
@@ -238,25 +237,5 @@ class AlarmRecyclerViewAdapter(
             (data as MutableList<AlarmItemModel>).add(it)
         }
         notifyDataSetChanged()
-    }
-
-    private fun setAlarm(time: String, scheduleTextView: TextView) {
-        val setTime = time.split(":")
-        val hour = Integer.parseInt(setTime[0])
-        val minute = Integer.parseInt(setTime[1])
-
-        c.apply {
-            this.set(Calendar.HOUR_OF_DAY, hour)
-            this.set(Calendar.MINUTE, minute)
-
-            if (this.before(Calendar.getInstance())) {
-                add(Calendar.DATE, 1)
-                scheduleTextView.text = context.resources.getString(R.string.tomorrow)
-            } else {
-                scheduleTextView.text = context.resources.getString(R.string.scheduled)
-            }
-
-            AlarmHelper.createAlarm(this, context)
-        }
     }
 }
