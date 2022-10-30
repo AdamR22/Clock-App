@@ -18,7 +18,6 @@ import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
 import com.github.adamr22.alarm.presentation.views.AlarmFragment
 import com.github.adamr22.bedtime.presentation.views.BedTimeFragment
 import com.github.adamr22.clock.ClockFragment
-import com.github.adamr22.data.entities.Alarm
 import com.github.adamr22.data.entities.AlarmAndDay
 import com.github.adamr22.stopwatch.StopWatchFragment
 import com.github.adamr22.timer.presentation.views.TimerFragment
@@ -248,7 +247,7 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
                 // If set time is before time alarm was set by user, set alarm to be triggered day after
                 setTime.add(Calendar.DAY_OF_WEEK, 1)
             }
-            setAlarmTrigger(data.alarm.id!!, setTime, data.alarm.reminder)
+            setAlarmTrigger(setTime, data.alarm.reminder)
         }
 
         if (listOfSchedule.isNotEmpty()) {
@@ -263,25 +262,11 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
-    private fun setAlarmTrigger(alarmId: Int, timeInstance: Calendar, reminderTime: Int) {
-        val alarmRequestCode = 2
-        val reminderRequestCode = 1
-
-        val reminderTimeInstance = Calendar.getInstance().apply {
-            this.set(Calendar.DAY_OF_WEEK, timeInstance.get(Calendar.DAY_OF_WEEK))
-            this.set(Calendar.HOUR_OF_DAY, timeInstance.get(Calendar.HOUR_OF_DAY))
-            this.set(Calendar.MINUTE, timeInstance.get(Calendar.MINUTE) - reminderTime)
-        }
-
-        // Create reminder and alarm broadcast receivers
+    private fun setAlarmTrigger(timeInstance: Calendar, reminderTime: Int) {
         val alarmIntent = Intent(this, AlertReceiver::class.java)
-        val reminderIntent = Intent(this, ReminderReceiver::class.java)
 
-        // Create Pending Intents
-        val reminderPendingIntent = PendingIntent.getBroadcast(this, reminderRequestCode, reminderIntent, 0)
-        val alarmPendingIntent = PendingIntent.getBroadcast(this, alarmRequestCode, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val alarmPendingIntent = PendingIntent.getBroadcast(this, 1105, alarmIntent, 0)
 
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminderTimeInstance.timeInMillis, reminderPendingIntent)
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, timeInstance.timeInMillis, alarmPendingIntent)
     }
 
@@ -296,9 +281,8 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
 
         // Create Pending Intents
         val reminderPendingIntent = PendingIntent.getBroadcast(this, reminderRequestCode, reminderIntent, 0)
-        val alarmPendingIntent = PendingIntent.getBroadcast(this, alarmRequestCode, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val alarmPendingIntent = PendingIntent.getBroadcast(this, alarmRequestCode, alarmIntent, 0)
 
         alarmManager.cancel(reminderPendingIntent)
-        alarmManager.cancel(alarmPendingIntent)
     }
 }

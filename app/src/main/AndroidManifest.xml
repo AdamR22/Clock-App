@@ -22,7 +22,8 @@
         <receiver
             android:name=".utils.AlertReceiver"
             android:enabled="true"
-            android:exported="false"/>
+            android:exported="false">
+        </receiver>
 
         <activity
             android:name=".MainActivity"
