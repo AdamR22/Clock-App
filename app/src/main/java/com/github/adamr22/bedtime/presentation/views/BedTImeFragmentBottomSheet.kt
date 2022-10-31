@@ -15,10 +15,10 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
-import com.github.adamr22.data.models.AlarmItemModel
 import com.github.adamr22.bedtime.presentation.viewmodels.BedTimeViewModel
 import com.github.adamr22.data.entities.Alarm
 import com.github.adamr22.data.entities.AlarmAndDay
+import com.github.adamr22.data.models.AlarmItemModel
 import com.github.adamr22.utils.PickAlarmInterface
 import com.github.adamr22.utils.TimePicker
 import com.github.adamr22.utils.VibrateSingleton
@@ -48,10 +48,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
 
     private lateinit var bedtimeNotTextContent: LinearLayout
     private lateinit var wakeUpNotTextContent: LinearLayout
-
-    private lateinit var bedtimeTextContent: LinearLayout
-    private lateinit var reminderNotificationText: TextView
-    private lateinit var reminderNotificationSetTime: TextView
 
     private lateinit var wakeUpTextContent: ConstraintLayout
     private lateinit var btnSunriseAlarm: SwitchMaterial
@@ -121,10 +117,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
         bedtimeNotTextContent = view.findViewById(R.id.bedtime_not_text_content)
         wakeUpNotTextContent = view.findViewById(R.id.wakeup_not_text_content)
 
-        bedtimeTextContent = view.findViewById(R.id.bed_time_text_content)
-        reminderNotificationText = view.findViewById(R.id.reminder_notification_text) //Clickable
-        reminderNotificationSetTime = view.findViewById(R.id.reminder_notification_set_time)
-
         wakeUpTextContent = view.findViewById(R.id.wakeup_text_content)
         btnSunriseAlarm = view.findViewById(R.id.btn_sunrise_alarm)
         tvDefaultSound = view.findViewById(R.id.tv_default_sound) // clickable
@@ -167,9 +159,7 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
             }
 
             bedtimeNotTextContent.visibility = View.VISIBLE
-
-            renderBedtimeTextContent(data)
-        } else bedtimeNotTextContent.visibility = View.GONE
+        }
 
         if (inflateWakeUpLayout!!) {
             bottomSheetIcon.setImageDrawable(
@@ -201,8 +191,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                         item = encapsulateData(it)
                         renderUI(item)
                         switchIsChecked(item)
-                        changeNotificationReminderText(item)
-                        selectReminderNotificationText(reminderNotificationText, item!!)
                         schedulesTime(item!!)
                         updateSetTime(item)
                     }
@@ -210,7 +198,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                     if (it == null) {
                         updateSetTime(null)
                         renderUI(null)
-                        changeNotificationReminderText(null)
                     }
                 }
             }
@@ -245,22 +232,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                     }
                 }
             }
-        }
-    }
-
-    private fun renderBedtimeTextContent(data: AlarmItemModel?) {
-        when (data?.isScheduled) {
-            true -> {
-                bedtimeNotTextContent.visibility = View.GONE
-                bedtimeTextContent.visibility = View.VISIBLE
-            }
-
-            false -> {
-                bedtimeTextContent.visibility = View.GONE
-                bedtimeNotTextContent.visibility = View.VISIBLE
-            }
-
-            else -> {}
         }
     }
 
@@ -315,19 +286,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    private fun changeNotificationReminderText(data: AlarmItemModel?) {
-        data?.let {
-            reminderNotificationSetTime.text = when (it.reminder) {
-                1 -> resources.getString(R.string.one_hr_reminder)
-                15 -> resources.getString(R.string.fifteen_min_reminder)
-                30 -> resources.getString(R.string.thirty_min_reminder)
-                45 -> resources.getString(R.string.forty_five_min_reminder)
-                -1 -> resources.getString(R.string.off)
-                else -> return
-            }
-        }
-    }
-
     private fun encapsulateData(it: AlarmAndDay): AlarmItemModel {
         val schedule = ArrayList<String>()
 
@@ -346,7 +304,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
             it.alarm.title,
             it.alarm.uri,
             it.alarm.isScheduled,
-            it.alarm.reminder,
             it.alarm.vibrates,
             it.alarm.sunriseMode
         )
@@ -358,17 +315,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
             "%02d".format(hour),
             "%02d".format(minute)
         )
-    }
-
-    private fun selectReminderNotificationText(
-        notificationReminderText: TextView,
-        data: AlarmItemModel
-    ) {
-        notificationReminderText.setOnClickListener {
-            NotificationReminderDialog(data).show(
-                parentFragmentManager, NotificationReminderDialog.TAG
-            )
-        }
     }
 
     private fun updateSetTime(data: AlarmItemModel?) {
@@ -401,7 +347,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                             data.isVibrate,
                             timePicker.hour,
                             timePicker.minute,
-                            data.reminder,
                         )
                     )
                 }
@@ -424,7 +369,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                         data.isVibrate,
                         data.hour,
                         data.minute,
-                        data.reminder,
                     )
                 )
             }
@@ -441,7 +385,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                         data.isVibrate,
                         data.hour,
                         data.minute,
-                        data.reminder,
                     )
                 )
             }
@@ -462,7 +405,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                         data.isVibrate,
                         data.hour,
                         data.minute,
-                        data.reminder,
                     )
                 )
             }
@@ -479,7 +421,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                         data.isVibrate,
                         data.hour,
                         data.minute,
-                        data.reminder,
                     )
                 )
             }
@@ -506,7 +447,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                     data.isVibrate,
                     data.hour,
                     data.minute,
-                    data.reminder,
                 )
             )
         }
@@ -527,7 +467,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                         true,
                         data.hour,
                         data.minute,
-                        data.reminder,
                     )
                 )
             }
@@ -544,7 +483,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                         false,
                         data.hour,
                         data.minute,
-                        data.reminder,
                     )
                 )
             }

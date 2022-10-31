@@ -170,7 +170,6 @@ class BedTimeFragment : Fragment() {
             it.alarm.title,
             it.alarm.uri,
             it.alarm.isScheduled,
-            it.alarm.reminder,
             it.alarm.vibrates,
             it.alarm.sunriseMode
         )

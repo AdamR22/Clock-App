@@ -12,19 +12,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ClockApp" >
-        <receiver
-            android:name=".utils.ReminderReceiver"
-            android:enabled="true"
-            android:exported="false" >
-        </receiver>
-
-
-        <receiver
-            android:name=".utils.AlertReceiver"
-            android:enabled="true"
-            android:exported="false">
-        </receiver>
-
+        <activity
+            android:name=".WakeUpScreen"
+            android:exported="false"
+            android:showOnLockScreen="true"
+            android:turnScreenOn="true">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
         <activity
             android:name=".MainActivity"
             android:exported="true" >

@@ -32,6 +32,4 @@ data class Alarm(
     var hour: Int,
 
     var minute: Int,
-
-    var reminder: Int = 15,
 )

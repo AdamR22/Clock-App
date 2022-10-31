@@ -11,7 +11,6 @@ data class AlarmItemModel(
     var ringtoneTitle: String? = null,
     var ringtoneUri: Uri? = null,
     var isScheduled: Boolean = true,
-    var reminder: Int = 15,
     var isVibrate: Boolean = true,
     var isSunriseMode: Boolean = true
 )

@@ -21,9 +21,7 @@ import com.github.adamr22.clock.ClockFragment
 import com.github.adamr22.data.entities.AlarmAndDay
 import com.github.adamr22.stopwatch.StopWatchFragment
 import com.github.adamr22.timer.presentation.views.TimerFragment
-import com.github.adamr22.utils.AlertReceiver
 import com.github.adamr22.utils.PickAlarmInterface
-import com.github.adamr22.utils.ReminderReceiver
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.flow.collectLatest
 import java.util.*
@@ -196,38 +194,6 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
         super.onSaveInstanceState(outState)
     }
 
-    private fun cancelAlarm(
-        data: AlarmAndDay,
-    ) {
-        val alarmData = data.alarm
-        val listOfSchedule = data.dayOfWeek
-
-        val setHour: Int = alarmData.hour
-        val setMinute: Int = alarmData.minute
-
-        val setTime = Calendar.getInstance().apply {
-            this.set(Calendar.HOUR_OF_DAY, setHour)
-            this.set(Calendar.MINUTE, setMinute)
-        }
-
-        if (listOfSchedule.isEmpty()) {
-            if (setTime.before(Calendar.getInstance())) {
-                // If set time is before time alarm was set by user, set alarm to be triggered day after
-                setTime.add(Calendar.DAY_OF_WEEK, 1)
-            }
-        }
-
-        if (listOfSchedule.isNotEmpty()) {
-            listOfSchedule.forEach {
-                if (it.day == Calendar.getInstance()
-                        .getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
-                ) {
-
-                }
-            }
-        }
-    }
-
     private fun setAlarm(
         data: AlarmAndDay
     ) {
@@ -247,7 +213,7 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
                 // If set time is before time alarm was set by user, set alarm to be triggered day after
                 setTime.add(Calendar.DAY_OF_WEEK, 1)
             }
-            setAlarmTrigger(setTime, data.alarm.reminder)
+            setAlarmTrigger(data.alarm.id!!, setTime)
         }
 
         if (listOfSchedule.isNotEmpty()) {
@@ -262,27 +228,14 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
-    private fun setAlarmTrigger(timeInstance: Calendar, reminderTime: Int) {
-        val alarmIntent = Intent(this, AlertReceiver::class.java)
+    private fun setAlarmTrigger(id: Int, timeInstance: Calendar) {
 
-        val alarmPendingIntent = PendingIntent.getBroadcast(this, 1105, alarmIntent, 0)
+        val alarmRequestCode = (id + 1) * 1000
 
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, timeInstance.timeInMillis, alarmPendingIntent)
-    }
+        val alarmIntent = Intent(this, WakeUpScreen::class.java)
 
-    @SuppressLint("UnspecifiedImmutableFlag")
-    private fun cancelAlarm(timeInstance: Calendar) {
-        val alarmRequestCode = 2
-        val reminderRequestCode = 1
+        val alarmPendingIntent = PendingIntent.getActivity(this, alarmRequestCode, alarmIntent, 0)
 
-        // Create reminder and alarm broadcast receivers
-        val alarmIntent = Intent(this, AlertReceiver::class.java)
-        val reminderIntent = Intent(this, ReminderReceiver::class.java)
-
-        // Create Pending Intents
-        val reminderPendingIntent = PendingIntent.getBroadcast(this, reminderRequestCode, reminderIntent, 0)
-        val alarmPendingIntent = PendingIntent.getBroadcast(this, alarmRequestCode, alarmIntent, 0)
-
-        alarmManager.cancel(reminderPendingIntent)
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeInstance.timeInMillis, alarmPendingIntent)
     }
 }
