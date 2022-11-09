@@ -15,6 +15,10 @@ class AlarmRepository(private val alarmDao: AlarmDao, private val dayOfWeekDao: 
 
     suspend fun updateAlarm(alarm: Alarm) = alarmDao.updateItem(alarm)
 
+    fun getItem(id: Int): Flow<AlarmAndDay> = alarmDao.getSpecificItem(id).distinctUntilChanged()
+
+    suspend fun updateSchedule(value: Boolean, id: Int) = alarmDao.updateSchedule(value, id)
+
     suspend fun deleteAlarm(alarm: Alarm) = alarmDao.deleteItem(alarm)
 
     suspend fun insertSchedule(day: String, alarmId: Int) = dayOfWeekDao.insertSchedule(day, alarmId)

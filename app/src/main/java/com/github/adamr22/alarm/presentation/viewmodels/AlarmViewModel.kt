@@ -19,6 +19,11 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getData() = repository.getAllItems()
 
+    fun getItem(id: Int) = repository.getItem(id)
+
+    fun updateSchedule(value: Boolean, id: Int) =
+        viewModelScope.launch(Dispatchers.IO) { repository.updateSchedule(value, id) }
+
     fun updateAlarm(alarm: Alarm) =
         viewModelScope.launch(Dispatchers.IO) { repository.updateAlarm(alarm) }
 }

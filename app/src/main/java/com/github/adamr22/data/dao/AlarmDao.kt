@@ -25,6 +25,13 @@ interface AlarmDao {
     @Query("SELECT * FROM alarm WHERE label = :wakeup")
     fun getWakeUpItem(wakeup: String): Flow<AlarmAndDay?>
 
+    @Transaction
+    @Query("SELECT * FROM alarm WHERE alarm_id = :id")
+    fun getSpecificItem(id: Int): Flow<AlarmAndDay>
+
+    @Query("UPDATE alarm SET is_scheduled = :value WHERE alarm_id = :id")
+    suspend fun updateSchedule(value: Boolean, id: Int)
+
     @Delete
     suspend fun deleteItem(alarm: Alarm)
 

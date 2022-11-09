@@ -35,6 +35,8 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
     private val FRAGMENT_ID = "frag_id"
     private val FRAG_KEY = "shared_pref_frag_id_key"
 
+    private val ALARM_ID_TAG = "alarm_id"
+
     private var selectedTone: Pair<Uri, String>? = null
 
     private val viewModel by lazy {
@@ -206,6 +208,7 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
         val setTime = Calendar.getInstance().apply {
             this.set(Calendar.HOUR_OF_DAY, setHour)
             this.set(Calendar.MINUTE, setMinute)
+            this.set(Calendar.SECOND, 0)
         }
 
         if (listOfSchedule.isEmpty()) {
@@ -232,10 +235,16 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
 
         val alarmRequestCode = (id + 1) * 1000
 
-        val alarmIntent = Intent(this, WakeUpScreen::class.java)
+        val alarmIntent = Intent(this, WakeUpScreen::class.java).apply {
+            this.putExtra(ALARM_ID_TAG, id)
+        }
 
         val alarmPendingIntent = PendingIntent.getActivity(this, alarmRequestCode, alarmIntent, 0)
 
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, timeInstance.timeInMillis, alarmPendingIntent)
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            timeInstance.timeInMillis,
+            alarmPendingIntent
+        )
     }
 }
