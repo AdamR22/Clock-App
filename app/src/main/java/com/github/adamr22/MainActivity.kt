@@ -19,6 +19,7 @@ import com.github.adamr22.alarm.presentation.views.AlarmFragment
 import com.github.adamr22.bedtime.presentation.views.BedTimeFragment
 import com.github.adamr22.clock.ClockFragment
 import com.github.adamr22.data.entities.AlarmAndDay
+import com.github.adamr22.data.entities.DayOfWeek
 import com.github.adamr22.stopwatch.StopWatchFragment
 import com.github.adamr22.timer.presentation.views.TimerFragment
 import com.github.adamr22.utils.PickAlarmInterface
@@ -61,6 +62,16 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
                 returnSelectedTone()
             }
         }
+
+    private enum class DAYS {
+        MONDAY,
+        TUESDAY,
+        WEDNESDAY,
+        THURSDAY,
+        FRIDAY,
+        SATURDAY,
+        SUNDAY
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -209,24 +220,18 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
             this.set(Calendar.HOUR_OF_DAY, setHour)
             this.set(Calendar.MINUTE, setMinute)
             this.set(Calendar.SECOND, 0)
+
+            if (this.before(Calendar.getInstance())) {
+                this.add(Calendar.DAY_OF_WEEK, 1)
+            }
         }
 
         if (listOfSchedule.isEmpty()) {
-            if (setTime.before(Calendar.getInstance())) {
-                // If set time is before time alarm was set by user, set alarm to be triggered day after
-                setTime.add(Calendar.DAY_OF_WEEK, 1)
-            }
             setAlarmTrigger(data.alarm.id!!, setTime)
         }
 
         if (listOfSchedule.isNotEmpty()) {
-            listOfSchedule.forEach {
-                if (it.day == Calendar.getInstance()
-                        .getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
-                ) {
-
-                }
-            }
+            setRepeatingAlarmTrigger(data.alarm.id!!, data.dayOfWeek, setTime)
         }
     }
 
@@ -244,6 +249,77 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             timeInstance.timeInMillis,
+            alarmPendingIntent
+        )
+    }
+
+    private fun setRepeatingAlarmTrigger(
+        id: Int,
+        schedule: List<DayOfWeek>,
+        timeInstance: Calendar
+    ) {
+
+        val alarmRequestCode = (id + 1)
+
+        schedule.forEach {
+            if (it.day == DAYS.MONDAY.name) setScheduleAlarm(
+                alarmRequestCode + 1 * 1000,
+                id,
+                timeInstance
+            )
+
+
+            if (it.day == DAYS.TUESDAY.name) setScheduleAlarm(
+                alarmRequestCode + 2 * 1000,
+                id,
+                timeInstance
+            )
+
+            if (it.day == DAYS.WEDNESDAY.name) setScheduleAlarm(
+                alarmRequestCode + 3 * 1000,
+                id,
+                timeInstance
+            )
+
+            if (it.day == DAYS.THURSDAY.name) setScheduleAlarm(
+                alarmRequestCode + 4 * 1000,
+                id,
+                timeInstance
+            )
+
+            if (it.day == DAYS.FRIDAY.name) setScheduleAlarm(
+                alarmRequestCode + 5 * 1000,
+                id,
+                timeInstance
+            )
+
+            if (it.day == DAYS.SATURDAY.name) setScheduleAlarm(
+                alarmRequestCode + 6 * 1000,
+                id,
+                timeInstance
+            )
+
+            if (it.day == DAYS.SUNDAY.name) setScheduleAlarm(
+                alarmRequestCode + 7 * 1000,
+                id,
+                timeInstance
+            )
+        }
+    }
+
+    @SuppressLint("UnspecifiedImmutableFlag")
+    private fun setScheduleAlarm(alarmRequestCode: Int, id: Int, timeInstance: Calendar) {
+        val alarmIntent = Intent(this, WakeUpScreen::class.java).apply {
+            this.putExtra(ALARM_ID_TAG, id)
+        }
+
+        val alarmPendingIntent =
+            PendingIntent.getActivity(this, alarmRequestCode, alarmIntent, 0)
+
+        alarmManager.setRepeating(
+            AlarmManager.RTC_WAKEUP,
+            timeInstance.timeInMillis,
+            AlarmManager.INTERVAL_DAY * 7,
             alarmPendingIntent
         )
     }
