@@ -45,11 +45,13 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface, CancelScheduleAlar
         ViewModelProvider(this)[AlarmViewModel::class.java]
     }
 
-    // For use in main activity since expected behaviour not occuring when used in desired fragments
+    // For use in main activity since expected behaviour not occurring when used in desired fragments
     private val alarmManager by lazy {
         getSystemService(Context.ALARM_SERVICE) as AlarmManager
     }
 
+    // To be used when picking song from adapter.
+    // Also used in bedtime fragment as refactoring said fragment to use own launcher might result in a lot of breakages
     private val activityForResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK && it.data != null) {

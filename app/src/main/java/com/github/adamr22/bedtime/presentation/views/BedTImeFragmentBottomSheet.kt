@@ -1,5 +1,6 @@
 package com.github.adamr22.bedtime.presentation.views
 
+import android.content.pm.PackageManager
 import android.media.RingtoneManager
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +11,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.ToggleButton
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -19,6 +21,7 @@ import com.github.adamr22.bedtime.presentation.viewmodels.BedTimeViewModel
 import com.github.adamr22.data.entities.Alarm
 import com.github.adamr22.data.entities.AlarmAndDay
 import com.github.adamr22.data.models.AlarmItemModel
+import com.github.adamr22.utils.CancelScheduleAlarm
 import com.github.adamr22.utils.PickAlarmInterface
 import com.github.adamr22.utils.TimePicker
 import com.github.adamr22.utils.VibrateSingleton
@@ -80,9 +83,25 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
         requireActivity() as PickAlarmInterface
     }
 
+    private val cancelScheduleAlarm by lazy {
+        requireActivity() as CancelScheduleAlarm
+    }
+
     private val viewModel by lazy {
         ViewModelProvider(requireActivity())[BedTimeViewModel::class.java]
     }
+
+    private fun storagePermissionGranted() = ContextCompat.checkSelfPermission(
+        requireContext(),
+        android.Manifest.permission.READ_EXTERNAL_STORAGE
+    ) == PackageManager.PERMISSION_GRANTED
+
+    private val permissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                pickAlarmInterface.selectAlarmTone()
+            }
+        }
 
     companion object {
         const val TAG = "BedTime Modal Bottom Sheet"
@@ -429,7 +448,13 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
 
     private fun selectSong(data: AlarmItemModel) {
         tvDefaultSound.setOnClickListener {
-            pickAlarmInterface.selectAlarmTone()
+            if (storagePermissionGranted()) {
+                pickAlarmInterface.selectAlarmTone()
+            }
+
+            if (!storagePermissionGranted()) {
+                permissionLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
         }
 
         if (pickAlarmInterface.returnSelectedTone() != null) {
@@ -508,56 +533,91 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                 if (isChecked)
                     viewModel.insertSchedule(resources.getString(R.string.monday), it.alarm.id!!)
 
-                if (!isChecked)
-                    viewModel.deleteDayFromSchedule(resources.getString(R.string.monday), it.alarm.id!!)
+                if (!isChecked) {
+                    viewModel.deleteDayFromSchedule(
+                        resources.getString(R.string.monday),
+                        it.alarm.id!!
+                    )
+                    cancelScheduleAlarm.cancelRepeatingAlarm((it.alarm.id + 2) * 1000)
+                }
             }
 
             btnTuesday.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked)
                     viewModel.insertSchedule(resources.getString(R.string.tuesday), it.alarm.id!!)
 
-                if (!isChecked)
-                    viewModel.deleteDayFromSchedule(resources.getString(R.string.tuesday), it.alarm.id!!)
+                if (!isChecked) {
+                    viewModel.deleteDayFromSchedule(
+                        resources.getString(R.string.tuesday),
+                        it.alarm.id!!
+                    )
+                    cancelScheduleAlarm.cancelRepeatingAlarm((it.alarm.id + 3) * 1000)
+                }
             }
 
             btnWednesday.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked)
                     viewModel.insertSchedule(resources.getString(R.string.wednesday), it.alarm.id!!)
 
-                if (!isChecked)
-                    viewModel.deleteDayFromSchedule(resources.getString(R.string.wednesday), it.alarm.id!!)
+                if (!isChecked) {
+                    viewModel.deleteDayFromSchedule(
+                        resources.getString(R.string.wednesday),
+                        it.alarm.id!!
+                    )
+                    cancelScheduleAlarm.cancelRepeatingAlarm((it.alarm.id + 4) * 1000)
+                }
             }
 
             btnThursday.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked)
                     viewModel.insertSchedule(resources.getString(R.string.thursday), it.alarm.id!!)
 
-                if (!isChecked)
-                    viewModel.deleteDayFromSchedule(resources.getString(R.string.thursday), it.alarm.id!!)
+                if (!isChecked) {
+                    viewModel.deleteDayFromSchedule(
+                        resources.getString(R.string.thursday),
+                        it.alarm.id!!
+                    )
+                    cancelScheduleAlarm.cancelRepeatingAlarm((it.alarm.id + 5) * 1000)
+                }
             }
 
             btnFriday.setOnCheckedChangeListener { _, isChecked ->
-                if  (isChecked)
+                if (isChecked)
                     viewModel.insertSchedule(resources.getString(R.string.friday), it.alarm.id!!)
 
-                if (!isChecked)
-                    viewModel.deleteDayFromSchedule(resources.getString(R.string.friday), it.alarm.id!!)
+                if (!isChecked) {
+                    viewModel.deleteDayFromSchedule(
+                        resources.getString(R.string.friday),
+                        it.alarm.id!!
+                    )
+                    cancelScheduleAlarm.cancelRepeatingAlarm((it.alarm.id + 6) * 1000)
+                }
             }
 
             btnSaturday.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked)
                     viewModel.insertSchedule(resources.getString(R.string.saturday), it.alarm.id!!)
 
-                if (!isChecked)
-                    viewModel.deleteDayFromSchedule(resources.getString(R.string.saturday), it.alarm.id!!)
+                if (!isChecked) {
+                    viewModel.deleteDayFromSchedule(
+                        resources.getString(R.string.saturday),
+                        it.alarm.id!!
+                    )
+                    cancelScheduleAlarm.cancelRepeatingAlarm((it.alarm.id + 7) * 1000)
+                }
             }
 
             btnSunday.setOnCheckedChangeListener { _, isChecked ->
                 if (isChecked)
                     viewModel.insertSchedule(resources.getString(R.string.sunday), it.alarm.id!!)
 
-                if (!isChecked)
-                    viewModel.deleteDayFromSchedule(resources.getString(R.string.sunday), it.alarm.id!!)
+                if (!isChecked) {
+                    viewModel.deleteDayFromSchedule(
+                        resources.getString(R.string.sunday),
+                        it.alarm.id!!
+                    )
+                    cancelScheduleAlarm.cancelRepeatingAlarm((it.alarm.id + 8) * 1000)
+                }
             }
 
         }
@@ -584,7 +644,7 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
             }
 
             btnFriday.setOnCheckedChangeListener { _, isChecked ->
-                if  (isChecked)
+                if (isChecked)
                     viewModel.insertSchedule(resources.getString(R.string.friday), it.alarm.id!!)
             }
 
