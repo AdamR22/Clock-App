@@ -22,12 +22,13 @@ import com.github.adamr22.data.entities.AlarmAndDay
 import com.github.adamr22.data.entities.DayOfWeek
 import com.github.adamr22.stopwatch.StopWatchFragment
 import com.github.adamr22.timer.presentation.views.TimerFragment
+import com.github.adamr22.utils.CancelScheduleAlarm
 import com.github.adamr22.utils.PickAlarmInterface
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.flow.collectLatest
 import java.util.*
 
-class MainActivity : AppCompatActivity(), PickAlarmInterface {
+class MainActivity : AppCompatActivity(), PickAlarmInterface, CancelScheduleAlarm {
 
     lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var mToolbar: Toolbar
@@ -44,6 +45,7 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
         ViewModelProvider(this)[AlarmViewModel::class.java]
     }
 
+    // For use in main activity since expected behaviour not occuring when used in desired fragments
     private val alarmManager by lazy {
         getSystemService(Context.ALARM_SERVICE) as AlarmManager
     }
@@ -170,6 +172,10 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
                     it.forEach { data ->
                         if (data.alarm.isScheduled) {
                             setAlarm(data)
+                        }
+
+                        if (!data.alarm.isScheduled) {
+                            cancelAlarm(data)
                         }
                     }
                 }
@@ -323,4 +329,93 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
             alarmPendingIntent
         )
     }
+
+    private fun cancelAlarm(data: AlarmAndDay) {
+        val listOfSchedule = data.dayOfWeek
+
+        if (listOfSchedule.isEmpty()) {
+            cancelAlarm(data.alarm.id!!)
+        }
+
+        if (listOfSchedule.isNotEmpty()) {
+            cancelRepeatingAlarmTrigger(data.alarm.id!!, listOfSchedule)
+        }
+    }
+
+    @SuppressLint("UnspecifiedImmutableFlag")
+    private fun cancelAlarm(id: Int) {
+
+        val alarmRequestCode = (id + 1) * 1000
+
+        val alarmIntent = Intent(this, WakeUpScreen::class.java)
+
+        val alarmPendingIntent = PendingIntent.getActivity(this, alarmRequestCode, alarmIntent, 0)
+
+        alarmManager.cancel(
+            alarmPendingIntent
+        )
+    }
+
+    private fun cancelRepeatingAlarmTrigger(
+        id: Int,
+        schedule: List<DayOfWeek>
+    ) {
+
+        val alarmRequestCode = (id + 1)
+
+        schedule.forEach {
+            if (it.day == DAYS.MONDAY.name) cancelScheduleAlarm(
+                alarmRequestCode + 1 * 1000
+            )
+
+
+            if (it.day == DAYS.TUESDAY.name) cancelScheduleAlarm(
+                alarmRequestCode + 2 * 1000
+            )
+
+            if (it.day == DAYS.WEDNESDAY.name) cancelScheduleAlarm(
+                alarmRequestCode + 3 * 1000
+            )
+
+            if (it.day == DAYS.THURSDAY.name) cancelScheduleAlarm(
+                alarmRequestCode + 4 * 1000
+            )
+
+            if (it.day == DAYS.FRIDAY.name) cancelScheduleAlarm(
+                alarmRequestCode + 5 * 1000
+            )
+
+            if (it.day == DAYS.SATURDAY.name) cancelScheduleAlarm(
+                alarmRequestCode + 6 * 1000
+            )
+
+            if (it.day == DAYS.SUNDAY.name) cancelScheduleAlarm(
+                alarmRequestCode + 7 * 1000
+            )
+        }
+    }
+
+    @SuppressLint("UnspecifiedImmutableFlag")
+    private fun cancelScheduleAlarm(alarmRequestCode: Int) {
+        val alarmIntent = Intent(this, WakeUpScreen::class.java)
+
+        val alarmPendingIntent =
+            PendingIntent.getActivity(this, alarmRequestCode, alarmIntent, 0)
+
+        alarmManager.cancel(
+            alarmPendingIntent
+        )
+    }
+
+    //For use by alarm items recyclerview adapter and bedtime fragment
+    @SuppressLint("UnspecifiedImmutableFlag")
+    override fun cancelRepeatingAlarm(alarmRequestCode: Int) {
+        val alarmIntent = Intent(this, WakeUpScreen::class.java)
+
+        val alarmPendingIntent =
+            PendingIntent.getActivity(this, alarmRequestCode, alarmIntent, 0)
+
+        alarmManager.cancel(alarmPendingIntent)
+    }
+
 }
