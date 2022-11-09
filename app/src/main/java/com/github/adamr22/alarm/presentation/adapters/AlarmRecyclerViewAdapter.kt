@@ -11,14 +11,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.R
-import com.github.adamr22.alarm.data.models.AlarmItemModel
+import com.github.adamr22.data.models.AlarmItemModel
 import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
-import com.github.adamr22.common.AddLabelDialog
-import com.github.adamr22.common.AlarmHelper
-import com.github.adamr22.common.TimePicker
-import com.github.adamr22.common.VibrateSingleton
+import com.github.adamr22.utils.*
+import com.github.adamr22.utils.TimePicker
 import com.google.android.material.switchmaterial.SwitchMaterial
-import kotlinx.coroutines.flow.collectLatest
 import java.util.*
 
 class AlarmRecyclerViewAdapter(
@@ -31,21 +28,16 @@ class AlarmRecyclerViewAdapter(
 
     private var mExpandedPosition: Int = -1
     private lateinit var mRecyclerView: RecyclerView
-    private val mCallbackInterface: CallbackInterface
     private lateinit var currentTitle: String
     private var c = Calendar.getInstance()
+
+    private val pickAlarmInterface by lazy {
+        context as PickAlarmInterface
+    }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         mRecyclerView = recyclerView
-    }
-
-    interface CallbackInterface {
-        fun selectChosenTone(index: Int, viewModel: AlarmViewModel, recyclerView: RecyclerView)
-    }
-
-    init {
-        mCallbackInterface = context as CallbackInterface
     }
 
     inner class AlarmItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -96,7 +88,7 @@ class AlarmRecyclerViewAdapter(
     override fun onBindViewHolder(holder: AlarmItemViewHolder, position: Int) {
         val isExpanded: Boolean = position == mExpandedPosition
 
-        currentTitle = data[position].ringtoneTitle
+//        currentTitle = data[position].ringtoneTitle
 
         if (data[position].label == "") {
             holder.addLabel.text = context.getText(R.string.add_label)
@@ -115,8 +107,8 @@ class AlarmRecyclerViewAdapter(
                 }.toString().replace("[", "").replace("]", "")
             }
         }
-
-        holder.currentTime.text = data[position].time
+//
+//        holder.currentTime.text = data[position].time
 
         holder.addLabel.setOnClickListener {
             AddLabelDialog.newInstance(position, viewModel, null)
@@ -124,23 +116,15 @@ class AlarmRecyclerViewAdapter(
 
 
             context.lifecycleScope.launchWhenCreated {
-                viewModel.labelChanged.collectLatest {
-                    when (it) {
-                        is AlarmViewModel.LabelChangedState.Changed -> notifyItemChanged(position)
-                        else -> {}
-                    }
-                }
             }
 
         }
 
         holder.activateAlarm.setOnCheckedChangeListener { buttonView, _ ->
             if (buttonView.isChecked) {
-                setAlarm(data[position].time, holder.alarmSchedule)
                 Toast.makeText(context, context.resources.getString(R.string.alarm_activated), Toast.LENGTH_SHORT).show()
             } else {
                 holder.alarmSchedule.text = context.resources.getString(R.string.not_scheduled)
-                AlarmHelper.cancelAlarm(context)
             }
         }
 
@@ -162,13 +146,11 @@ class AlarmRecyclerViewAdapter(
             val picker = TimePicker.buildPicker("Set Alarm")
             picker.show((context as AppCompatActivity).supportFragmentManager, "Reschedule Alarm")
             picker.addOnPositiveButtonClickListener {
-                viewModel.changeTime(position, "%02d:%02d".format(picker.hour, picker.minute))
                 notifyItemChanged(position)
             }
         }
 
         holder.delete.setOnClickListener {
-            viewModel.deleteItem(position)
             notifyItemRemoved(position)
         }
 
@@ -182,70 +164,56 @@ class AlarmRecyclerViewAdapter(
 
         holder.btnMonday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.addDayToSchedule(position, "Monday")
                 notifyItemChanged(position)
             } else {
-                viewModel.removeDayOnSchedule(position, "Monday")
                 notifyItemChanged(position)
             }
         }
 
         holder.btnTuesday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.addDayToSchedule(position, "Tuesday")
                 notifyItemChanged(position)
             } else {
-                viewModel.removeDayOnSchedule(position, "Tuesday")
                 notifyItemChanged(position)
             }
         }
 
         holder.btnWednesday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.addDayToSchedule(position, "Wednesday")
                 notifyItemChanged(position)
             } else {
-                viewModel.removeDayOnSchedule(position, "Wednesday")
                 notifyItemChanged(position)
             }
         }
 
         holder.btnThursday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.addDayToSchedule(position, "Thursday")
                 notifyItemChanged(position)
             } else {
-                viewModel.removeDayOnSchedule(position, "Thursday")
                 notifyItemChanged(position)
             }
         }
 
         holder.btnFriday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.addDayToSchedule(position, "Friday")
                 notifyItemChanged(position)
             } else {
-                viewModel.removeDayOnSchedule(position, "Friday")
                 notifyItemChanged(position)
             }
         }
 
         holder.btnSaturday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.addDayToSchedule(position, "Saturday")
                 notifyItemChanged(position)
             } else {
-                viewModel.removeDayOnSchedule(position, "Saturday")
                 notifyItemChanged(position)
             }
         }
 
         holder.btnSunday.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                viewModel.addDayToSchedule(position, "Saturday")
                 notifyItemChanged(position)
             } else {
-                viewModel.removeDayOnSchedule(position, "Sunday")
                 notifyItemChanged(position)
             }
         }
@@ -253,7 +221,7 @@ class AlarmRecyclerViewAdapter(
         holder.selectSong.text = data[position].ringtoneTitle
 
         holder.selectSong.setOnClickListener {
-            mCallbackInterface.selectChosenTone(position, viewModel, mRecyclerView)
+            pickAlarmInterface.selectAlarmTone()
         }
 
     }
@@ -269,25 +237,5 @@ class AlarmRecyclerViewAdapter(
             (data as MutableList<AlarmItemModel>).add(it)
         }
         notifyDataSetChanged()
-    }
-
-    private fun setAlarm(time: String, scheduleTextView: TextView) {
-        val setTime = time.split(":")
-        val hour = Integer.parseInt(setTime[0])
-        val minute = Integer.parseInt(setTime[1])
-
-        c.apply {
-            this.set(Calendar.HOUR_OF_DAY, hour)
-            this.set(Calendar.MINUTE, minute)
-
-            if (this.before(Calendar.getInstance())) {
-                add(Calendar.DATE, 1)
-                scheduleTextView.text = context.resources.getString(R.string.tomorrow)
-            } else {
-                scheduleTextView.text = context.resources.getString(R.string.scheduled)
-            }
-
-            AlarmHelper.createAlarm(this, context)
-        }
     }
 }

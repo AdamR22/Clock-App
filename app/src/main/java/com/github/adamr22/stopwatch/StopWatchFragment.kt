@@ -61,7 +61,7 @@ class StopWatchFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        (requireContext() as AppCompatActivity).supportActionBar?.title = "Stopwatch"
+        (requireContext() as AppCompatActivity).supportActionBar?.title = resources.getString(R.string.stopwatch)
 
         return inflater.inflate(R.layout.fragment_stop_watch, container, false)
     }

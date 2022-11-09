@@ -1,8 +1,6 @@
 package com.github.adamr22.alarm.presentation.views
 
-import android.media.RingtoneManager
 import android.os.Bundle
-import android.provider.Settings
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -14,13 +12,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.R
-import com.github.adamr22.alarm.data.models.AlarmItemModel
 import com.github.adamr22.alarm.presentation.adapters.AlarmRecyclerViewAdapter
 import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
-import com.github.adamr22.common.TimePicker
+import com.github.adamr22.utils.TimePicker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.timepicker.MaterialTimePicker
-import kotlinx.coroutines.flow.collectLatest
 
 class AlarmFragment : Fragment() {
 
@@ -36,6 +32,7 @@ class AlarmFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+        (requireActivity() as AppCompatActivity).supportActionBar?.title = resources.getString(R.string.alarm)
         return inflater.inflate(R.layout.fragment_alarm, container, false)
     }
 
@@ -54,27 +51,12 @@ class AlarmFragment : Fragment() {
         alarmRecyclerView.hasFixedSize()
 
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-            alarmViewModel.alarmItems.collectLatest {
-                when (it) {
-                    is AlarmViewModel.AlarmUIState.AlarmItems -> {
-                        alarmRecyclerView.visibility = View.VISIBLE
-                        emptyAlarmContent.visibility = View.GONE
-                        alarmAdapter.updateAlarmList(it.alarmItems)
-                    }
 
-                    is AlarmViewModel.AlarmUIState.Empty -> {
-                        alarmRecyclerView.visibility = View.GONE
-                        emptyAlarmContent.visibility = View.VISIBLE
-                    }
-                }
-            }
         }
     }
 
     override fun onResume() {
         super.onResume()
-
-        (activity as AppCompatActivity).supportActionBar?.title = "Alarm"
 
         addAlarmButton.setOnClickListener {
             picker.show(parentFragmentManager, "Alarm Picker")
@@ -87,18 +69,6 @@ class AlarmFragment : Fragment() {
 
     private fun addAlarmItem() {
         val chosenTime = "%02d:%02d".format(picker.hour, picker.minute)
-        val alarm = AlarmItemModel(
-            chosenTime,
-            RingtoneManager.getRingtone(
-                requireActivity(),
-                Settings.System.DEFAULT_ALARM_ALERT_URI
-            ).getTitle(requireContext()),
-            RingtoneManager.getActualDefaultRingtoneUri(
-                requireContext(),
-                RingtoneManager.TYPE_ALARM
-            ),
-        )
-        alarmViewModel.addAlarmItem(alarm)
     }
 
     companion object {

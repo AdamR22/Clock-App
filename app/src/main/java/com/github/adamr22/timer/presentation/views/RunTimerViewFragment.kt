@@ -17,8 +17,8 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
-import com.github.adamr22.common.AddLabelDialog
-import com.github.adamr22.common.NotificationHelper
+import com.github.adamr22.utils.AddLabelDialog
+import com.github.adamr22.utils.NotificationHelper
 import com.github.adamr22.timer.presentation.viewmodels.TimerViewModel
 import com.github.adamr22.timer.data.models.TimerModel
 import com.github.adamr22.timer.presentation.adapters.RunFragmentViewPagerAdapter
