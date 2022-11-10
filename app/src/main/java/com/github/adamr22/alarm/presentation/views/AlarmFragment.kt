@@ -3,7 +3,6 @@ package com.github.adamr22.alarm.presentation.views
 import android.content.pm.PackageManager
 import android.media.RingtoneManager
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,9 +18,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.R
 import com.github.adamr22.alarm.presentation.adapters.AlarmRecyclerViewAdapter
 import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
+import com.github.adamr22.data.entities.Alarm
 import com.github.adamr22.utils.TimePicker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.timepicker.MaterialTimePicker
+import kotlinx.coroutines.flow.collectLatest
 
 class AlarmFragment : Fragment() {
 
@@ -79,7 +81,18 @@ class AlarmFragment : Fragment() {
         alarmRecyclerView.hasFixedSize()
 
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-            // TODO: Get all alarm items apart from one labelled bedtime
+            alarmViewModel.getData().collectLatest {
+                if (it == null || it.isEmpty()) {
+                    emptyAlarmContent.visibility = View.VISIBLE
+                    alarmRecyclerView.visibility = View.GONE
+                }
+
+                it?.let {
+                    emptyAlarmContent.visibility = View.GONE
+                    alarmRecyclerView.visibility = View.VISIBLE
+                    alarmAdapter.data.submitList(it)
+                }
+            }
         }
     }
 
@@ -101,7 +114,14 @@ class AlarmFragment : Fragment() {
     }
 
     private fun addAlarmItem() {
-        // TODO: Add Item to Database
+        alarmViewModel.insertAlarm(
+            Alarm(
+                title = defaultRingtoneTitle,
+                uri = defaultRingtoneUri,
+                hour = picker.hour,
+                minute = picker.minute
+            )
+        )
     }
 
     companion object {

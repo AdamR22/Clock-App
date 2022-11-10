@@ -11,9 +11,13 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 class AlarmRepository(private val alarmDao: AlarmDao, private val dayOfWeekDao: DayOfWeekDao) {
     fun getAllItems(): Flow<List<AlarmAndDay>?> = alarmDao.getAllItems().distinctUntilChanged()
 
+    fun getAllApartFromBedtime(): Flow<List<AlarmAndDay>?> = alarmDao.getAllApartFromBedtime().distinctUntilChanged()
+
     suspend fun insertAlarm(alarm: Alarm) = alarmDao.insertItem(alarm)
 
     suspend fun updateAlarm(alarm: Alarm) = alarmDao.updateItem(alarm)
+
+    suspend fun updateAlarmLabel(label: String, id: Int) = alarmDao.updateAlarmLabel(label, id)
 
     fun getItem(id: Int): Flow<AlarmAndDay> = alarmDao.getSpecificItem(id).distinctUntilChanged()
 
