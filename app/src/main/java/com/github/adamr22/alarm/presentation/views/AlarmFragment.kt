@@ -81,7 +81,7 @@ class AlarmFragment : Fragment() {
         alarmRecyclerView.hasFixedSize()
 
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
-            alarmViewModel.getData().collectLatest {
+            alarmViewModel.getAllDataApartFromBedtime().collectLatest {
                 if (it == null || it.isEmpty()) {
                     emptyAlarmContent.visibility = View.VISIBLE
                     alarmRecyclerView.visibility = View.GONE

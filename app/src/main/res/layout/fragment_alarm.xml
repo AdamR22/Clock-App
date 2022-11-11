@@ -60,7 +60,6 @@
         android:clickable="true"
         android:contentDescription="@string/add"
         android:focusable="true"
-        style="@style/LightModeFab"
         app:fabCustomSize="100dp"
         app:srcCompat="@drawable/ic_baseline_add_light"/>
 </FrameLayout>
