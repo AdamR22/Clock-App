@@ -14,10 +14,8 @@ import com.github.adamr22.R
 import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
 import com.github.adamr22.data.entities.Alarm
 import com.github.adamr22.data.entities.AlarmAndDay
-import com.github.adamr22.utils.AddLabelDialog
-import com.github.adamr22.utils.PickAlarmInterface
+import com.github.adamr22.utils.*
 import com.github.adamr22.utils.TimePicker
-import com.github.adamr22.utils.VibrateSingleton
 import com.google.android.material.switchmaterial.SwitchMaterial
 
 class AlarmRecyclerViewAdapter(
@@ -31,6 +29,10 @@ class AlarmRecyclerViewAdapter(
 
     private val pickAlarmInterface by lazy {
         context as PickAlarmInterface
+    }
+
+    private val cancelScheduleAlarm by lazy {
+        context as CancelScheduleAlarm
     }
 
     private val diffUtilCallback = object : DiffUtil.ItemCallback<AlarmAndDay>() {
@@ -120,7 +122,8 @@ class AlarmRecyclerViewAdapter(
                 }
             }
 
-            if (!holder.activateAlarm.isChecked) holder.alarmSchedule.text = context.getText(R.string.not_scheduled)
+            if (!holder.activateAlarm.isChecked) holder.alarmSchedule.text =
+                context.getText(R.string.not_scheduled)
         }
 
         if (dataItem.dayOfWeek.isEmpty()) {
@@ -246,59 +249,189 @@ class AlarmRecyclerViewAdapter(
             }
         }
 
-        holder.btnMonday.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                viewModel.insertSchedule(context.getString(R.string.monday), dataItem.alarm.id!!)
-            } else {
-                viewModel.deleteDayFromSchedule(context.getString(R.string.monday), dataItem.alarm.id!!)
+        val schedule = dataItem.dayOfWeek
+
+        if (schedule.isNotEmpty()) {
+            schedule.forEach {
+                holder.btnMonday.isChecked = it.day == context.getString(R.string.monday)
+                holder.btnTuesday.isChecked = it.day == context.getString(R.string.tuesday)
+                holder.btnWednesday.isChecked = it.day == context.getString(R.string.wednesday)
+                holder.btnThursday.isChecked = it.day == context.getString(R.string.thursday)
+                holder.btnFriday.isChecked = it.day == context.getString(R.string.friday)
+                holder.btnSaturday.isChecked = it.day == context.getString(R.string.saturday)
+                holder.btnSunday.isChecked = it.day == context.getString(R.string.sunday)
+
             }
+
+            holder.btnMonday.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked)
+                    viewModel.insertSchedule(
+                        context.getString(R.string.monday),
+                        dataItem.alarm.id!!
+                    )
+
+                if (!isChecked) {
+                    viewModel.deleteDayFromSchedule(
+                        context.getString(R.string.monday),
+                        dataItem.alarm.id!!
+                    )
+                    cancelScheduleAlarm.cancelRepeatingAlarm((dataItem.alarm.id + 2) * 1000)
+                }
+            }
+
+            holder.btnTuesday.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked)
+                    viewModel.insertSchedule(
+                        context.getString(R.string.tuesday),
+                        dataItem.alarm.id!!
+                    )
+
+                if (!isChecked) {
+                    viewModel.deleteDayFromSchedule(
+                        context.getString(R.string.tuesday),
+                        dataItem.alarm.id!!
+                    )
+                    cancelScheduleAlarm.cancelRepeatingAlarm((dataItem.alarm.id + 3) * 1000)
+                }
+            }
+
+            holder.btnWednesday.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked)
+                    viewModel.insertSchedule(
+                        context.getString(R.string.wednesday),
+                        dataItem.alarm.id!!
+                    )
+
+                if (!isChecked) {
+                    viewModel.deleteDayFromSchedule(
+                        context.getString(R.string.wednesday),
+                        dataItem.alarm.id!!
+                    )
+                    cancelScheduleAlarm.cancelRepeatingAlarm((dataItem.alarm.id + 4) * 1000)
+                }
+            }
+
+            holder.btnThursday.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked)
+                    viewModel.insertSchedule(
+                        context.getString(R.string.thursday),
+                        dataItem.alarm.id!!
+                    )
+
+                if (!isChecked) {
+                    viewModel.deleteDayFromSchedule(
+                        context.getString(R.string.thursday),
+                        dataItem.alarm.id!!
+                    )
+                    cancelScheduleAlarm.cancelRepeatingAlarm((dataItem.alarm.id + 5) * 1000)
+                }
+            }
+
+            holder.btnFriday.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked)
+                    viewModel.insertSchedule(
+                        context.getString(R.string.friday),
+                        dataItem.alarm.id!!
+                    )
+
+                if (!isChecked) {
+                    viewModel.deleteDayFromSchedule(
+                        context.getString(R.string.friday),
+                        dataItem.alarm.id!!
+                    )
+                    cancelScheduleAlarm.cancelRepeatingAlarm((dataItem.alarm.id + 6) * 1000)
+                }
+            }
+
+            holder.btnSaturday.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked)
+                    viewModel.insertSchedule(
+                        context.getString(R.string.saturday),
+                        dataItem.alarm.id!!
+                    )
+
+                if (!isChecked) {
+                    viewModel.deleteDayFromSchedule(
+                        context.getString(R.string.saturday),
+                        dataItem.alarm.id!!
+                    )
+                    cancelScheduleAlarm.cancelRepeatingAlarm((dataItem.alarm.id + 7) * 1000)
+                }
+            }
+
+            holder.btnSunday.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked)
+                    viewModel.insertSchedule(
+                        context.getString(R.string.sunday),
+                        dataItem.alarm.id!!
+                    )
+
+                if (!isChecked) {
+                    viewModel.deleteDayFromSchedule(
+                        context.getString(R.string.sunday),
+                        dataItem.alarm.id!!
+                    )
+                    cancelScheduleAlarm.cancelRepeatingAlarm((dataItem.alarm.id + 8) * 1000)
+                }
+            }
+
         }
 
-        holder.btnTuesday.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                viewModel.insertSchedule(context.getString(R.string.tuesday), dataItem.alarm.id!!)
-            } else {
-                viewModel.deleteDayFromSchedule(context.getString(R.string.tuesday), dataItem.alarm.id!!)
+        if (schedule.isEmpty()) {
+            holder.btnMonday.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked)
+                    viewModel.insertSchedule(
+                        context.getString(R.string.monday),
+                        dataItem.alarm.id!!
+                    )
             }
-        }
 
-        holder.btnWednesday.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                viewModel.insertSchedule(context.getString(R.string.wednesday), dataItem.alarm.id!!)
-            } else {
-                viewModel.deleteDayFromSchedule(context.getString(R.string.wednesday), dataItem.alarm.id!!)
+            holder.btnTuesday.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked)
+                    viewModel.insertSchedule(
+                        context.getString(R.string.tuesday),
+                        dataItem.alarm.id!!
+                    )
             }
-        }
 
-        holder.btnThursday.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                viewModel.insertSchedule(context.getString(R.string.thursday), dataItem.alarm.id!!)
-            } else {
-                viewModel.deleteDayFromSchedule(context.getString(R.string.thursday), dataItem.alarm.id!!)
+            holder.btnWednesday.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked)
+                    viewModel.insertSchedule(
+                        context.getString(R.string.wednesday),
+                        dataItem.alarm.id!!
+                    )
             }
-        }
 
-        holder.btnFriday.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                viewModel.insertSchedule(context.getString(R.string.friday), dataItem.alarm.id!!)
-            } else {
-                viewModel.deleteDayFromSchedule(context.getString(R.string.friday), dataItem.alarm.id!!)
+            holder.btnThursday.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked)
+                    viewModel.insertSchedule(
+                        context.getString(R.string.thursday),
+                        dataItem.alarm.id!!
+                    )
             }
-        }
 
-        holder.btnSaturday.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                viewModel.insertSchedule(context.getString(R.string.saturday), dataItem.alarm.id!!)
-            } else {
-                viewModel.deleteDayFromSchedule(context.getString(R.string.saturday), dataItem.alarm.id!!)
+            holder.btnFriday.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked)
+                    viewModel.insertSchedule(
+                        context.getString(R.string.friday),
+                        dataItem.alarm.id!!
+                    )
             }
-        }
 
-        holder.btnSunday.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                viewModel.insertSchedule(context.getString(R.string.sunday), dataItem.alarm.id!!)
-            } else {
-                viewModel.deleteDayFromSchedule(context.getString(R.string.sunday), dataItem.alarm.id!!)
+            holder.btnSaturday.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked)
+                    viewModel.insertSchedule(
+                        context.getString(R.string.saturday),
+                        dataItem.alarm.id!!
+                    )
+            }
+
+            holder.btnSunday.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked)
+                    viewModel.insertSchedule(
+                        context.getString(R.string.sunday),
+                        dataItem.alarm.id!!
+                    )
             }
         }
 

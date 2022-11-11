@@ -178,7 +178,7 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
             }
 
             bedtimeNotTextContent.visibility = View.VISIBLE
-        }
+        } else bedtimeNotTextContent.visibility = View.GONE
 
         if (inflateWakeUpLayout!!) {
             bottomSheetIcon.setImageDrawable(
@@ -352,6 +352,8 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                             label = bottomSheetText.text.toString(),
                             hour = timePicker.hour,
                             minute = timePicker.minute,
+                            title = defaultRingtoneTitle,
+                            uri = defaultRingtoneUri
                         )
                     )
                 } else {

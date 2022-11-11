@@ -2,6 +2,7 @@ package com.github.adamr22.data.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.github.adamr22.data.entities.DayOfWeek
 
