@@ -34,6 +34,10 @@ class BedTimeViewModel(application: Application) : AndroidViewModel(application)
     fun updateDaily(value: Boolean, id: Int) =
         viewModelScope.launch(Dispatchers.IO) { repository.updateDaily(value, id) }
 
-    fun updateExpandedItem(value: Boolean, id: Int) =
-        viewModelScope.launch(Dispatchers.IO) { repository.updateExpandedItem(value, id) }
+    fun getData() = repository.getData()
+
+    fun getItem(id: Int) = repository.getItem(id)
+
+    fun updateSchedule(value: Boolean, id: Int) =
+        viewModelScope.launch(Dispatchers.IO) { repository.updateSchedule(value, id) }
 }

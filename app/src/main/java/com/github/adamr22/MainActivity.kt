@@ -14,8 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
-import com.github.adamr22.alarm.presentation.views.AlarmFragment
+import com.github.adamr22.bedtime.presentation.viewmodels.BedTimeViewModel
 import com.github.adamr22.bedtime.presentation.views.BedTimeFragment
 import com.github.adamr22.clock.ClockFragment
 import com.github.adamr22.data.entities.Alarm
@@ -30,7 +29,7 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
 
     lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var mToolbar: Toolbar
-    private var currentFragment = 0
+    private var currentFragment = 1
 
     private val FRAGMENT_ID = "frag_id"
     private val FRAG_KEY = "shared_pref_frag_id_key"
@@ -40,7 +39,7 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
     private var selectedTone: Pair<Uri, String>? = null
 
     private val viewModel by lazy {
-        ViewModelProvider(this)[AlarmViewModel::class.java]
+        ViewModelProvider(this)[BedTimeViewModel::class.java]
     }
 
     // For use in main activity since expected behaviour not occurring when used in desired fragments
@@ -71,7 +70,7 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
 
         if (savedInstanceState == null) {
             getSharedPreferences(FRAG_KEY, MODE_PRIVATE).apply {
-                currentFragment = this.getInt(FRAGMENT_ID, 0)
+                currentFragment = this.getInt(FRAGMENT_ID, 1)
             }
         }
 
@@ -88,12 +87,6 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
         super.onResume()
 
         when (currentFragment) {
-            0 -> {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, AlarmFragment.newInstance()).commit()
-
-                bottomNavigationView.selectedItemId = R.id.alarm
-            }
             1 -> {
                 supportFragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, ClockFragment.newInstance()).commit()
@@ -122,12 +115,6 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface {
 
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.alarm -> {
-                    currentFragment = 0
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, AlarmFragment.newInstance()).commit()
-                    true
-                }
                 R.id.clock -> {
                     currentFragment = 1
                     supportFragmentManager.beginTransaction()

@@ -113,7 +113,7 @@ class RunTimerViewFragment(
         if (!timerModel.timerFinished) ringtoneAlarm.stop()
 
         addLabel.setOnClickListener {
-            AddLabelDialog.newInstance(position, null, timerViewModel, null)
+            AddLabelDialog.newInstance(position, timerViewModel, null)
                 .show(mFragmentManager, null)
         }
 

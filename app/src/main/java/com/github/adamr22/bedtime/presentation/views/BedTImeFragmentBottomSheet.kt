@@ -128,7 +128,7 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
         tvDefaultSound = view.findViewById(R.id.tv_default_sound)
         btnVibrate = view.findViewById(R.id.btn_vibrate)
 
-        dailyCheckbox = view.findViewById(R.id.daily_alarm_checkbox)
+        dailyCheckbox = view.findViewById(R.id.day_picker_checkout)
 
         tvSetTime = view.findViewById(R.id.tv_set_time)
     }

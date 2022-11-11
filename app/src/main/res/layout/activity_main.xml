@@ -30,7 +30,7 @@
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:name="com.github.adamr22.alarm.presentation.views.AlarmFragment"
+        android:name="com.github.adamr22.clock.ClockFragment"
         app:layout_constraintBottom_toTopOf="@+id/bottomNav"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

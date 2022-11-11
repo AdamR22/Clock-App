@@ -9,9 +9,13 @@ class BedtimeRepository(
     private val alarmDao: AlarmDao
 ) {
 
+    fun getData() = alarmDao.getAllItems().distinctUntilChanged()
+
     fun getBedtime(bedtime: String): Flow<Alarm?> = alarmDao.getBedtimeItem(bedtime).distinctUntilChanged()
 
     fun getWakeup(wakeup: String): Flow<Alarm?> = alarmDao.getWakeUpItem(wakeup).distinctUntilChanged()
+
+    fun getItem(id: Int): Flow<Alarm> = alarmDao.getSpecificItem(id)
 
     suspend fun updateTime(alarm: Alarm) = alarmDao.updateItem(alarm)
 
@@ -19,5 +23,6 @@ class BedtimeRepository(
 
     suspend fun updateDaily(value: Boolean, id: Int) = alarmDao.updateDaily(value, id)
 
-    suspend fun updateExpandedItem(value: Boolean, id: Int) = alarmDao.updateExpandedItem(value, id)
+    suspend fun updateSchedule(value: Boolean, id: Int) = alarmDao.updateSchedule(value, id)
+
 }
