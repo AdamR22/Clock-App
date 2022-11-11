@@ -1,11 +1,13 @@
 package com.github.adamr22.alarm.presentation.adapters
 
 import android.content.Context
-import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.CheckBox
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
@@ -15,7 +17,6 @@ import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
 import com.github.adamr22.data.entities.Alarm
 import com.github.adamr22.data.entities.AlarmAndDay
 import com.github.adamr22.utils.*
-import com.github.adamr22.utils.TimePicker
 import com.google.android.material.switchmaterial.SwitchMaterial
 
 class AlarmRecyclerViewAdapter(
@@ -24,15 +25,10 @@ class AlarmRecyclerViewAdapter(
 ) :
     RecyclerView.Adapter<AlarmRecyclerViewAdapter.AlarmItemViewHolder>() {
 
-    private var mExpandedPosition: Int = -1
     private lateinit var mRecyclerView: RecyclerView
 
     private val pickAlarmInterface by lazy {
         context as PickAlarmInterface
-    }
-
-    private val cancelScheduleAlarm by lazy {
-        context as CancelScheduleAlarm
     }
 
     private val diffUtilCallback = object : DiffUtil.ItemCallback<AlarmAndDay>() {
@@ -58,17 +54,11 @@ class AlarmRecyclerViewAdapter(
         val currentTime: TextView
         val alarmSchedule: TextView
         val activateAlarm: SwitchMaterial
-        val btnMonday: ToggleButton
-        val btnTuesday: ToggleButton
-        val btnWednesday: ToggleButton
-        val btnThursday: ToggleButton
-        val btnFriday: ToggleButton
-        val btnSaturday: ToggleButton
-        val btnSunday: ToggleButton
         val selectSong: TextView
         val delete: TextView
         val vibrate: CheckBox
         val extraContent: LinearLayout
+        val dailyAlarm: CheckBox
 
         init {
             addLabel = itemView.findViewById(R.id.tv_label)
@@ -76,17 +66,11 @@ class AlarmRecyclerViewAdapter(
             currentTime = itemView.findViewById(R.id.set_time)
             alarmSchedule = itemView.findViewById(R.id.tv_days_scheduled)
             activateAlarm = itemView.findViewById(R.id.switch_alarm_on_off)
-            btnMonday = itemView.findViewById(R.id.mon)
-            btnTuesday = itemView.findViewById(R.id.tue)
-            btnWednesday = itemView.findViewById(R.id.wed)
-            btnThursday = itemView.findViewById(R.id.thur)
-            btnFriday = itemView.findViewById(R.id.fri)
-            btnSaturday = itemView.findViewById(R.id.sat)
-            btnSunday = itemView.findViewById(R.id.sun)
             selectSong = itemView.findViewById(R.id.tv_chosen_song)
             delete = itemView.findViewById(R.id.delete_alarm_item)
             vibrate = itemView.findViewById(R.id.vibrate_checkbox)
             extraContent = itemView.findViewById(R.id.expanded_content)
+            dailyAlarm = itemView.findViewById(R.id.daily_alarm_checkbox)
         }
     }
 
@@ -99,8 +83,7 @@ class AlarmRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: AlarmItemViewHolder, position: Int) {
         val dataItem = data.currentList[position]
-
-        val isExpanded: Boolean = position == mExpandedPosition
+        var isExpanded = false
 
         holder.activateAlarm.isChecked = dataItem.alarm.isScheduled
         holder.vibrate.isChecked = dataItem.alarm.vibrates
@@ -176,18 +159,12 @@ class AlarmRecyclerViewAdapter(
         }
 
         holder.expandOrCollapseItem.setOnClickListener {
-            mExpandedPosition = if (isExpanded) -1 else position
-            TransitionManager.beginDelayedTransition(mRecyclerView)
-            notifyItemChanged(position)
+            isExpanded = toggleLayout(
+                isExpanded,
+                extraContent = holder.extraContent,
+                holder.expandOrCollapseItem
+            )
         }
-
-        if (isExpanded) {
-            holder.expandOrCollapseItem.setImageResource(R.drawable.ic_arrow_up)
-        } else {
-            holder.expandOrCollapseItem.setImageResource(R.drawable.ic_arrow_down)
-        }
-
-        holder.extraContent.visibility = if (isExpanded) View.VISIBLE else View.GONE
 
         holder.currentTime.setOnClickListener {
             val picker = TimePicker.buildPicker("Set Alarm")
@@ -249,191 +226,7 @@ class AlarmRecyclerViewAdapter(
             }
         }
 
-        val schedule = dataItem.dayOfWeek
-
-        if (schedule.isNotEmpty()) {
-            schedule.forEach {
-                holder.btnMonday.isChecked = it.day == context.getString(R.string.monday)
-                holder.btnTuesday.isChecked = it.day == context.getString(R.string.tuesday)
-                holder.btnWednesday.isChecked = it.day == context.getString(R.string.wednesday)
-                holder.btnThursday.isChecked = it.day == context.getString(R.string.thursday)
-                holder.btnFriday.isChecked = it.day == context.getString(R.string.friday)
-                holder.btnSaturday.isChecked = it.day == context.getString(R.string.saturday)
-                holder.btnSunday.isChecked = it.day == context.getString(R.string.sunday)
-
-            }
-
-            holder.btnMonday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(
-                        context.getString(R.string.monday),
-                        dataItem.alarm.id!!
-                    )
-
-                if (!isChecked) {
-                    viewModel.deleteDayFromSchedule(
-                        context.getString(R.string.monday),
-                        dataItem.alarm.id!!
-                    )
-                    cancelScheduleAlarm.cancelRepeatingAlarm((dataItem.alarm.id + 2) * 1000)
-                }
-            }
-
-            holder.btnTuesday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(
-                        context.getString(R.string.tuesday),
-                        dataItem.alarm.id!!
-                    )
-
-                if (!isChecked) {
-                    viewModel.deleteDayFromSchedule(
-                        context.getString(R.string.tuesday),
-                        dataItem.alarm.id!!
-                    )
-                    cancelScheduleAlarm.cancelRepeatingAlarm((dataItem.alarm.id + 3) * 1000)
-                }
-            }
-
-            holder.btnWednesday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(
-                        context.getString(R.string.wednesday),
-                        dataItem.alarm.id!!
-                    )
-
-                if (!isChecked) {
-                    viewModel.deleteDayFromSchedule(
-                        context.getString(R.string.wednesday),
-                        dataItem.alarm.id!!
-                    )
-                    cancelScheduleAlarm.cancelRepeatingAlarm((dataItem.alarm.id + 4) * 1000)
-                }
-            }
-
-            holder.btnThursday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(
-                        context.getString(R.string.thursday),
-                        dataItem.alarm.id!!
-                    )
-
-                if (!isChecked) {
-                    viewModel.deleteDayFromSchedule(
-                        context.getString(R.string.thursday),
-                        dataItem.alarm.id!!
-                    )
-                    cancelScheduleAlarm.cancelRepeatingAlarm((dataItem.alarm.id + 5) * 1000)
-                }
-            }
-
-            holder.btnFriday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(
-                        context.getString(R.string.friday),
-                        dataItem.alarm.id!!
-                    )
-
-                if (!isChecked) {
-                    viewModel.deleteDayFromSchedule(
-                        context.getString(R.string.friday),
-                        dataItem.alarm.id!!
-                    )
-                    cancelScheduleAlarm.cancelRepeatingAlarm((dataItem.alarm.id + 6) * 1000)
-                }
-            }
-
-            holder.btnSaturday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(
-                        context.getString(R.string.saturday),
-                        dataItem.alarm.id!!
-                    )
-
-                if (!isChecked) {
-                    viewModel.deleteDayFromSchedule(
-                        context.getString(R.string.saturday),
-                        dataItem.alarm.id!!
-                    )
-                    cancelScheduleAlarm.cancelRepeatingAlarm((dataItem.alarm.id + 7) * 1000)
-                }
-            }
-
-            holder.btnSunday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(
-                        context.getString(R.string.sunday),
-                        dataItem.alarm.id!!
-                    )
-
-                if (!isChecked) {
-                    viewModel.deleteDayFromSchedule(
-                        context.getString(R.string.sunday),
-                        dataItem.alarm.id!!
-                    )
-                    cancelScheduleAlarm.cancelRepeatingAlarm((dataItem.alarm.id + 8) * 1000)
-                }
-            }
-
-        }
-
-        if (schedule.isEmpty()) {
-            holder.btnMonday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(
-                        context.getString(R.string.monday),
-                        dataItem.alarm.id!!
-                    )
-            }
-
-            holder.btnTuesday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(
-                        context.getString(R.string.tuesday),
-                        dataItem.alarm.id!!
-                    )
-            }
-
-            holder.btnWednesday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(
-                        context.getString(R.string.wednesday),
-                        dataItem.alarm.id!!
-                    )
-            }
-
-            holder.btnThursday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(
-                        context.getString(R.string.thursday),
-                        dataItem.alarm.id!!
-                    )
-            }
-
-            holder.btnFriday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(
-                        context.getString(R.string.friday),
-                        dataItem.alarm.id!!
-                    )
-            }
-
-            holder.btnSaturday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(
-                        context.getString(R.string.saturday),
-                        dataItem.alarm.id!!
-                    )
-            }
-
-            holder.btnSunday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(
-                        context.getString(R.string.sunday),
-                        dataItem.alarm.id!!
-                    )
-            }
-        }
+        //TODO: Add single checkbox for everyday alarm or single instance alarm
 
         holder.selectSong.text = dataItem.alarm.title
 
@@ -465,4 +258,19 @@ class AlarmRecyclerViewAdapter(
         return data.currentList.size
     }
 
+    private fun toggleLayout(
+        expanded: Boolean,
+        extraContent: LinearLayout,
+        view: ImageButton
+    ): Boolean {
+        if (expanded) {
+            Animations.collapse(extraContent)
+            view.setImageResource(R.drawable.ic_arrow_up)
+            return false
+        }
+
+        Animations.expand(extraContent)
+        view.setImageResource(R.drawable.ic_arrow_down)
+        return true
+    }
 }

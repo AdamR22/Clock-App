@@ -112,11 +112,15 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_days_scheduled">
 
-            <include
-                layout="@layout/day_picker_layout"
+            <CheckBox
+                android:id="@+id/daily_alarm_checkbox"
+                android:text="@string/everyday"
+                android:textColor="@color/white"
+                android:fontFamily="@font/poppins"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center" />
+                android:layout_marginStart="8sp"
+                tools:ignore="TouchTargetSizeCheck" />
 
             <TextView
                 android:clickable="true"
