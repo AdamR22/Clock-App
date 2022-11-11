@@ -440,6 +440,25 @@ class AlarmRecyclerViewAdapter(
         holder.selectSong.setOnClickListener {
             pickAlarmInterface.selectAlarmTone()
         }
+
+        pickAlarmInterface.returnSelectedTone()?.let {
+            val title = pickAlarmInterface.returnSelectedTone()!!.second
+            val uri = pickAlarmInterface.returnSelectedTone()!!.first
+
+            viewModel.updateAlarm(
+                Alarm(
+                    dataItem.alarm.id,
+                    dataItem.alarm.label,
+                    title,
+                    uri,
+                    dataItem.alarm.isScheduled,
+                    dataItem.alarm.sunriseMode,
+                    dataItem.alarm.vibrates,
+                    dataItem.alarm.hour,
+                    dataItem.alarm.minute,
+                )
+            )
+        }
     }
 
     override fun getItemCount(): Int {

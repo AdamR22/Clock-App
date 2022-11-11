@@ -82,15 +82,15 @@ class AlarmFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launchWhenCreated {
             alarmViewModel.getAllDataApartFromBedtime().collectLatest {
-                if (it == null || it.isEmpty()) {
-                    emptyAlarmContent.visibility = View.VISIBLE
-                    alarmRecyclerView.visibility = View.GONE
-                }
-
                 it?.let {
                     emptyAlarmContent.visibility = View.GONE
                     alarmRecyclerView.visibility = View.VISIBLE
                     alarmAdapter.data.submitList(it)
+                }
+
+                if (it == null || it.isEmpty()) {
+                    emptyAlarmContent.visibility = View.VISIBLE
+                    alarmRecyclerView.visibility = View.GONE
                 }
             }
         }
