@@ -18,8 +18,15 @@ interface AlarmDao {
     fun getAllItems(): Flow<List<AlarmAndDay>?>
 
     @Transaction
+    @Query("SELECT * FROM alarm WHERE label != 'BEDTIME'")
+    fun getAllApartFromBedtime(): Flow<List<AlarmAndDay>?>
+
+    @Transaction
     @Query("SELECT * FROM alarm WHERE label = :bedtime")
     fun getBedtimeItem(bedtime: String): Flow<AlarmAndDay?>
+
+    @Query("UPDATE alarm SET label = :label WHERE alarm_id = :id")
+    suspend fun updateAlarmLabel(label: String, id: Int)
 
     @Transaction
     @Query("SELECT * FROM alarm WHERE label = :wakeup")

@@ -1,22 +1,23 @@
 package com.github.adamr22.alarm.presentation.adapters
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.transition.TransitionManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.CheckBox
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.R
-import com.github.adamr22.data.models.AlarmItemModel
 import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
+import com.github.adamr22.data.entities.Alarm
+import com.github.adamr22.data.entities.AlarmAndDay
 import com.github.adamr22.utils.*
-import com.github.adamr22.utils.TimePicker
 import com.google.android.material.switchmaterial.SwitchMaterial
-import java.util.*
 
 class AlarmRecyclerViewAdapter(
     private val context: Context,
@@ -24,16 +25,23 @@ class AlarmRecyclerViewAdapter(
 ) :
     RecyclerView.Adapter<AlarmRecyclerViewAdapter.AlarmItemViewHolder>() {
 
-    private var data = mutableListOf<AlarmItemModel>()
-
-    private var mExpandedPosition: Int = -1
     private lateinit var mRecyclerView: RecyclerView
-    private lateinit var currentTitle: String
-    private var c = Calendar.getInstance()
 
     private val pickAlarmInterface by lazy {
         context as PickAlarmInterface
     }
+
+    private val diffUtilCallback = object : DiffUtil.ItemCallback<AlarmAndDay>() {
+        override fun areItemsTheSame(oldItem: AlarmAndDay, newItem: AlarmAndDay): Boolean {
+            return oldItem.alarm.id == newItem.alarm.id
+        }
+
+        override fun areContentsTheSame(oldItem: AlarmAndDay, newItem: AlarmAndDay): Boolean {
+            return oldItem == newItem
+        }
+    }
+
+    val data = AsyncListDiffer(this, diffUtilCallback)
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
@@ -46,17 +54,11 @@ class AlarmRecyclerViewAdapter(
         val currentTime: TextView
         val alarmSchedule: TextView
         val activateAlarm: SwitchMaterial
-        val btnMonday: ToggleButton
-        val btnTuesday: ToggleButton
-        val btnWednesday: ToggleButton
-        val btnThursday: ToggleButton
-        val btnFriday: ToggleButton
-        val btnSaturday: ToggleButton
-        val btnSunday: ToggleButton
         val selectSong: TextView
         val delete: TextView
         val vibrate: CheckBox
         val extraContent: LinearLayout
+        val dailyAlarm: CheckBox
 
         init {
             addLabel = itemView.findViewById(R.id.tv_label)
@@ -64,17 +66,11 @@ class AlarmRecyclerViewAdapter(
             currentTime = itemView.findViewById(R.id.set_time)
             alarmSchedule = itemView.findViewById(R.id.tv_days_scheduled)
             activateAlarm = itemView.findViewById(R.id.switch_alarm_on_off)
-            btnMonday = itemView.findViewById(R.id.mon)
-            btnTuesday = itemView.findViewById(R.id.tue)
-            btnWednesday = itemView.findViewById(R.id.wed)
-            btnThursday = itemView.findViewById(R.id.thur)
-            btnFriday = itemView.findViewById(R.id.fri)
-            btnSaturday = itemView.findViewById(R.id.sat)
-            btnSunday = itemView.findViewById(R.id.sun)
             selectSong = itemView.findViewById(R.id.tv_chosen_song)
             delete = itemView.findViewById(R.id.delete_alarm_item)
             vibrate = itemView.findViewById(R.id.vibrate_checkbox)
             extraContent = itemView.findViewById(R.id.expanded_content)
+            dailyAlarm = itemView.findViewById(R.id.daily_alarm_checkbox)
         }
     }
 
@@ -86,156 +82,195 @@ class AlarmRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: AlarmItemViewHolder, position: Int) {
-        val isExpanded: Boolean = position == mExpandedPosition
+        val dataItem = data.currentList[position]
+        var isExpanded = false
 
-//        currentTitle = data[position].ringtoneTitle
+        holder.activateAlarm.isChecked = dataItem.alarm.isScheduled
+        holder.vibrate.isChecked = dataItem.alarm.vibrates
 
-        if (data[position].label == "") {
+        if (dataItem.alarm.label == null) {
             holder.addLabel.text = context.getText(R.string.add_label)
         } else {
-            holder.addLabel.text = data[position].label
+            holder.addLabel.text = dataItem.alarm.label
         }
 
-        if (data[position].schedule.isEmpty() && !holder.activateAlarm.isChecked) {
-            holder.alarmSchedule.text = context.getText(R.string.not_scheduled)
-        } else {
-            if (data[position].schedule.size == 1) {
-                holder.alarmSchedule.text = data[position].schedule[0]
-            } else {
-                holder.alarmSchedule.text = data[position].schedule.map { s: String ->
-                    s.slice(0..2)
-                }.toString().replace("[", "").replace("]", "")
+        if (dataItem.dayOfWeek.isNotEmpty()) {
+            if (holder.activateAlarm.isChecked) {
+                if (dataItem.dayOfWeek.size == 1) {
+                    holder.alarmSchedule.text = dataItem.dayOfWeek[0].day
+                } else {
+                    holder.alarmSchedule.text = dataItem.dayOfWeek.map {
+                        it.day?.slice(0..2)
+                    }.toString().replace("[", "").replace("]", "")
+                }
             }
+
+            if (!holder.activateAlarm.isChecked) holder.alarmSchedule.text =
+                context.getText(R.string.not_scheduled)
         }
-//
-//        holder.currentTime.text = data[position].time
+
+        if (dataItem.dayOfWeek.isEmpty()) {
+            if (holder.activateAlarm.isChecked) context.getText(R.string.scheduled)
+
+            if (!holder.activateAlarm.isChecked) context.getText(R.string.not_scheduled)
+        }
+
+        holder.currentTime.text = String.format(
+            context.resources.getString(R.string.default_time_2),
+            "%02d".format(dataItem.alarm.hour),
+            "%02d".format(dataItem.alarm.minute)
+        )
 
         holder.addLabel.setOnClickListener {
-            AddLabelDialog.newInstance(position, viewModel, null)
+            AddLabelDialog.newInstance(position, viewModel, null, dataItem.alarm.id)
                 .show((context as AppCompatActivity).supportFragmentManager, "Add Label")
-
-
-            context.lifecycleScope.launchWhenCreated {
-            }
-
         }
 
         holder.activateAlarm.setOnCheckedChangeListener { buttonView, _ ->
             if (buttonView.isChecked) {
-                Toast.makeText(context, context.resources.getString(R.string.alarm_activated), Toast.LENGTH_SHORT).show()
+                viewModel.updateAlarm(
+                    Alarm(
+                        dataItem.alarm.id,
+                        dataItem.alarm.label,
+                        dataItem.alarm.title,
+                        dataItem.alarm.uri,
+                        true,
+                        dataItem.alarm.sunriseMode,
+                        dataItem.alarm.vibrates,
+                        dataItem.alarm.hour,
+                        dataItem.alarm.minute
+                    )
+                )
             } else {
-                holder.alarmSchedule.text = context.resources.getString(R.string.not_scheduled)
+                viewModel.updateAlarm(
+                    Alarm(
+                        dataItem.alarm.id,
+                        dataItem.alarm.label,
+                        dataItem.alarm.title,
+                        dataItem.alarm.uri,
+                        false,
+                        dataItem.alarm.sunriseMode,
+                        dataItem.alarm.vibrates,
+                        dataItem.alarm.hour,
+                        dataItem.alarm.minute
+                    )
+                )
             }
         }
 
         holder.expandOrCollapseItem.setOnClickListener {
-            mExpandedPosition = if (isExpanded) -1 else position
-            TransitionManager.beginDelayedTransition(mRecyclerView)
-            notifyItemChanged(position)
+            isExpanded = toggleLayout(
+                isExpanded,
+                extraContent = holder.extraContent,
+                holder.expandOrCollapseItem
+            )
         }
-
-        if (isExpanded) {
-            holder.expandOrCollapseItem.setImageResource(R.drawable.ic_arrow_up)
-        } else {
-            holder.expandOrCollapseItem.setImageResource(R.drawable.ic_arrow_down)
-        }
-
-        holder.extraContent.visibility = if (isExpanded) View.VISIBLE else View.GONE
 
         holder.currentTime.setOnClickListener {
             val picker = TimePicker.buildPicker("Set Alarm")
             picker.show((context as AppCompatActivity).supportFragmentManager, "Reschedule Alarm")
             picker.addOnPositiveButtonClickListener {
-                notifyItemChanged(position)
+                viewModel.updateAlarm(
+                    Alarm(
+                        dataItem.alarm.id,
+                        dataItem.alarm.label,
+                        dataItem.alarm.title,
+                        dataItem.alarm.uri,
+                        dataItem.alarm.isScheduled,
+                        dataItem.alarm.sunriseMode,
+                        dataItem.alarm.vibrates,
+                        picker.hour,
+                        picker.minute
+                    )
+                )
             }
         }
 
         holder.delete.setOnClickListener {
-            notifyItemRemoved(position)
+            dataItem.dayOfWeek.forEach { dayOfWeek ->
+                viewModel.deleteSchedule(dayOfWeek)
+            }
+            viewModel.deleteAlarm(dataItem.alarm)
         }
 
         holder.vibrate.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 VibrateSingleton.vibrateDeviceOnce(context, true)
+                viewModel.updateAlarm(
+                    Alarm(
+                        dataItem.alarm.id,
+                        dataItem.alarm.label,
+                        dataItem.alarm.title,
+                        dataItem.alarm.uri,
+                        dataItem.alarm.isScheduled,
+                        dataItem.alarm.sunriseMode,
+                        true,
+                        dataItem.alarm.hour,
+                        dataItem.alarm.minute
+                    )
+                )
             } else {
-                VibrateSingleton.vibrateDeviceOnce(context, false)
+                viewModel.updateAlarm(
+                    Alarm(
+                        dataItem.alarm.id,
+                        dataItem.alarm.label,
+                        dataItem.alarm.title,
+                        dataItem.alarm.uri,
+                        dataItem.alarm.isScheduled,
+                        dataItem.alarm.sunriseMode,
+                        false,
+                        dataItem.alarm.hour,
+                        dataItem.alarm.minute
+                    )
+                )
             }
         }
 
-        holder.btnMonday.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                notifyItemChanged(position)
-            } else {
-                notifyItemChanged(position)
-            }
-        }
+        //TODO: Add single checkbox for everyday alarm or single instance alarm
 
-        holder.btnTuesday.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                notifyItemChanged(position)
-            } else {
-                notifyItemChanged(position)
-            }
-        }
-
-        holder.btnWednesday.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                notifyItemChanged(position)
-            } else {
-                notifyItemChanged(position)
-            }
-        }
-
-        holder.btnThursday.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                notifyItemChanged(position)
-            } else {
-                notifyItemChanged(position)
-            }
-        }
-
-        holder.btnFriday.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                notifyItemChanged(position)
-            } else {
-                notifyItemChanged(position)
-            }
-        }
-
-        holder.btnSaturday.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                notifyItemChanged(position)
-            } else {
-                notifyItemChanged(position)
-            }
-        }
-
-        holder.btnSunday.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                notifyItemChanged(position)
-            } else {
-                notifyItemChanged(position)
-            }
-        }
-
-        holder.selectSong.text = data[position].ringtoneTitle
+        holder.selectSong.text = dataItem.alarm.title
 
         holder.selectSong.setOnClickListener {
             pickAlarmInterface.selectAlarmTone()
         }
 
+        pickAlarmInterface.returnSelectedTone()?.let {
+            val title = pickAlarmInterface.returnSelectedTone()!!.second
+            val uri = pickAlarmInterface.returnSelectedTone()!!.first
+
+            viewModel.updateAlarm(
+                Alarm(
+                    dataItem.alarm.id,
+                    dataItem.alarm.label,
+                    title,
+                    uri,
+                    dataItem.alarm.isScheduled,
+                    dataItem.alarm.sunriseMode,
+                    dataItem.alarm.vibrates,
+                    dataItem.alarm.hour,
+                    dataItem.alarm.minute,
+                )
+            )
+        }
     }
 
     override fun getItemCount(): Int {
-        return data.size
+        return data.currentList.size
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun updateAlarmList(newList: List<AlarmItemModel>) {
-        data.clear()
-        newList.forEach {
-            (data as MutableList<AlarmItemModel>).add(it)
+    private fun toggleLayout(
+        expanded: Boolean,
+        extraContent: LinearLayout,
+        view: ImageButton
+    ): Boolean {
+        if (expanded) {
+            Animations.collapse(extraContent)
+            view.setImageResource(R.drawable.ic_arrow_up)
+            return false
         }
-        notifyDataSetChanged()
+
+        Animations.expand(extraContent)
+        view.setImageResource(R.drawable.ic_arrow_down)
+        return true
     }
 }

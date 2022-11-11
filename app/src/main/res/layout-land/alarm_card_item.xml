@@ -2,7 +2,7 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:layout_width="500dp"
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
     app:cardCornerRadius="12dp"
@@ -113,13 +113,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_days_scheduled">
 
-            <include
-                layout="@layout/day_picker_layout"
+            <CheckBox
+                android:id="@+id/daily_alarm_checkbox"
+                android:text="@string/everyday"
+                android:textColor="@color/white"
+                android:fontFamily="@font/poppins"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center" />
+                android:layout_marginStart="8sp"
+                tools:ignore="TouchTargetSizeCheck" />
 
             <TextView
+                android:id="@+id/tv_chosen_song"
                 android:clickable="true"
                 android:focusable="true"
                 android:layout_width="wrap_content"

@@ -113,7 +113,8 @@ class RunTimerViewFragment(
         if (!timerModel.timerFinished) ringtoneAlarm.stop()
 
         addLabel.setOnClickListener {
-            AddLabelDialog.newInstance(position, null, timerViewModel).show(mFragmentManager, null)
+            AddLabelDialog.newInstance(position, null, timerViewModel, null)
+                .show(mFragmentManager, null)
         }
 
         btnDeleteTimer.setOnClickListener {

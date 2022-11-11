@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.ToggleButton
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -21,7 +20,6 @@ import com.github.adamr22.bedtime.presentation.viewmodels.BedTimeViewModel
 import com.github.adamr22.data.entities.Alarm
 import com.github.adamr22.data.entities.AlarmAndDay
 import com.github.adamr22.data.models.AlarmItemModel
-import com.github.adamr22.utils.CancelScheduleAlarm
 import com.github.adamr22.utils.PickAlarmInterface
 import com.github.adamr22.utils.TimePicker
 import com.github.adamr22.utils.VibrateSingleton
@@ -57,14 +55,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
     private lateinit var tvDefaultSound: TextView
     private lateinit var btnVibrate: SwitchMaterial
 
-    private lateinit var btnMonday: ToggleButton
-    private lateinit var btnTuesday: ToggleButton
-    private lateinit var btnWednesday: ToggleButton
-    private lateinit var btnThursday: ToggleButton
-    private lateinit var btnFriday: ToggleButton
-    private lateinit var btnSaturday: ToggleButton
-    private lateinit var btnSunday: ToggleButton
-
     private lateinit var tvSetTime: TextView
 
     private val defaultRingtoneUri by lazy {
@@ -81,10 +71,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
 
     private val pickAlarmInterface by lazy {
         requireActivity() as PickAlarmInterface
-    }
-
-    private val cancelScheduleAlarm by lazy {
-        requireActivity() as CancelScheduleAlarm
     }
 
     private val viewModel by lazy {
@@ -141,14 +127,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
         tvDefaultSound = view.findViewById(R.id.tv_default_sound) // clickable
         btnVibrate = view.findViewById(R.id.btn_vibrate)
 
-        btnMonday = view.findViewById(R.id.mon)
-        btnTuesday = view.findViewById(R.id.tue)
-        btnWednesday = view.findViewById(R.id.wed)
-        btnThursday = view.findViewById(R.id.thur)
-        btnFriday = view.findViewById(R.id.fri)
-        btnSaturday = view.findViewById(R.id.sat)
-        btnSunday = view.findViewById(R.id.sun)
-
         tvSetTime = view.findViewById(R.id.tv_set_time)
     }
 
@@ -178,7 +156,7 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
             }
 
             bedtimeNotTextContent.visibility = View.VISIBLE
-        }
+        } else bedtimeNotTextContent.visibility = View.GONE
 
         if (inflateWakeUpLayout!!) {
             bottomSheetIcon.setImageDrawable(
@@ -206,7 +184,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                 viewModel.getBedtime(BEDTIME_LABEL).collectLatest {
                     it?.let {
                         // Feeds data to helper functions since updating data with outside function yields null
-                        toggleButtonHelper(it)
                         item = encapsulateData(it)
                         renderUI(item)
                         switchIsChecked(item)
@@ -227,7 +204,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                 viewModel.getWakeup(WAKEUP_LABEL).collectLatest {
                     it?.let {
                         // Feeds data to helper functions since updating data with outside function yields null
-                        toggleButtonHelper(it)
                         item = encapsulateData(it)
                         renderUI(item)
                         isSunrise(item)
@@ -352,6 +328,8 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                             label = bottomSheetText.text.toString(),
                             hour = timePicker.hour,
                             minute = timePicker.minute,
+                            title = defaultRingtoneTitle,
+                            uri = defaultRingtoneUri
                         )
                     )
                 } else {
@@ -510,152 +488,6 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                         data.minute,
                     )
                 )
-            }
-        }
-    }
-
-    private fun toggleButtonHelper(it: AlarmAndDay) {
-        val schedule = it.dayOfWeek
-
-        if (schedule.isNotEmpty()) {
-            schedule.forEach {
-                btnMonday.isChecked = it.day == resources.getString(R.string.monday)
-                btnTuesday.isChecked = it.day == resources.getString(R.string.tuesday)
-                btnWednesday.isChecked = it.day == resources.getString(R.string.wednesday)
-                btnThursday.isChecked = it.day == resources.getString(R.string.thursday)
-                btnFriday.isChecked = it.day == resources.getString(R.string.friday)
-                btnSaturday.isChecked = it.day == resources.getString(R.string.saturday)
-                btnSunday.isChecked = it.day == resources.getString(R.string.sunday)
-
-            }
-
-            btnMonday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(resources.getString(R.string.monday), it.alarm.id!!)
-
-                if (!isChecked) {
-                    viewModel.deleteDayFromSchedule(
-                        resources.getString(R.string.monday),
-                        it.alarm.id!!
-                    )
-                    cancelScheduleAlarm.cancelRepeatingAlarm((it.alarm.id + 2) * 1000)
-                }
-            }
-
-            btnTuesday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(resources.getString(R.string.tuesday), it.alarm.id!!)
-
-                if (!isChecked) {
-                    viewModel.deleteDayFromSchedule(
-                        resources.getString(R.string.tuesday),
-                        it.alarm.id!!
-                    )
-                    cancelScheduleAlarm.cancelRepeatingAlarm((it.alarm.id + 3) * 1000)
-                }
-            }
-
-            btnWednesday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(resources.getString(R.string.wednesday), it.alarm.id!!)
-
-                if (!isChecked) {
-                    viewModel.deleteDayFromSchedule(
-                        resources.getString(R.string.wednesday),
-                        it.alarm.id!!
-                    )
-                    cancelScheduleAlarm.cancelRepeatingAlarm((it.alarm.id + 4) * 1000)
-                }
-            }
-
-            btnThursday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(resources.getString(R.string.thursday), it.alarm.id!!)
-
-                if (!isChecked) {
-                    viewModel.deleteDayFromSchedule(
-                        resources.getString(R.string.thursday),
-                        it.alarm.id!!
-                    )
-                    cancelScheduleAlarm.cancelRepeatingAlarm((it.alarm.id + 5) * 1000)
-                }
-            }
-
-            btnFriday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(resources.getString(R.string.friday), it.alarm.id!!)
-
-                if (!isChecked) {
-                    viewModel.deleteDayFromSchedule(
-                        resources.getString(R.string.friday),
-                        it.alarm.id!!
-                    )
-                    cancelScheduleAlarm.cancelRepeatingAlarm((it.alarm.id + 6) * 1000)
-                }
-            }
-
-            btnSaturday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(resources.getString(R.string.saturday), it.alarm.id!!)
-
-                if (!isChecked) {
-                    viewModel.deleteDayFromSchedule(
-                        resources.getString(R.string.saturday),
-                        it.alarm.id!!
-                    )
-                    cancelScheduleAlarm.cancelRepeatingAlarm((it.alarm.id + 7) * 1000)
-                }
-            }
-
-            btnSunday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(resources.getString(R.string.sunday), it.alarm.id!!)
-
-                if (!isChecked) {
-                    viewModel.deleteDayFromSchedule(
-                        resources.getString(R.string.sunday),
-                        it.alarm.id!!
-                    )
-                    cancelScheduleAlarm.cancelRepeatingAlarm((it.alarm.id + 8) * 1000)
-                }
-            }
-
-        }
-
-        if (schedule.isEmpty()) {
-            btnMonday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(resources.getString(R.string.monday), it.alarm.id!!)
-            }
-
-            btnTuesday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(resources.getString(R.string.tuesday), it.alarm.id!!)
-            }
-
-            btnWednesday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(resources.getString(R.string.wednesday), it.alarm.id!!)
-            }
-
-            btnThursday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(resources.getString(R.string.thursday), it.alarm.id!!)
-            }
-
-            btnFriday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(resources.getString(R.string.friday), it.alarm.id!!)
-            }
-
-            btnSaturday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(resources.getString(R.string.saturday), it.alarm.id!!)
-            }
-
-            btnSunday.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked)
-                    viewModel.insertSchedule(resources.getString(R.string.sunday), it.alarm.id!!)
             }
         }
     }

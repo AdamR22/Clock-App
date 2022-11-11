@@ -13,7 +13,8 @@ import com.google.android.material.textfield.TextInputEditText
 class AddLabelDialog(
     private val position: Int,
     private val addAlarmLabel: AlarmViewModel?,
-    private val addTimerLabel: TimerViewModel?
+    private val addTimerLabel: TimerViewModel?,
+    private val alarmId: Int? = null
 ) : DialogFragment() {
 
     @SuppressLint("InflateParams")
@@ -29,7 +30,7 @@ class AddLabelDialog(
                         dialog?.findViewById<TextInputEditText>(R.id.add_label_edit_text)?.text.toString()
                     if (label.isNotEmpty()) {
                         addTimerLabel?.addLabel(position, label)
-//                        addAlarmLabel?.addLabel(label, position)
+                        addAlarmLabel?.updateAlarmLabel(label, alarmId!!)
                     }
                 }
                 .setNegativeButton("CANCEL") { dialogInterface, _ ->
@@ -44,8 +45,9 @@ class AddLabelDialog(
         fun newInstance(
             position: Int,
             funcAlarm: AlarmViewModel?,
-            funcTimer: TimerViewModel?
+            funcTimer: TimerViewModel?,
+            alarmId: Int?
         ) =
-            AddLabelDialog(position, funcAlarm, funcTimer)
+            AddLabelDialog(position, funcAlarm, funcTimer, alarmId)
     }
 }
