@@ -7,15 +7,12 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.github.adamr22.data.Converter
 import com.github.adamr22.data.dao.AlarmDao
-import com.github.adamr22.data.dao.DayOfWeekDao
 import com.github.adamr22.data.entities.Alarm
-import com.github.adamr22.data.entities.DayOfWeek
 
-@Database(entities = [Alarm::class, DayOfWeek::class], version = 1)
+@Database(entities = [Alarm::class], version = 1)
 @TypeConverters(Converter::class)
 abstract class ClockAppDB : RoomDatabase() {
     abstract fun alarmDao(): AlarmDao
-    abstract fun dayOfWeekDao(): DayOfWeekDao
 
     companion object {
         @Volatile

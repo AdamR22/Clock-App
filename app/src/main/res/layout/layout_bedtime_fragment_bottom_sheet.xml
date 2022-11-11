@@ -63,19 +63,18 @@
             app:layout_constraintTop_toBottomOf="@+id/bottom_sheet_text" />
 
 
-        <LinearLayout
-            android:id="@+id/day_picker_layout_container"
+        <CheckBox
+            android:id="@+id/day_picker_checkout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
+            android:fontFamily="@font/poppins"
             android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:text="@string/everyday"
+            android:textColor="@color/white"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_set_time">
-
-            <include layout="@layout/day_picker_layout" />
-
-        </LinearLayout>
+            app:layout_constraintTop_toBottomOf="@+id/tv_set_time" />
 
         <TextView
             android:id="@+id/bottom_sheet_stroke"
@@ -85,7 +84,7 @@
             android:background="@drawable/bottom_sheet_stroke"
             android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/day_picker_layout_container" />
+            app:layout_constraintTop_toBottomOf="@+id/day_picker_checkout" />
 
         <LinearLayout
             android:id="@+id/bedtime_not_text_content"

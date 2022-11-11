@@ -17,7 +17,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
 import com.github.adamr22.data.entities.Alarm
-import com.github.adamr22.data.entities.AlarmAndDay
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.flow.collectLatest
 
@@ -46,7 +45,7 @@ class WakeUpScreen : AppCompatActivity() {
 
     private var alarmId: Int? = null
 
-    private lateinit var data: AlarmAndDay
+    private lateinit var data: Alarm
 
     private lateinit var btnDismissAlarm: FloatingActionButton
     private lateinit var tvTime: TextView
@@ -80,8 +79,7 @@ class WakeUpScreen : AppCompatActivity() {
         alarmId?.let {
             lifecycleScope.launchWhenCreated {
                 viewModel.getItem(it).collectLatest {
-                    data = it
-                    dealWithAlarm(data.alarm)
+                    dealWithAlarm(it)
                 }
             }
         }
@@ -107,14 +105,14 @@ class WakeUpScreen : AppCompatActivity() {
 
     private fun cancelAlarm() {
         data.let {
-            if (it.dayOfWeek.isEmpty()) {
+            if (!it.everyDay) {
                 tvTime.clearAnimation()
                 viewModel.updateSchedule(false, alarmId!!)
                 mediaPlayer.release()
                 cancelPendingIntent(alarmId!!)
             }
 
-            if (it.dayOfWeek.isNotEmpty()) {
+            if (it.everyDay) {
                 tvTime.clearAnimation()
                 mediaPlayer.release()
                 finish()

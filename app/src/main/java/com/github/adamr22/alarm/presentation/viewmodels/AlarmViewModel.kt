@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.github.adamr22.alarm.data.repositories.AlarmRepository
 import com.github.adamr22.data.database.ClockAppDB
 import com.github.adamr22.data.entities.Alarm
-import com.github.adamr22.data.entities.DayOfWeek
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -14,9 +13,8 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
     private val db = ClockAppDB.getInstance(application.applicationContext)
 
     private val alarmDao = db.alarmDao()
-    private val dayOfWeekDao = db.dayOfWeekDao()
 
-    private val repository = AlarmRepository(alarmDao, dayOfWeekDao)
+    private val repository = AlarmRepository(alarmDao)
 
     fun getData() = repository.getAllItems()
 
@@ -39,12 +37,9 @@ class AlarmViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteAlarm(alarm: Alarm) =
         viewModelScope.launch(Dispatchers.IO) { repository.deleteAlarm(alarm) }
 
-    fun deleteSchedule(dayOfWeek: DayOfWeek) =
-        viewModelScope.launch(Dispatchers.IO) { repository.deleteSchedule(dayOfWeek) }
+    fun updateDaily(value: Boolean, id: Int) =
+        viewModelScope.launch(Dispatchers.IO) { repository.updateDaily(value, id) }
 
-    fun deleteDayFromSchedule(day: String, id: Int) =
-        viewModelScope.launch(Dispatchers.IO) { repository.deleteDayFromSchedule(day, id) }
-
-    fun insertSchedule(day: String, id: Int) =
-        viewModelScope.launch(Dispatchers.IO) { repository.insertSchedule(day, id) }
+    fun updateExpandedItem(value: Boolean, id: Int) =
+        viewModelScope.launch(Dispatchers.IO) { repository.updateExpandedItem(value, id) }
 }

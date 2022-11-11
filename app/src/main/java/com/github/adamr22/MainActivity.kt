@@ -18,17 +18,15 @@ import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
 import com.github.adamr22.alarm.presentation.views.AlarmFragment
 import com.github.adamr22.bedtime.presentation.views.BedTimeFragment
 import com.github.adamr22.clock.ClockFragment
-import com.github.adamr22.data.entities.AlarmAndDay
-import com.github.adamr22.data.entities.DayOfWeek
+import com.github.adamr22.data.entities.Alarm
 import com.github.adamr22.stopwatch.StopWatchFragment
 import com.github.adamr22.timer.presentation.views.TimerFragment
-import com.github.adamr22.utils.CancelScheduleAlarm
 import com.github.adamr22.utils.PickAlarmInterface
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.flow.collectLatest
 import java.util.*
 
-class MainActivity : AppCompatActivity(), PickAlarmInterface, CancelScheduleAlarm {
+class MainActivity : AppCompatActivity(), PickAlarmInterface {
 
     lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var mToolbar: Toolbar
@@ -66,16 +64,6 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface, CancelScheduleAlar
                 returnSelectedTone()
             }
         }
-
-    private enum class DAYS {
-        MONDAY,
-        TUESDAY,
-        WEDNESDAY,
-        THURSDAY,
-        FRIDAY,
-        SATURDAY,
-        SUNDAY
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -172,12 +160,12 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface, CancelScheduleAlar
             viewModel.getData().collectLatest {
                 it?.let {
                     it.forEach { data ->
-                        if (data.alarm.isScheduled) {
+                        if (data.isScheduled) {
                             setAlarm(data)
                         }
 
-                        if (!data.alarm.isScheduled) {
-                            cancelAlarm(data)
+                        if (!data.isScheduled) {
+                            cancelAlarm(data.id!!)
                         }
                     }
                 }
@@ -216,13 +204,11 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface, CancelScheduleAlar
     }
 
     private fun setAlarm(
-        data: AlarmAndDay
+        data: Alarm
     ) {
-        val alarmData = data.alarm
-        val listOfSchedule = data.dayOfWeek
 
-        val setHour: Int = alarmData.hour
-        val setMinute: Int = alarmData.minute
+        val setHour: Int = data.hour
+        val setMinute: Int = data.minute
 
         val setTime = Calendar.getInstance().apply {
             this.set(Calendar.HOUR_OF_DAY, setHour)
@@ -234,13 +220,8 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface, CancelScheduleAlar
             }
         }
 
-        if (listOfSchedule.isEmpty()) {
-            setAlarmTrigger(data.alarm.id!!, setTime)
-        }
+        setAlarmTrigger(data.id!!, setTime)
 
-        if (listOfSchedule.isNotEmpty()) {
-            setRepeatingAlarmTrigger(data.alarm.id!!, data.dayOfWeek, setTime)
-        }
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
@@ -261,89 +242,6 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface, CancelScheduleAlar
         )
     }
 
-    private fun setRepeatingAlarmTrigger(
-        id: Int,
-        schedule: List<DayOfWeek>,
-        timeInstance: Calendar
-    ) {
-
-        val alarmRequestCode = (id + 1)
-
-        schedule.forEach {
-            if (it.day == DAYS.MONDAY.name) setScheduleAlarm(
-                alarmRequestCode + 1 * 1000,
-                id,
-                timeInstance
-            )
-
-
-            if (it.day == DAYS.TUESDAY.name) setScheduleAlarm(
-                alarmRequestCode + 2 * 1000,
-                id,
-                timeInstance
-            )
-
-            if (it.day == DAYS.WEDNESDAY.name) setScheduleAlarm(
-                alarmRequestCode + 3 * 1000,
-                id,
-                timeInstance
-            )
-
-            if (it.day == DAYS.THURSDAY.name) setScheduleAlarm(
-                alarmRequestCode + 4 * 1000,
-                id,
-                timeInstance
-            )
-
-            if (it.day == DAYS.FRIDAY.name) setScheduleAlarm(
-                alarmRequestCode + 5 * 1000,
-                id,
-                timeInstance
-            )
-
-            if (it.day == DAYS.SATURDAY.name) setScheduleAlarm(
-                alarmRequestCode + 6 * 1000,
-                id,
-                timeInstance
-            )
-
-            if (it.day == DAYS.SUNDAY.name) setScheduleAlarm(
-                alarmRequestCode + 7 * 1000,
-                id,
-                timeInstance
-            )
-        }
-    }
-
-    @SuppressLint("UnspecifiedImmutableFlag")
-    private fun setScheduleAlarm(alarmRequestCode: Int, id: Int, timeInstance: Calendar) {
-        val alarmIntent = Intent(this, WakeUpScreen::class.java).apply {
-            this.putExtra(ALARM_ID_TAG, id)
-        }
-
-        val alarmPendingIntent =
-            PendingIntent.getActivity(this, alarmRequestCode, alarmIntent, 0)
-
-        alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP,
-            timeInstance.timeInMillis,
-            AlarmManager.INTERVAL_DAY * 7,
-            alarmPendingIntent
-        )
-    }
-
-    private fun cancelAlarm(data: AlarmAndDay) {
-        val listOfSchedule = data.dayOfWeek
-
-        if (listOfSchedule.isEmpty()) {
-            cancelAlarm(data.alarm.id!!)
-        }
-
-        if (listOfSchedule.isNotEmpty()) {
-            cancelRepeatingAlarmTrigger(data.alarm.id!!, listOfSchedule)
-        }
-    }
-
     @SuppressLint("UnspecifiedImmutableFlag")
     private fun cancelAlarm(id: Int) {
 
@@ -357,67 +255,4 @@ class MainActivity : AppCompatActivity(), PickAlarmInterface, CancelScheduleAlar
             alarmPendingIntent
         )
     }
-
-    private fun cancelRepeatingAlarmTrigger(
-        id: Int,
-        schedule: List<DayOfWeek>
-    ) {
-
-        val alarmRequestCode = (id + 1)
-
-        schedule.forEach {
-            if (it.day == DAYS.MONDAY.name) cancelScheduleAlarm(
-                alarmRequestCode + 1 * 1000
-            )
-
-
-            if (it.day == DAYS.TUESDAY.name) cancelScheduleAlarm(
-                alarmRequestCode + 2 * 1000
-            )
-
-            if (it.day == DAYS.WEDNESDAY.name) cancelScheduleAlarm(
-                alarmRequestCode + 3 * 1000
-            )
-
-            if (it.day == DAYS.THURSDAY.name) cancelScheduleAlarm(
-                alarmRequestCode + 4 * 1000
-            )
-
-            if (it.day == DAYS.FRIDAY.name) cancelScheduleAlarm(
-                alarmRequestCode + 5 * 1000
-            )
-
-            if (it.day == DAYS.SATURDAY.name) cancelScheduleAlarm(
-                alarmRequestCode + 6 * 1000
-            )
-
-            if (it.day == DAYS.SUNDAY.name) cancelScheduleAlarm(
-                alarmRequestCode + 7 * 1000
-            )
-        }
-    }
-
-    @SuppressLint("UnspecifiedImmutableFlag")
-    private fun cancelScheduleAlarm(alarmRequestCode: Int) {
-        val alarmIntent = Intent(this, WakeUpScreen::class.java)
-
-        val alarmPendingIntent =
-            PendingIntent.getActivity(this, alarmRequestCode, alarmIntent, 0)
-
-        alarmManager.cancel(
-            alarmPendingIntent
-        )
-    }
-
-    //For use by alarm items recyclerview adapter and bedtime fragment
-    @SuppressLint("UnspecifiedImmutableFlag")
-    override fun cancelRepeatingAlarm(alarmRequestCode: Int) {
-        val alarmIntent = Intent(this, WakeUpScreen::class.java)
-
-        val alarmPendingIntent =
-            PendingIntent.getActivity(this, alarmRequestCode, alarmIntent, 0)
-
-        alarmManager.cancel(alarmPendingIntent)
-    }
-
 }

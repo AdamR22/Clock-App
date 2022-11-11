@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.github.adamr22.R
 import com.github.adamr22.alarm.presentation.viewmodels.AlarmViewModel
 import com.github.adamr22.data.entities.Alarm
-import com.github.adamr22.data.entities.AlarmAndDay
 import com.github.adamr22.utils.*
 import com.google.android.material.switchmaterial.SwitchMaterial
 
@@ -31,12 +30,12 @@ class AlarmRecyclerViewAdapter(
         context as PickAlarmInterface
     }
 
-    private val diffUtilCallback = object : DiffUtil.ItemCallback<AlarmAndDay>() {
-        override fun areItemsTheSame(oldItem: AlarmAndDay, newItem: AlarmAndDay): Boolean {
-            return oldItem.alarm.id == newItem.alarm.id
+    private val diffUtilCallback = object : DiffUtil.ItemCallback<Alarm>() {
+        override fun areItemsTheSame(oldItem: Alarm, newItem: Alarm): Boolean {
+            return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: AlarmAndDay, newItem: AlarmAndDay): Boolean {
+        override fun areContentsTheSame(oldItem: Alarm, newItem: Alarm): Boolean {
             return oldItem == newItem
         }
     }
@@ -83,33 +82,26 @@ class AlarmRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: AlarmItemViewHolder, position: Int) {
         val dataItem = data.currentList[position]
-        var isExpanded = false
 
-        holder.activateAlarm.isChecked = dataItem.alarm.isScheduled
-        holder.vibrate.isChecked = dataItem.alarm.vibrates
+        holder.activateAlarm.isChecked = dataItem.isScheduled
+        holder.vibrate.isChecked = dataItem.vibrates
 
-        if (dataItem.alarm.label == null) {
+        if (dataItem.label == null) {
             holder.addLabel.text = context.getText(R.string.add_label)
         } else {
-            holder.addLabel.text = dataItem.alarm.label
+            holder.addLabel.text = dataItem.label
         }
 
-        if (dataItem.dayOfWeek.isNotEmpty()) {
+        if (dataItem.everyDay) {
             if (holder.activateAlarm.isChecked) {
-                if (dataItem.dayOfWeek.size == 1) {
-                    holder.alarmSchedule.text = dataItem.dayOfWeek[0].day
-                } else {
-                    holder.alarmSchedule.text = dataItem.dayOfWeek.map {
-                        it.day?.slice(0..2)
-                    }.toString().replace("[", "").replace("]", "")
-                }
+                context.getText(R.string.scheduled_daily)
             }
 
             if (!holder.activateAlarm.isChecked) holder.alarmSchedule.text =
                 context.getText(R.string.not_scheduled)
         }
 
-        if (dataItem.dayOfWeek.isEmpty()) {
+        if (!dataItem.everyDay) {
             if (holder.activateAlarm.isChecked) context.getText(R.string.scheduled)
 
             if (!holder.activateAlarm.isChecked) context.getText(R.string.not_scheduled)
@@ -117,12 +109,12 @@ class AlarmRecyclerViewAdapter(
 
         holder.currentTime.text = String.format(
             context.resources.getString(R.string.default_time_2),
-            "%02d".format(dataItem.alarm.hour),
-            "%02d".format(dataItem.alarm.minute)
+            "%02d".format(dataItem.hour),
+            "%02d".format(dataItem.minute)
         )
 
         holder.addLabel.setOnClickListener {
-            AddLabelDialog.newInstance(position, viewModel, null, dataItem.alarm.id)
+            AddLabelDialog.newInstance(position, viewModel, null, dataItem.id)
                 .show((context as AppCompatActivity).supportFragmentManager, "Add Label")
         }
 
@@ -130,39 +122,44 @@ class AlarmRecyclerViewAdapter(
             if (buttonView.isChecked) {
                 viewModel.updateAlarm(
                     Alarm(
-                        dataItem.alarm.id,
-                        dataItem.alarm.label,
-                        dataItem.alarm.title,
-                        dataItem.alarm.uri,
+                        dataItem.id,
+                        dataItem.label,
+                        dataItem.title,
+                        dataItem.uri,
                         true,
-                        dataItem.alarm.sunriseMode,
-                        dataItem.alarm.vibrates,
-                        dataItem.alarm.hour,
-                        dataItem.alarm.minute
+                        dataItem.sunriseMode,
+                        dataItem.vibrates,
+                        dataItem.expandedItem,
+                        dataItem.everyDay,
+                        dataItem.hour,
+                        dataItem.minute
                     )
                 )
             } else {
                 viewModel.updateAlarm(
                     Alarm(
-                        dataItem.alarm.id,
-                        dataItem.alarm.label,
-                        dataItem.alarm.title,
-                        dataItem.alarm.uri,
+                        dataItem.id,
+                        dataItem.label,
+                        dataItem.title,
+                        dataItem.uri,
                         false,
-                        dataItem.alarm.sunriseMode,
-                        dataItem.alarm.vibrates,
-                        dataItem.alarm.hour,
-                        dataItem.alarm.minute
+                        dataItem.sunriseMode,
+                        dataItem.vibrates,
+                        dataItem.expandedItem,
+                        dataItem.everyDay,
+                        dataItem.hour,
+                        dataItem.minute
                     )
                 )
             }
         }
 
         holder.expandOrCollapseItem.setOnClickListener {
-            isExpanded = toggleLayout(
-                isExpanded,
+            toggleLayout(
+                dataItem.expandedItem,
                 extraContent = holder.extraContent,
-                holder.expandOrCollapseItem
+                holder.expandOrCollapseItem,
+                dataItem.id!!
             )
         }
 
@@ -172,13 +169,15 @@ class AlarmRecyclerViewAdapter(
             picker.addOnPositiveButtonClickListener {
                 viewModel.updateAlarm(
                     Alarm(
-                        dataItem.alarm.id,
-                        dataItem.alarm.label,
-                        dataItem.alarm.title,
-                        dataItem.alarm.uri,
-                        dataItem.alarm.isScheduled,
-                        dataItem.alarm.sunriseMode,
-                        dataItem.alarm.vibrates,
+                        dataItem.id,
+                        dataItem.label,
+                        dataItem.title,
+                        dataItem.uri,
+                        dataItem.isScheduled,
+                        dataItem.sunriseMode,
+                        dataItem.vibrates,
+                        dataItem.expandedItem,
+                        dataItem.everyDay,
                         picker.hour,
                         picker.minute
                     )
@@ -187,10 +186,7 @@ class AlarmRecyclerViewAdapter(
         }
 
         holder.delete.setOnClickListener {
-            dataItem.dayOfWeek.forEach { dayOfWeek ->
-                viewModel.deleteSchedule(dayOfWeek)
-            }
-            viewModel.deleteAlarm(dataItem.alarm)
+            viewModel.deleteAlarm(dataItem)
         }
 
         holder.vibrate.setOnCheckedChangeListener { _, isChecked ->
@@ -198,37 +194,47 @@ class AlarmRecyclerViewAdapter(
                 VibrateSingleton.vibrateDeviceOnce(context, true)
                 viewModel.updateAlarm(
                     Alarm(
-                        dataItem.alarm.id,
-                        dataItem.alarm.label,
-                        dataItem.alarm.title,
-                        dataItem.alarm.uri,
-                        dataItem.alarm.isScheduled,
-                        dataItem.alarm.sunriseMode,
+                        dataItem.id,
+                        dataItem.label,
+                        dataItem.title,
+                        dataItem.uri,
+                        dataItem.isScheduled,
+                        dataItem.sunriseMode,
                         true,
-                        dataItem.alarm.hour,
-                        dataItem.alarm.minute
+                        dataItem.expandedItem,
+                        dataItem.everyDay,
+                        dataItem.hour,
+                        dataItem.minute
                     )
                 )
             } else {
                 viewModel.updateAlarm(
                     Alarm(
-                        dataItem.alarm.id,
-                        dataItem.alarm.label,
-                        dataItem.alarm.title,
-                        dataItem.alarm.uri,
-                        dataItem.alarm.isScheduled,
-                        dataItem.alarm.sunriseMode,
+                        dataItem.id,
+                        dataItem.label,
+                        dataItem.title,
+                        dataItem.uri,
+                        dataItem.isScheduled,
+                        dataItem.sunriseMode,
                         false,
-                        dataItem.alarm.hour,
-                        dataItem.alarm.minute
+                        dataItem.expandedItem,
+                        dataItem.everyDay,
+                        dataItem.hour,
+                        dataItem.minute
                     )
                 )
             }
         }
 
-        //TODO: Add single checkbox for everyday alarm or single instance alarm
+        holder.dailyAlarm.isChecked = dataItem.everyDay
 
-        holder.selectSong.text = dataItem.alarm.title
+        holder.dailyAlarm.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) viewModel.updateDaily(true, dataItem.id!!)
+
+            if (!isChecked) viewModel.updateDaily(false, dataItem.id!!)
+        }
+
+        holder.selectSong.text = dataItem.title
 
         holder.selectSong.setOnClickListener {
             pickAlarmInterface.selectAlarmTone()
@@ -240,15 +246,17 @@ class AlarmRecyclerViewAdapter(
 
             viewModel.updateAlarm(
                 Alarm(
-                    dataItem.alarm.id,
-                    dataItem.alarm.label,
+                    dataItem.id,
+                    dataItem.label,
                     title,
                     uri,
-                    dataItem.alarm.isScheduled,
-                    dataItem.alarm.sunriseMode,
-                    dataItem.alarm.vibrates,
-                    dataItem.alarm.hour,
-                    dataItem.alarm.minute,
+                    dataItem.isScheduled,
+                    dataItem.sunriseMode,
+                    dataItem.vibrates,
+                    dataItem.expandedItem,
+                    dataItem.everyDay,
+                    dataItem.hour,
+                    dataItem.minute,
                 )
             )
         }
@@ -261,16 +269,18 @@ class AlarmRecyclerViewAdapter(
     private fun toggleLayout(
         expanded: Boolean,
         extraContent: LinearLayout,
-        view: ImageButton
-    ): Boolean {
+        view: ImageButton,
+        id: Int
+    ) {
         if (expanded) {
             Animations.collapse(extraContent)
             view.setImageResource(R.drawable.ic_arrow_up)
-            return false
+            viewModel.updateExpandedItem(false, id)
+        } else {
+            Animations.expand(extraContent)
+            view.setImageResource(R.drawable.ic_arrow_down)
+            viewModel.updateExpandedItem(true, id)
         }
 
-        Animations.expand(extraContent)
-        view.setImageResource(R.drawable.ic_arrow_down)
-        return true
     }
 }
