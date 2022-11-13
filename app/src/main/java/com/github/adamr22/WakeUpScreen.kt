@@ -20,6 +20,7 @@ import com.github.adamr22.data.entities.Alarm
 import com.github.adamr22.utils.VibrateSingleton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.flow.collectLatest
+import kotlin.system.exitProcess
 
 class WakeUpScreen : AppCompatActivity() {
 
@@ -108,15 +109,10 @@ class WakeUpScreen : AppCompatActivity() {
 
             if (it.everyDay) {
                 tvTime.clearAnimation()
-                finish()
+                finishAffinity()
+                exitProcess(0)
             }
         }
-    }
-
-    override fun onDestroy() {
-        RingtoneManager.getRingtone(applicationContext, data.uri!!).stop()
-        VibrateSingleton.vibrateDevice(applicationContext, false)
-        super.onDestroy()
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
@@ -131,7 +127,8 @@ class WakeUpScreen : AppCompatActivity() {
 
         alarmManager.cancel(pendingIntent)
 
-        finish()
+        finishAffinity()
+        exitProcess(0)
     }
 
     private fun ringtonePlaying(value: Boolean) {
