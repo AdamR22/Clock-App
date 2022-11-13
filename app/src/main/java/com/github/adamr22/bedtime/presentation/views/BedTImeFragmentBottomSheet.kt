@@ -3,10 +3,10 @@ package com.github.adamr22.bedtime.presentation.views
 import android.content.pm.PackageManager
 import android.media.RingtoneManager
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -18,7 +18,6 @@ import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
 import com.github.adamr22.bedtime.presentation.viewmodels.BedTimeViewModel
 import com.github.adamr22.data.entities.Alarm
-import com.github.adamr22.data.entities.AlarmAndDay
 import com.github.adamr22.data.models.AlarmItemModel
 import com.github.adamr22.utils.PickAlarmInterface
 import com.github.adamr22.utils.TimePicker
@@ -54,6 +53,8 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
     private lateinit var btnSunriseAlarm: SwitchMaterial
     private lateinit var tvDefaultSound: TextView
     private lateinit var btnVibrate: SwitchMaterial
+
+    private lateinit var dailyCheckbox: CheckBox
 
     private lateinit var tvSetTime: TextView
 
@@ -124,8 +125,10 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
 
         wakeUpTextContent = view.findViewById(R.id.wakeup_text_content)
         btnSunriseAlarm = view.findViewById(R.id.btn_sunrise_alarm)
-        tvDefaultSound = view.findViewById(R.id.tv_default_sound) // clickable
+        tvDefaultSound = view.findViewById(R.id.tv_default_sound)
         btnVibrate = view.findViewById(R.id.btn_vibrate)
+
+        dailyCheckbox = view.findViewById(R.id.day_picker_checkout)
 
         tvSetTime = view.findViewById(R.id.tv_set_time)
     }
@@ -138,6 +141,9 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun renderUI(data: AlarmItemModel?) {
+        data?.let {
+            dailyCheckbox.isChecked = it.everyDay
+        }
         renderBottomSheetText(data)
     }
 
@@ -186,6 +192,7 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                         // Feeds data to helper functions since updating data with outside function yields null
                         item = encapsulateData(it)
                         renderUI(item)
+                        dailyCheck(item!!)
                         switchIsChecked(item)
                         schedulesTime(item!!)
                         updateSetTime(item)
@@ -206,6 +213,7 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                         // Feeds data to helper functions since updating data with outside function yields null
                         item = encapsulateData(it)
                         renderUI(item)
+                        dailyCheck(item!!)
                         isSunrise(item)
                         selectedSound(item)
                         isVibrate(item)
@@ -281,26 +289,20 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    private fun encapsulateData(it: AlarmAndDay): AlarmItemModel {
-        val schedule = ArrayList<String>()
-
-        it.dayOfWeek.forEach {
-            if (it.day != null) schedule.add(it.day!!)
-        }
-
-        Log.d(TAG, "encapsulateData: Data: $it")
+    private fun encapsulateData(it: Alarm): AlarmItemModel {
 
         return AlarmItemModel(
-            it.alarm.id!!,
-            it.alarm.label,
-            it.alarm.hour,
-            it.alarm.minute,
-            schedule,
-            it.alarm.title,
-            it.alarm.uri,
-            it.alarm.isScheduled,
-            it.alarm.vibrates,
-            it.alarm.sunriseMode
+            it.id!!,
+            it.label,
+            it.hour,
+            it.minute,
+            it.title,
+            it.uri,
+            it.isScheduled,
+            it.vibrates,
+            it.sunriseMode,
+            it.expandedItem,
+            it.everyDay
         )
     }
 
@@ -342,6 +344,8 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                             data.isScheduled,
                             data.isSunriseMode,
                             data.isVibrate,
+                            data.expandedItem,
+                            data.everyDay,
                             timePicker.hour,
                             timePicker.minute,
                         )
@@ -364,6 +368,8 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                         true,
                         data.isSunriseMode,
                         data.isVibrate,
+                        data.expandedItem,
+                        data.everyDay,
                         data.hour,
                         data.minute,
                     )
@@ -380,6 +386,8 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                         false,
                         data.isSunriseMode,
                         data.isVibrate,
+                        data.expandedItem,
+                        data.everyDay,
                         data.hour,
                         data.minute,
                     )
@@ -400,6 +408,8 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                         data.isScheduled,
                         true,
                         data.isVibrate,
+                        data.expandedItem,
+                        data.everyDay,
                         data.hour,
                         data.minute,
                     )
@@ -416,6 +426,8 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                         data.isScheduled,
                         false,
                         data.isVibrate,
+                        data.expandedItem,
+                        data.everyDay,
                         data.hour,
                         data.minute,
                     )
@@ -448,6 +460,8 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                     data.isScheduled,
                     data.isSunriseMode,
                     data.isVibrate,
+                    data.expandedItem,
+                    data.everyDay,
                     data.hour,
                     data.minute,
                 )
@@ -468,6 +482,8 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                         data.isScheduled,
                         data.isSunriseMode,
                         true,
+                        data.expandedItem,
+                        data.everyDay,
                         data.hour,
                         data.minute,
                     )
@@ -484,11 +500,21 @@ class BedTImeFragmentBottomSheet : BottomSheetDialogFragment() {
                         data.isScheduled,
                         data.isSunriseMode,
                         false,
+                        data.expandedItem,
+                        data.everyDay,
                         data.hour,
                         data.minute,
                     )
                 )
             }
+        }
+    }
+
+    private fun dailyCheck(item: AlarmItemModel) {
+        dailyCheckbox.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) viewModel.updateDaily(true, item.id)
+
+            if (!isChecked) viewModel.updateDaily(false, item.id)
         }
     }
 }

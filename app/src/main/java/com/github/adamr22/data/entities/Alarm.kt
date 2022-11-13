@@ -29,6 +29,10 @@ data class Alarm(
     @ColumnInfo(name = "vibrate_on")
     var vibrates: Boolean = true,
 
+    var expandedItem: Boolean = false,
+
+    var everyDay: Boolean = false,
+
     var hour: Int,
 
     var minute: Int,

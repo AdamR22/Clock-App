@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item
-        android:id="@+id/alarm"
-        android:enabled="true"
-        android:icon="@drawable/ic_alarm"
-        android:title="@string/alarm" />
     <item
         android:id="@+id/clock"
         android:enabled="true"

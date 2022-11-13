@@ -1,18 +1,18 @@
 package com.github.adamr22.bedtime.presentation.views
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.github.adamr22.R
 import com.github.adamr22.bedtime.presentation.viewmodels.BedTimeViewModel
-import com.github.adamr22.data.entities.AlarmAndDay
+import com.github.adamr22.data.entities.Alarm
 import com.github.adamr22.data.models.AlarmItemModel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -154,24 +154,20 @@ class BedTimeFragment : Fragment() {
         )
     }
 
-    private fun encapsulateData(it: AlarmAndDay): AlarmItemModel {
-        val schedule = ArrayList<String>()
-
-        it.dayOfWeek.forEach {
-            if (it.day != null) schedule.add(it.day!!)
-        }
+    private fun encapsulateData(it: Alarm): AlarmItemModel {
 
         return AlarmItemModel(
-            it.alarm.id!!,
-            it.alarm.label,
-            it.alarm.hour,
-            it.alarm.minute,
-            schedule,
-            it.alarm.title,
-            it.alarm.uri,
-            it.alarm.isScheduled,
-            it.alarm.vibrates,
-            it.alarm.sunriseMode
+            it.id!!,
+            it.label,
+            it.hour,
+            it.minute,
+            it.title,
+            it.uri,
+            it.isScheduled,
+            it.vibrates,
+            it.sunriseMode,
+            it.expandedItem,
+            it.everyDay
         )
     }
 

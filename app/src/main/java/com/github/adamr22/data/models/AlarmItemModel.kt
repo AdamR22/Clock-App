@@ -7,10 +7,11 @@ data class AlarmItemModel(
     var label: String? = null,
     var hour: Int,
     var minute: Int,
-    val schedule: ArrayList<String> = ArrayList(),
     var ringtoneTitle: String? = null,
     var ringtoneUri: Uri? = null,
     var isScheduled: Boolean = true,
     var isVibrate: Boolean = true,
-    var isSunriseMode: Boolean = true
+    var isSunriseMode: Boolean = true,
+    var expandedItem: Boolean = false,
+    var everyDay: Boolean = false
 )
