@@ -8,7 +8,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.github.adamr22"
+        applicationId "com.github.adamr22.clockapp"
         minSdk 23
         targetSdk 31
         versionCode 1
@@ -30,7 +30,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-    namespace 'com.github.adamr22'
+    namespace 'com.github.adamr22.clockapp'
     buildFeatures {
         viewBinding true
     }

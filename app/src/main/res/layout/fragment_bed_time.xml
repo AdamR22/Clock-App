@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".bedtime.presentation.views.BedTimeFragment">
+    tools:context=".clockapp.bedtime.presentation.views.BedTimeFragment">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/bedtime_schedule_card"

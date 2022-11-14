@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".clockapp.MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="0dp"
@@ -30,7 +30,7 @@
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:name="com.github.adamr22.clock.ClockFragment"
+        android:name="com.github.adamr22.clockapp.clock.ClockFragment"
         app:layout_constraintBottom_toTopOf="@+id/bottomNav"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

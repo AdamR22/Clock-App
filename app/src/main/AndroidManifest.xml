@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ClockApp" >
         <activity
-            android:name=".WakeUpScreen"
+            android:name=".clockapp.WakeUpScreen"
             android:exported="false"
             android:showOnLockScreen="true"
             android:turnScreenOn="true">
@@ -22,7 +22,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".clockapp.MainActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
