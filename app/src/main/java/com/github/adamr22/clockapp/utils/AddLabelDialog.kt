@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
-import com.github.adamr22.R
+import com.github.adamr22.clockapp.R
 import com.github.adamr22.clockapp.timer.presentation.viewmodels.TimerViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText

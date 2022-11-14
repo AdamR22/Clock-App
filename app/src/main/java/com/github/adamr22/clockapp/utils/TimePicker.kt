@@ -1,6 +1,6 @@
 package com.github.adamr22.clockapp.utils
 
-import com.github.adamr22.R
+import com.github.adamr22.clockapp.R
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 

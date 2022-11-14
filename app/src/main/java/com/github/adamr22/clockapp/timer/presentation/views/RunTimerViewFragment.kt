@@ -16,7 +16,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
-import com.github.adamr22.R
+import com.github.adamr22.clockapp.R
 import com.github.adamr22.clockapp.utils.AddLabelDialog
 import com.github.adamr22.clockapp.utils.NotificationHelper
 import com.github.adamr22.clockapp.timer.presentation.viewmodels.TimerViewModel

@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import com.github.adamr22.R
+import com.github.adamr22.clockapp.R
 
 class SetTimerAdapter(private val numpadText: Array<String>, private val context: Context) :
     BaseAdapter() {

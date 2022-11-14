@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
-import com.github.adamr22.R
+import com.github.adamr22.clockapp.R
 import com.github.adamr22.clockapp.timer.presentation.viewmodels.TimerViewModel
 import com.github.adamr22.clockapp.timer.presentation.adapters.RunFragmentViewPagerAdapter
 import ru.tinkoff.scrollingpagerindicator.ScrollingPagerIndicator

@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.github.adamr22.R
+import com.github.adamr22.clockapp.R
 import com.github.adamr22.clockapp.timer.presentation.viewmodels.TimerViewModel
 import com.github.adamr22.clockapp.timer.presentation.adapters.SetTimerAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton

@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import com.github.adamr22.R
+import com.github.adamr22.clockapp.R
 
 class TimerFragment : Fragment() {
 

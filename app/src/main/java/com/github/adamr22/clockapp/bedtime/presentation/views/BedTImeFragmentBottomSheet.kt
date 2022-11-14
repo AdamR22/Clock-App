@@ -15,7 +15,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.github.adamr22.R
+import com.github.adamr22.clockapp.R
 import com.github.adamr22.clockapp.bedtime.presentation.viewmodels.BedTimeViewModel
 import com.github.adamr22.clockapp.data.entities.Alarm
 import com.github.adamr22.clockapp.data.models.AlarmItemModel

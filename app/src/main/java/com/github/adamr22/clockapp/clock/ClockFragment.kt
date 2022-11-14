@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextClock
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.github.adamr22.R
+import com.github.adamr22.clockapp.R
 import java.util.*
 
 class ClockFragment : Fragment() {
