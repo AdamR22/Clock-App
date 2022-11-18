@@ -1,4 +1,4 @@
-package com.github.adamr22
+package com.github.adamr22.clockapp
 
 import org.junit.Test
 

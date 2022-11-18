@@ -1,8 +1,9 @@
 package com.github.adamr22.clockapp.data.models
 
 import android.net.Uri
+import androidx.annotation.Keep
 
-data class AlarmItemModel(
+@Keep data class AlarmItemModel(
     val id: Int,
     var label: String? = null,
     var hour: Int,
